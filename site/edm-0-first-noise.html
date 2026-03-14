@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.0 — First Noise</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+/* Reduce internal padding/space in the strudel component */
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#first-sound">Sound</a>
+    <a href="#pattern-language">Patterns</a>
+    <a href="#stacking">Stacking</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1>First <span class="accent">Noise</span></h1>
+<div class="subtitle">EDM.0 &mdash; the part where you make sound come out of the computer</div>
+
+<p>Strudel is a live coding instrument in your browser. Type patterns. Press play. Sound happens.
+No install, no plugins, no waiting.</p>
+
+<p>Every code block below is a live editor. Change anything, hit the play button, hear what breaks.
+That&rsquo;s the whole method.</p>
+
+<div class="concept warm">
+    <span class="c-label">how to read this page</span>
+    <p>Play the code first. Listen. <em>Then</em> read the text around it.
+    The sound comes before the name. Always.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: YOUR FIRST SOUND ============ -->
+<section id="first-sound">
+<h2><span class="num">01</span>Your First Sound</h2>
+
+<p>Hit play.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>one kick drum, one cycle, forever</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+s("bd")
+    -->
+    </strudel-editor>
+</div>
+
+<p>A kick drum. <code>s()</code> plays a sample. <code>"bd"</code> is that sample&rsquo;s name &mdash; <em>bass drum</em>.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Swap <code>bd</code> for <code>sd</code> (snare), <code>hh</code> (hi-hat), <code>cp</code> (clap),
+    or <code>oh</code> (open hat). Hit play after each change.</p>
+</div>
+
+<p>Now line up a few:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>four sounds, one cycle</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+s("bd sd hh oh")
+    -->
+    </strudel-editor>
+</div>
+
+<p>Four sounds, evenly spaced. Strudel carves one cycle into equal slots. More sounds, less time each.
+Fewer sounds, more time each.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Pack it: <code>s("bd sd hh oh cp mt lt ht")</code>. Then strip it back to two. Hear the timing shift.</p>
+</div>
+
+<div class="concept">
+    <span class="c-label">pattern</span>
+    <p>What you just played is a <em>pattern</em> &mdash; events spread across a repeating cycle.
+    Sounds, notes, effects: everything in strudel is a pattern. The cycle is the clock.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 2: THE PATTERN LANGUAGE ============ -->
+<section id="pattern-language">
+<h2><span class="num">02</span>The Pattern Language</h2>
+
+<p>The text inside the quotes is <em>mini-notation</em> &mdash; a tiny language for shaping patterns. Five tools.</p>
+
+<h3>Brackets &mdash; subdivide a slot</h3>
+
+<p>Cram two sounds where one used to be. <code>[ ]</code> splits a slot&rsquo;s time between everything inside.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>slot two now holds two sounds</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+s("bd [sd sd] hh oh")
+    -->
+    </strudel-editor>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Nest them: <code>s("bd [sd [hh hh]] oh cp")</code>. Brackets inside brackets. Each level subdivides further.</p>
+</div>
+
+<h3>Multiply &mdash; repeat fast</h3>
+
+<p><code>*8</code> crams the sound in eight times, all within one cycle. Hi-hat rolls come from this.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>eight hats in one cycle</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+s("hh*8")
+    -->
+    </strudel-editor>
+</div>
+
+<h3>Rest &mdash; silence has weight</h3>
+
+<p>Tilde <code>~</code> holds a slot open but plays nothing. Without gaps, everything runs together. The rest gives each hit space.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>kick, gap, snare, gap</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2c">
+    <!--
+s("bd ~ sd ~")
+    -->
+    </strudel-editor>
+</div>
+
+<h3>Euclidean &mdash; let math place the hits</h3>
+
+<p><code>(3,8)</code> distributes three kicks as evenly as possible across eight slots.
+The math picks the spacing. It ends up sounding good because even distribution tends to.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>three in eight &mdash; euclidean</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2d">
+    <!--
+s("bd(3,8)")
+    -->
+    </strudel-editor>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>(5,8)</code>, <code>(3,4)</code>, <code>(7,16)</code>, <code>(2,5)</code>.
+    Different numbers, different feel. Some of these are West African and Afro-Cuban rhythms, centuries old.</p>
+</div>
+
+<!-- Euclidean rabbit hole -->
+<details class="rabbit-hole">
+    <summary>rabbit hole &mdash; euclidean rhythms, the algorithm, and 500 years of rhythm</summary>
+    <div class="rh-body">
+        <h4>E(3,8) &mdash; the tresillo</h4>
+        <p>Hear that pattern you just played? That&rsquo;s the tresillo. Three hits, eight slots, spaced as evenly as possible.</p>
+
+        <!-- === INTERACTIVE EUCLIDEAN CIRCLE === -->
+        <div style="margin: 0 0 1.5rem;">
+            <div style="display: flex; gap: 0.4rem; margin-bottom: 0.8rem; flex-wrap: wrap; justify-content: center;">
+                <button class="eucl-btn" data-k="3" data-n="8" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #ff6b35; background: #ff6b3533; color: #ff6b35; transition: all 0.2s; letter-spacing: 0.04em;">(3,8)</button>
+                <button class="eucl-btn" data-k="5" data-n="8" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">(5,8)</button>
+                <button class="eucl-btn" data-k="3" data-n="4" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">(3,4)</button>
+                <button class="eucl-btn" data-k="7" data-n="12" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">(7,12)</button>
+                <button class="eucl-btn" data-k="5" data-n="16" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">(5,16)</button>
+                <button class="eucl-btn" data-k="7" data-n="16" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">(7,16)</button>
+            </div>
+            <svg id="euclidean-svg" viewBox="0 0 300 300" width="300" height="300" style="display:block; margin: 0 auto;">
+                <rect width="300" height="300" fill="#141418" rx="6"/>
+                <circle cx="150" cy="150" r="110" fill="none" stroke="#1e1e24" stroke-width="1.5"/>
+                <g id="eucl-arcs"></g>
+                <g id="eucl-labels"></g>
+                <g id="eucl-dots"></g>
+            </svg>
+            <p style="font-family: 'SF Mono', monospace; font-size: 0.75rem; color: #8a8780; text-align: center; margin-top: 0.5rem;" id="eucl-binary"></p>
+        </div>
+        <script>
+        (function() {
+            // Bjorklund algorithm — returns array of 0s and 1s
+            function bjorklund(k, n) {
+                if (k >= n) return Array(n).fill(1);
+                if (k === 0) return Array(n).fill(0);
+
+                // Two groups: 'front' (k copies of [1]) and 'back' (n-k copies of [0])
+                // Each round, append one back-group to each front-group until
+                // the smaller side is consumed. Leftovers become the new 'back'.
+                let front = Array.from({length: k}, () => [1]);
+                let back  = Array.from({length: n - k}, () => [0]);
+
+                while (back.length > 1) {
+                    const pairs = Math.min(front.length, back.length);
+                    const merged = [];
+                    for (let i = 0; i < pairs; i++) {
+                        merged.push(front[i].concat(back[i]));
+                    }
+                    if (front.length > back.length) {
+                        back = front.slice(pairs);
+                    } else {
+                        back = back.slice(pairs);
+                    }
+                    front = merged;
+                }
+
+                return front.concat(back).flat();
+            }
+
+            function slotPos(i, n, cx, cy, r) {
+                const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
+                return {
+                    x: cx + r * Math.cos(angle),
+                    y: cy + r * Math.sin(angle)
+                };
+            }
+
+            function arcPath(p1, p2, r, largeArc) {
+                return `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+            }
+
+            function drawEuclidean(k, n) {
+                const pattern = bjorklund(k, n);
+                const cx = 150, cy = 150, r = 110;
+                const svgNS = 'http://www.w3.org/2000/svg';
+                const arcsG = document.getElementById('eucl-arcs');
+                const labelsG = document.getElementById('eucl-labels');
+                const dotsG = document.getElementById('eucl-dots');
+                const binaryEl = document.getElementById('eucl-binary');
+
+                arcsG.innerHTML = '';
+                labelsG.innerHTML = '';
+                dotsG.innerHTML = '';
+
+                // show binary pattern
+                binaryEl.textContent = '[' + pattern.map(v => v ? 'x' : '.').join(' ') + ']';
+
+                // find hit indices
+                const hits = [];
+                for (let i = 0; i < n; i++) {
+                    if (pattern[i] === 1) hits.push(i);
+                }
+
+                // draw arcs between consecutive hits
+                for (let h = 0; h < hits.length; h++) {
+                    const from = hits[h];
+                    const to = hits[(h + 1) % hits.length];
+                    const p1 = slotPos(from, n, cx, cy, r);
+                    const p2 = slotPos(to, n, cx, cy, r);
+
+                    // calculate steps between hits (wrapping)
+                    const steps = (to - from + n) % n;
+                    const largeArc = steps > n / 2 ? 1 : 0;
+
+                    const path = document.createElementNS(svgNS, 'path');
+                    path.setAttribute('d', arcPath(p1, p2, r, largeArc));
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke', '#ff6b35');
+                    path.setAttribute('stroke-width', '2');
+                    path.setAttribute('opacity', '0.5');
+                    arcsG.appendChild(path);
+
+                    // interval label at midpoint of arc
+                    const midIdx = from + steps / 2;
+                    const labelR = r + 18;
+                    const labelPos = slotPos(midIdx, n, cx, cy, labelR);
+                    const text = document.createElementNS(svgNS, 'text');
+                    text.setAttribute('x', labelPos.x.toFixed(2));
+                    text.setAttribute('y', labelPos.y.toFixed(2));
+                    text.setAttribute('fill', '#ff6b35');
+                    text.setAttribute('font-family', 'SF Mono, monospace');
+                    text.setAttribute('font-size', n > 12 ? '10' : '14');
+                    text.setAttribute('font-weight', '600');
+                    text.setAttribute('text-anchor', 'middle');
+                    text.setAttribute('dominant-baseline', 'central');
+                    text.textContent = steps;
+                    labelsG.appendChild(text);
+                }
+
+                // draw dots
+                for (let i = 0; i < n; i++) {
+                    const pos = slotPos(i, n, cx, cy, r);
+                    const isHit = pattern[i] === 1;
+                    const circle = document.createElementNS(svgNS, 'circle');
+                    circle.setAttribute('cx', pos.x.toFixed(2));
+                    circle.setAttribute('cy', pos.y.toFixed(2));
+
+                    if (isHit) {
+                        circle.setAttribute('r', n > 12 ? '6' : '8');
+                        circle.setAttribute('fill', '#ff6b35');
+                    } else {
+                        circle.setAttribute('r', n > 12 ? '4' : '6');
+                        circle.setAttribute('fill', 'none');
+                        circle.setAttribute('stroke', '#8a8780');
+                        circle.setAttribute('stroke-width', '1.5');
+                    }
+                    dotsG.appendChild(circle);
+
+                    // beat 1 label
+                    if (i === 0) {
+                        const labelPos = slotPos(i, n, cx, cy, r - 20);
+                        const label = document.createElementNS(svgNS, 'text');
+                        label.setAttribute('x', labelPos.x.toFixed(2));
+                        label.setAttribute('y', (labelPos.y - 2).toFixed(2));
+                        label.setAttribute('fill', '#8a8780');
+                        label.setAttribute('font-family', 'SF Mono, monospace');
+                        label.setAttribute('font-size', '10');
+                        label.setAttribute('text-anchor', 'middle');
+                        label.textContent = '1';
+                        dotsG.appendChild(label);
+                    }
+                }
+            }
+
+            // button handlers
+            const euclBtns = document.querySelectorAll('.eucl-btn');
+            euclBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    euclBtns.forEach(b => {
+                        b.style.borderColor = '#1e1e24';
+                        b.style.color = '#8a8780';
+                        b.style.background = '#141418';
+                    });
+                    btn.style.borderColor = '#ff6b35';
+                    btn.style.color = '#ff6b35';
+                    btn.style.background = '#ff6b3533';
+                    const k = parseInt(btn.getAttribute('data-k'));
+                    const n = parseInt(btn.getAttribute('data-n'));
+                    drawEuclidean(k, n);
+                });
+            });
+
+            // default: (3,8)
+            drawEuclidean(3, 8);
+        })();
+        </script>
+
+        <p style="font-size: 0.95rem; margin: 1rem 0;">What you&rsquo;re looking at is a <em>rhythm necklace</em> &mdash; a circular pattern where rotation doesn&rsquo;t change the shape, only where beat 1 falls. Every row in the table above is a different necklace. The tresillo and the son clave are the same necklace, worn differently.</p>
+
+        <h4>The algorithm</h4>
+        <p>Distribute 3 hits across 8 slots as evenly as possible. The gaps between hits can only ever be two sizes &mdash; here, 3 and 2. That&rsquo;s maximal evenness.</p>
+        <p style="font-family: 'SF Mono', monospace; color: var(--cool); font-size: 0.95rem; letter-spacing: 0.05em;">[x . . x . . x .]</p>
+
+        <h4>Where these patterns show up</h4>
+        <table>
+            <thead><tr><th>pattern</th><th>name</th><th>tradition</th><th>vibe</th></tr></thead>
+            <tbody>
+            <tr><td>(3,8)</td><td>Tresillo</td><td>Cuban / West African</td><td>The backbone of Afro-Cuban music. Claves, cowbell, bass.</td></tr>
+            <tr><td>(5,8)</td><td>Cinquillo</td><td>Cuban contradanza</td><td>Tresillo&rsquo;s denser cousin. Timbales, guiro.</td></tr>
+            <tr><td>(3,4)</td><td>Cumbia</td><td>Colombian / Persian</td><td>Nearly full &mdash; three hits, one gap.</td></tr>
+            <tr><td>(7,12)</td><td>West African bell</td><td>Ashanti / Yoruba / Ewe</td><td>The standard bell pattern. Everything else plays around it.</td></tr>
+            <tr><td>(5,16)</td><td>Bossa nova</td><td>Brazilian</td><td>Two bars of floating syncopation.</td></tr>
+            <tr><td>(7,16)</td><td>Samba</td><td>Brazilian</td><td>Dense, driving agogo bell pattern.</td></tr>
+            </tbody>
+        </table>
+
+        <h4>Rotation</h4>
+        <p><code>(3,8,2)</code> is the same three hits, started from a different position. Same necklace, different downbeat. The tresillo and the son clave are rotations of each other &mdash; same math, different groove.</p>
+
+        <div class="strudel-block">
+            <div class="strudel-label"><span>rotation comparison &mdash; same hits, different start</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-euclidean">
+            <!--
+stack(
+  s("bd(3,8,0)"),
+  s("cp(3,8,2)").gain(.6)
+)
+            -->
+            </strudel-editor>
+        </div>
+    </div>
+</details>
+
+<h3>Angle brackets &mdash; alternate per cycle</h3>
+
+<p><code>&lt; &gt;</code> rotates through its options, one per cycle. Snare, clap, snare, clap.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>snare on odd cycles, clap on even</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2e">
+    <!--
+s("bd <sd cp> hh oh")
+    -->
+    </strudel-editor>
+</div>
+
+<div class="concept">
+    <span class="c-label">mini-notation &mdash; the short version</span>
+    <p><code>[ ]</code> subdivide &bull; <code>*N</code> multiply &bull; <code>~</code> rest &bull;
+    <code>(k,n)</code> euclidean &bull; <code>&lt; &gt;</code> alternate</p>
+    <p>Five tools. Every rhythm you&rsquo;ve heard uses some combination of these.</p>
+</div>
+
+</section>
+
+<!-- ============ SECTION 3: STACKING ============ -->
+<section id="stacking">
+<h2><span class="num">03</span>Stack It</h2>
+
+<p>One pattern at a time gets old. Music is layers.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>three patterns at once</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3a">
+    <!--
+stack(
+  s("bd ~ bd ~"),
+  s("~ cp ~ cp"),
+  s("hh*8")
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Kick on 1 and 3. Clap on 2 and 4. Hi-hats throughout. You just built a drum beat.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Swap the hat for <code>s("hh*16")</code>. Make the kick euclidean: <code>s("bd(3,8)")</code>.
+    Stack as many layers as you want.</p>
+</div>
+
+<p>Now add pitch. <code>note()</code> plays notes:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>drums + bass</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3b">
+    <!--
+stack(
+  s("bd ~ bd ~"),
+  s("~ cp ~ cp"),
+  s("hh*8").gain(.5),
+  note("c2 ~ eb2 ~")
+    .s("sawtooth")
+    .lpf(500)
+    .decay(.15)
+    .sustain(0)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>C in the second octave. <code>.s("sawtooth")</code> swaps the sample for a synthesizer &mdash; a raw buzzy wave.
+<code>.lpf(500)</code> chops the harsh highs. <code>.decay()</code> and <code>.sustain(0)</code> make it short and punchy.</p>
+
+<!-- Synth/filter rabbit hole -->
+<details class="rabbit-hole">
+    <summary>rabbit hole &mdash; samples vs synths, wave shapes, and filters</summary>
+    <div class="rh-body">
+        <h4>Samples vs synths</h4>
+        <p><code>s()</code> plays a recording &mdash; someone hit a drum, we play it back. <code>note()</code> generates a wave from scratch &mdash; no recording, just math. Samples sound &ldquo;real.&rdquo; Synths sound &ldquo;electronic.&rdquo; Both are patterns.</p>
+
+        <h4>Wave types</h4>
+        <table>
+            <thead><tr><th>wave</th><th>sound</th><th>code</th></tr></thead>
+            <tbody>
+            <tr><td>sine</td><td>pure, clean, sub-bass</td><td><code>.s("sine")</code></td></tr>
+            <tr><td>sawtooth</td><td>bright, buzzy, leads + bass</td><td><code>.s("sawtooth")</code></td></tr>
+            <tr><td>square</td><td>hollow, woody, chiptune</td><td><code>.s("square")</code></td></tr>
+            <tr><td>triangle</td><td>soft, muted, gentler saw</td><td><code>.s("triangle")</code></td></tr>
+            </tbody>
+        </table>
+
+        <!-- === WAVE TYPES VISUALIZER === -->
+        <div style="margin: 1rem 0 1.5rem;">
+            <div style="display: flex; gap: 0.4rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                <button class="wave-btn" data-wave="sine" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">sine</button>
+                <button class="wave-btn" data-wave="sawtooth" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">sawtooth</button>
+                <button class="wave-btn" data-wave="square" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">square</button>
+                <button class="wave-btn" data-wave="triangle" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">triangle</button>
+            </div>
+            <canvas id="wave-canvas" width="800" height="120" style="width: 100%; height: 120px; background: #0a0a0c; border: 1px solid #1e1e24; border-radius: 6px; display: block;"></canvas>
+        </div>
+        <script>
+        (function() {
+            const canvas = document.getElementById('wave-canvas');
+            const ctx = canvas.getContext('2d');
+            const buttons = document.querySelectorAll('.wave-btn');
+            let waveAudioCtx = null;
+
+            function drawWave(type) {
+                const w = canvas.width;
+                const h = canvas.height;
+                const cycles = 3.5;
+                const period = w / cycles;
+
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = '#0a0a0c';
+                ctx.fillRect(0, 0, w, h);
+
+                // center line
+                ctx.strokeStyle = '#1e1e24';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, h / 2);
+                ctx.lineTo(w, h / 2);
+                ctx.stroke();
+
+                ctx.strokeStyle = '#ff6b35';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+
+                for (let px = 0; px < w; px++) {
+                    const x = px;
+                    const phase = (px / period) * Math.PI * 2;
+                    let y;
+                    switch (type) {
+                        case 'sine':
+                            y = Math.sin(phase);
+                            break;
+                        case 'sawtooth':
+                            y = 2 * (px / period - Math.floor(px / period + 0.5));
+                            break;
+                        case 'square':
+                            y = Math.sign(Math.sin(phase));
+                            break;
+                        case 'triangle':
+                            y = 2 * Math.abs(2 * (px / period - Math.floor(px / period + 0.5))) - 1;
+                            break;
+                    }
+                    const py = h / 2 - y * (h / 2 - 10);
+                    if (px === 0) ctx.moveTo(x, py);
+                    else ctx.lineTo(x, py);
+                }
+                ctx.stroke();
+            }
+
+            function playTone(type) {
+                if (!waveAudioCtx) waveAudioCtx = new AudioContext();
+                const osc = waveAudioCtx.createOscillator();
+                const gain = waveAudioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = 220;
+                gain.gain.setValueAtTime(0.3, waveAudioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, waveAudioCtx.currentTime + 1);
+                osc.connect(gain);
+                gain.connect(waveAudioCtx.destination);
+                osc.start();
+                osc.stop(waveAudioCtx.currentTime + 1);
+            }
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    buttons.forEach(b => {
+                        b.style.borderColor = '#1e1e24';
+                        b.style.color = '#8a8780';
+                        b.style.background = '#141418';
+                    });
+                    btn.style.borderColor = '#ff6b35';
+                    btn.style.color = '#ff6b35';
+                    btn.style.background = '#ff6b3533';
+                    const type = btn.getAttribute('data-wave');
+                    drawWave(type);
+                    playTone(type);
+                });
+            });
+
+            // default: draw sine
+            drawWave('sine');
+            buttons[0].style.borderColor = '#ff6b35';
+            buttons[0].style.color = '#ff6b35';
+            buttons[0].style.background = '#ff6b3533';
+        })();
+        </script>
+
+        <h4>Filters</h4>
+        <p>A filter removes frequencies. <code>.lpf(500)</code> = low-pass filter at 500hz &mdash; everything above 500hz gets cut. The number is the cutoff. Lower number = darker sound. Higher = brighter.</p>
+        <table>
+            <thead><tr><th>filter</th><th>does</th><th>code</th></tr></thead>
+            <tbody>
+            <tr><td>lpf</td><td>cuts highs (low-pass)</td><td><code>.lpf(500)</code></td></tr>
+            <tr><td>hpf</td><td>cuts lows (high-pass)</td><td><code>.hpf(200)</code></td></tr>
+            </tbody>
+        </table>
+
+        <!-- === FILTER SVG ILLUSTRATIONS === -->
+        <div style="display: flex; gap: 1rem; margin: 1rem 0 1.5rem; flex-wrap: wrap;">
+            <!-- LPF -->
+            <svg viewBox="0 0 200 100" style="flex: 1; min-width: 180px; max-width: 300px; border-radius: 6px; overflow: visible;">
+                <rect width="200" height="100" fill="#141418" rx="4"/>
+                <!-- pass area fill -->
+                <polygon points="15,20 120,20 120,85 15,85" fill="#ff6b3522"/>
+                <!-- pass line (flat full volume) -->
+                <line x1="15" y1="20" x2="120" y2="20" stroke="#ff6b35" stroke-width="2"/>
+                <!-- drop line -->
+                <line x1="120" y1="20" x2="185" y2="85" stroke="#ff6b35" stroke-width="2"/>
+                <!-- baseline -->
+                <line x1="15" y1="85" x2="185" y2="85" stroke="#1e1e24" stroke-width="1"/>
+                <!-- cutoff dashed line -->
+                <line x1="120" y1="10" x2="120" y2="90" stroke="#ff6b35" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
+                <!-- labels -->
+                <text x="120" y="8" fill="#ff6b35" font-family="SF Mono, monospace" font-size="7" text-anchor="middle">cutoff</text>
+                <text x="65" y="55" fill="#ff6b35" font-family="SF Mono, monospace" font-size="8" text-anchor="middle" opacity="0.7">passes</text>
+                <text x="155" y="55" fill="#8a8780" font-family="SF Mono, monospace" font-size="8" text-anchor="middle" opacity="0.6">cut</text>
+                <text x="100" y="97" fill="#8a8780" font-family="SF Mono, monospace" font-size="6" text-anchor="middle">frequency →</text>
+                <text x="6" y="55" fill="#8a8780" font-family="SF Mono, monospace" font-size="6" text-anchor="middle" transform="rotate(-90, 6, 55)">volume</text>
+                <!-- title -->
+                <text x="100" y="98" fill="#ff6b35" font-family="SF Mono, monospace" font-size="7" text-anchor="middle" opacity="0" dy="-82">LPF</text>
+            </svg>
+            <!-- HPF -->
+            <svg viewBox="0 0 200 100" style="flex: 1; min-width: 180px; max-width: 300px; border-radius: 6px; overflow: visible;">
+                <rect width="200" height="100" fill="#141418" rx="4"/>
+                <!-- pass area fill -->
+                <polygon points="80,20 185,20 185,85 80,85" fill="#4fc3f722"/>
+                <!-- rise line -->
+                <line x1="15" y1="85" x2="80" y2="20" stroke="#4fc3f7" stroke-width="2"/>
+                <!-- pass line (flat full volume) -->
+                <line x1="80" y1="20" x2="185" y2="20" stroke="#4fc3f7" stroke-width="2"/>
+                <!-- baseline -->
+                <line x1="15" y1="85" x2="185" y2="85" stroke="#1e1e24" stroke-width="1"/>
+                <!-- cutoff dashed line -->
+                <line x1="80" y1="10" x2="80" y2="90" stroke="#4fc3f7" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
+                <!-- labels -->
+                <text x="80" y="8" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="7" text-anchor="middle">cutoff</text>
+                <text x="45" y="55" fill="#8a8780" font-family="SF Mono, monospace" font-size="8" text-anchor="middle" opacity="0.6">cut</text>
+                <text x="135" y="55" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="8" text-anchor="middle" opacity="0.7">passes</text>
+                <text x="100" y="97" fill="#8a8780" font-family="SF Mono, monospace" font-size="6" text-anchor="middle">frequency →</text>
+                <text x="6" y="55" fill="#8a8780" font-family="SF Mono, monospace" font-size="6" text-anchor="middle" transform="rotate(-90, 6, 55)">volume</text>
+            </svg>
+        </div>
+
+        <h4>Envelope (ADSR)</h4>
+        <p>An envelope shapes a sound over time. Four stages:</p>
+        <table>
+            <thead><tr><th>stage</th><th>controls</th><th>code</th></tr></thead>
+            <tbody>
+            <tr><td>attack</td><td>how fast the sound starts</td><td><code>.attack(0.01)</code></td></tr>
+            <tr><td>decay</td><td>how fast it drops from peak</td><td><code>.decay(0.1)</code></td></tr>
+            <tr><td>sustain</td><td>level it holds at (0&ndash;1)</td><td><code>.sustain(0.5)</code></td></tr>
+            <tr><td>release</td><td>how fast it fades after stopping</td><td><code>.release(0.3)</code></td></tr>
+            </tbody>
+        </table>
+        <!-- === ADSR ENVELOPE SVG === -->
+        <svg viewBox="0 0 400 150" style="width: 100%; max-width: 500px; display: block; margin: 1rem auto 1.5rem; border-radius: 6px;">
+            <defs>
+                <linearGradient id="adsr-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ff6b35" stop-opacity="0.08"/>
+                    <stop offset="100%" stop-color="#141418" stop-opacity="0"/>
+                </linearGradient>
+            </defs>
+            <rect width="400" height="150" fill="#141418" rx="4"/>
+
+            <!-- filled area under the ADSR curve -->
+            <polygon points="30,130 100,20 170,68 280,68 370,130" fill="url(#adsr-fill)"/>
+
+            <!-- Attack: (30,130) -> (100,20) -->
+            <line x1="30" y1="130" x2="100" y2="20" stroke="#ff6b35" stroke-width="2.5"/>
+            <!-- Decay: (100,20) -> (170,68) -->
+            <line x1="100" y1="20" x2="170" y2="68" stroke="#4fc3f7" stroke-width="2.5"/>
+            <!-- Sustain: (170,68) -> (280,68) -->
+            <line x1="170" y1="68" x2="280" y2="68" stroke="#66bb6a" stroke-width="2.5"/>
+            <!-- Release: (280,68) -> (370,130) -->
+            <line x1="280" y1="68" x2="370" y2="130" stroke="#ab47bc" stroke-width="2.5"/>
+
+            <!-- sustain level dashed line -->
+            <line x1="25" y1="68" x2="380" y2="68" stroke="#8a8780" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.4"/>
+            <text x="385" y="71" fill="#8a8780" font-family="SF Mono, monospace" font-size="7" opacity="0.6" text-anchor="end">sustain level</text>
+
+            <!-- baseline -->
+            <line x1="25" y1="130" x2="380" y2="130" stroke="#1e1e24" stroke-width="1"/>
+
+            <!-- segment labels -->
+            <text x="65" y="145" fill="#ff6b35" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">attack</text>
+            <text x="135" y="145" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">decay</text>
+            <text x="225" y="145" fill="#66bb6a" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">sustain</text>
+            <text x="325" y="145" fill="#ab47bc" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">release</text>
+
+            <!-- peak dot -->
+            <circle cx="100" cy="20" r="3" fill="#ff6b35"/>
+            <!-- sustain start dot -->
+            <circle cx="170" cy="68" r="3" fill="#4fc3f7"/>
+            <!-- sustain end dot -->
+            <circle cx="280" cy="68" r="3" fill="#66bb6a"/>
+        </svg>
+
+        <p><code>.sustain(0)</code> with a short <code>.decay()</code> = a pluck. No sustain, instant drop.</p>
+    </div>
+</details>
+
+<div class="concept">
+    <span class="c-label">method chaining</span>
+    <p>Chain effects with dots: <code>note("c2").s("sawtooth").lpf(500)</code>.
+    Each one adds something &mdash; sound, filter, envelope. Order barely matters.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 4: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">04</span>Your First Loop</h2>
+
+<div class="punchline">
+    <p>Everything from this lesson, combined. Play it, wreck it, rebuild it until it sounds like <em>yours</em>.
+    Then hit <em>share</em>.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: first noise</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-capstone">
+    <!--
+stack(
+  s("bd ~ [~ bd] ~"),
+  s("~ cp ~ ~"),
+  s("hh*8").gain(".5 .8 .5 .9"),
+  s("~ ~ ~ oh").gain(.6),
+  note("<c2 c2 eb2 f2>")
+    .s("sawtooth")
+    .lpf(600)
+    .decay(.12)
+    .sustain(0)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="exercises">
+    <span class="ex-label">compose &mdash; make it yours</span>
+    <ol>
+        <li>Rewrite the bass line. Try <code>note("&lt;c2 [c2 eb2] f2 [eb2 c2]&gt;")</code></li>
+        <li>Add a layer &mdash; a euclidean clap: <code>s("cp(3,8)").gain(.4)</code></li>
+        <li>Alternate the hats: <code>s("&lt;hh*8 hh*16&gt;")</code></li>
+        <li>When it sounds right, hit the <em>share</em> button. Day 1 post.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>s()</td><td>plays a sample by name</td><td><code>s("bd sd hh")</code></td></tr>
+        <tr><td>note()</td><td>plays a pitched note through a synth</td><td><code>note("c2 eb2")</code></td></tr>
+        <tr><td>stack()</td><td>layers patterns on top of each other</td><td><code>stack(s("bd"), s("hh*8"))</code></td></tr>
+        <tr><td>[ ]</td><td>subdivides a slot (crams sounds in)</td><td><code>s("bd [sd sd]")</code></td></tr>
+        <tr><td>*N</td><td>repeats a sound N times in one slot</td><td><code>s("hh*8")</code></td></tr>
+        <tr><td>~</td><td>rest &mdash; holds the slot silent</td><td><code>s("bd ~ sd ~")</code></td></tr>
+        <tr><td>(k,n)</td><td>euclidean &mdash; distributes k hits across n slots</td><td><code>s("bd(3,8)")</code></td></tr>
+        <tr><td>&lt; &gt;</td><td>alternates options, one per cycle</td><td><code>s("bd &lt;sd cp&gt;")</code></td></tr>
+        <tr><td>.method()</td><td>chains effects onto a pattern</td><td><code>.lpf(500).gain(.5)</code></td></tr>
+        <tr><td>.s()</td><td>sets the sound source (sample or synth type)</td><td><code>.s("sawtooth")</code></td></tr>
+        <tr><td>.gain()</td><td>sets volume (0 to 1+)</td><td><code>.gain(.5)</code></td></tr>
+        <tr><td>.lpf()</td><td>low-pass filter &mdash; cuts frequencies above cutoff</td><td><code>.lpf(500)</code></td></tr>
+        <tr><td>.decay()</td><td>how fast the sound drops from peak</td><td><code>.decay(.15)</code></td></tr>
+        <tr><td>.sustain()</td><td>level the sound holds at after decay</td><td><code>.sustain(0)</code></td></tr>
+        <tr><td>sawtooth</td><td>a bright, buzzy synthesizer wave</td><td><code>.s("sawtooth")</code></td></tr>
+        </tbody>
+    </table>
+    <p class="earned-next">Next: <em>The Break</em> &mdash; 170bpm, half-time snare, an actual DnB beat.</p>
+    </div>
+</details>
+
+<details class="earned">
+    <summary>mini-notation reference</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>syntax</th><th>name</th><th>does</th><th>example</th></tr></thead>
+        <tbody>
+        <tr><td>[ ]</td><td>brackets</td><td>subdivides a slot</td><td><code>s("bd [sd sd]")</code></td></tr>
+        <tr><td>*N</td><td>multiply</td><td>repeats N times in one slot</td><td><code>s("hh*8")</code></td></tr>
+        <tr><td>~</td><td>rest</td><td>silence, holds the slot</td><td><code>s("bd ~ sd ~")</code></td></tr>
+        <tr><td>(k,n)</td><td>euclidean</td><td>distributes k hits across n slots</td><td><code>s("bd(3,8)")</code></td></tr>
+        <tr><td>(k,n,r)</td><td>euclidean + rotation</td><td>same but rotated r steps</td><td><code>s("bd(3,8,2)")</code></td></tr>
+        <tr><td>&lt; &gt;</td><td>alternate</td><td>one option per cycle, rotating</td><td><code>s("bd &lt;sd cp&gt;")</code></td></tr>
+        <tr><td>/N</td><td>slow</td><td>stretches pattern across N cycles</td><td><code>s("[bd sd hh oh]/2")</code></td></tr>
+        <tr><td>!N</td><td>replicate</td><td>repeats without changing speed</td><td><code>s("bd!3 sd")</code></td></tr>
+        <tr><td>?</td><td>degrade</td><td>50% chance of silence</td><td><code>s("hh*8?")</code></td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(20, 0.08, 1.5)
+            .color(1.0, 0.4, 0.1)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.5)
+            .modulateScale(
+                h.osc(3, 0.2).rotate(0.3),
+                () => 0.1 + window._audioData.fft[1] * 0.5
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.3)
+            .saturate(() => 1.2 + window._audioData.fft[2] * 2)
+            .kaleid(() => 2 + Math.floor(window._audioData.fft[3] * 4))
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    // Try known StrudelMirror / CodeMirror accessors
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    // Fallback: read from attribute or inner HTML comment
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    // Stop all others
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        // Fallback: open in new tab
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hljóð — silence and sound</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0.15;
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 6rem 2rem 4rem; }
+
+/* --- Hero --- */
+.hero { text-align: center; margin-bottom: 4rem; }
+.hero h1 {
+    font-size: 3.5rem; font-weight: 200; letter-spacing: 0.12em;
+    margin-bottom: 0.3rem; color: var(--text);
+}
+.hero h1 .accent { color: var(--accent); }
+.hero .tagline {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.2em; text-transform: uppercase;
+}
+.hero .meaning {
+    font-size: 0.9rem; color: var(--text-faint); margin-top: 1rem;
+    font-style: italic;
+}
+
+/* --- Section tabs --- */
+.tabs {
+    display: flex; gap: 0; margin-bottom: 3rem;
+    border-bottom: 1px solid var(--divider);
+}
+.tab {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    padding: 0.8rem 1.5rem; cursor: pointer;
+    color: var(--text-dim); border-bottom: 2px solid transparent;
+    transition: all 0.2s; background: none; border-top: none;
+    border-left: none; border-right: none;
+}
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* --- Track headers --- */
+.track {
+    margin-bottom: 3rem;
+}
+.track-header {
+    display: flex; align-items: baseline; gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+.track-name {
+    font-size: 1.3rem; font-weight: 400; letter-spacing: 0.02em;
+}
+.track-tag {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+}
+.track-desc {
+    color: var(--text-dim); font-size: 0.95rem; margin-bottom: 1.5rem;
+}
+
+/* --- Module cards --- */
+.modules { display: flex; flex-direction: column; gap: 0.5rem; }
+.module-card {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1rem 1.2rem;
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; text-decoration: none; color: var(--text);
+    transition: all 0.2s;
+}
+.module-card:hover {
+    border-color: var(--accent-dim); background: var(--surface2);
+    transform: translateX(4px);
+}
+.module-card.locked {
+    opacity: 0.4; pointer-events: none;
+}
+.module-num {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); min-width: 2rem;
+    letter-spacing: 0.05em;
+}
+.module-info { flex: 1; }
+.module-title { font-size: 1rem; font-weight: 400; }
+.module-desc {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--text-dim); letter-spacing: 0.04em; margin-top: 0.15rem;
+}
+.module-status {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 0.2rem 0.5rem; border-radius: 3px;
+}
+.module-status.live {
+    color: var(--green); border: 1px solid var(--green-dim);
+    background: var(--green-dim);
+}
+.module-status.soon {
+    color: var(--text-faint); border: 1px solid var(--divider);
+}
+
+/* --- Ride placeholder --- */
+.placeholder {
+    text-align: center; padding: 4rem 2rem;
+    color: var(--text-faint);
+}
+.placeholder p { font-size: 0.95rem; }
+.placeholder .soon-tag {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--text-faint); margin-top: 1rem;
+    display: block;
+}
+
+/* --- Footer --- */
+.footer {
+    margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--divider);
+    text-align: center;
+}
+.footer p {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.08em;
+}
+.footer a { color: var(--text-dim); text-decoration: none; }
+.footer a:hover { color: var(--accent); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4rem 1.2rem 3rem; }
+    .hero h1 { font-size: 2.5rem; }
+    .tabs { overflow-x: auto; }
+}
+</style>
+</head><body>
+
+<canvas id="hydra-canvas"></canvas>
+
+<div class="container">
+
+<!-- Hero -->
+<div class="hero">
+    <h1>hlj<span class="accent">óð</span></h1>
+    <div class="tagline">silence and sound</div>
+    <p class="meaning"></p>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+    <button class="tab active" onclick="showTab('ramp')">Ramp</button>
+    <button class="tab" onclick="showTab('ride')">Ride</button>
+</div>
+
+<!-- RAMP -->
+<div class="tab-content active" id="tab-ramp">
+
+<div class="track">
+    <div class="track-header">
+        <span class="track-name">EDM Track</span>
+        <span class="track-tag">DnB-flavored &bull; strudel-native</span>
+    </div>
+    <p class="track-desc">Learn to live-code music. Strudel is the instrument. Every lesson ends with something you can share.</p>
+
+    <div class="modules">
+        <a class="module-card" href="edm-0-first-noise.html">
+            <span class="module-num">0</span>
+            <div class="module-info">
+                <div class="module-title">First Noise</div>
+                <div class="module-desc">patterns, mini-notation, samples, synths, stacking</div>
+            </div>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card" href="edm-1-the-break.html">
+            <span class="module-num">1</span>
+            <div class="module-info">
+                <div class="module-title">The Break</div>
+                <div class="module-desc">170bpm, half-time snare, kick placement, the DnB groove</div>
+            </div>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card locked" href="#">
+            <span class="module-num">2</span>
+            <div class="module-info">
+                <div class="module-title">The Bass</div>
+                <div class="module-desc">sub bass, reese, filtering, octaves</div>
+            </div>
+            <span class="module-status soon">soon</span>
+        </a>
+        <a class="module-card locked" href="#">
+            <span class="module-num">3</span>
+            <div class="module-info">
+                <div class="module-title">Layers</div>
+                <div class="module-desc">polyrhythm, euclidean, hi-hat rolls, arrangement</div>
+            </div>
+            <span class="module-status soon">soon</span>
+        </a>
+        <a class="module-card locked" href="#">
+            <span class="module-num">4</span>
+            <div class="module-info">
+                <div class="module-title">Atmosphere</div>
+                <div class="module-desc">pads, reverb, delay, texture</div>
+            </div>
+            <span class="module-status soon">soon</span>
+        </a>
+        <a class="module-card locked" href="#">
+            <span class="module-num">5</span>
+            <div class="module-info">
+                <div class="module-title">Movement</div>
+                <div class="module-desc">.every(), .sometimes(), .rev(), pattern transforms</div>
+            </div>
+            <span class="module-status soon">soon</span>
+        </a>
+        <a class="module-card locked" href="#">
+            <span class="module-num">6</span>
+            <div class="module-info">
+                <div class="module-title">The Drop</div>
+                <div class="module-desc">arrangement, silence, tension and release</div>
+            </div>
+            <span class="module-status soon">soon</span>
+        </a>
+        <a class="module-card locked" href="#">
+            <span class="module-num">7</span>
+            <div class="module-info">
+                <div class="module-title">Chopping</div>
+                <div class="module-desc">sample slicing, break manipulation, amen</div>
+            </div>
+            <span class="module-status soon">soon</span>
+        </a>
+        <a class="module-card locked" href="#">
+            <span class="module-num">8</span>
+            <div class="module-info">
+                <div class="module-title">Melodic DnB</div>
+                <div class="module-desc">scales, arpeggios, melody over beats</div>
+            </div>
+            <span class="module-status soon">soon</span>
+        </a>
+        <a class="module-card locked" href="#">
+            <span class="module-num">9</span>
+            <div class="module-info">
+                <div class="module-title">The Set</div>
+                <div class="module-desc">transitions, chaining, live performance</div>
+            </div>
+            <span class="module-status soon">soon</span>
+        </a>
+    </div>
+</div>
+
+<div class="track" style="margin-top: 3rem;">
+    <div class="track-header">
+        <span class="track-name">Blues Track</span>
+        <span class="track-tag">Bb &bull; harmony &bull; guitar</span>
+    </div>
+    <p class="track-desc">Functional harmony through the blues. Strudel as theory lab. Everything transfers to guitar.</p>
+
+    <div class="modules">
+        <a class="module-card locked" href="#">
+            <span class="module-num">1</span>
+            <div class="module-info">
+                <div class="module-title">Intervals + Dom7</div>
+                <div class="module-desc">intervals, stacking thirds, dominant 7th chord quality</div>
+            </div>
+            <span class="module-status soon">soon</span>
+        </a>
+        <a class="module-card locked" href="#">
+            <span class="module-num">2</span>
+            <div class="module-info">
+                <div class="module-title">The 12-Bar Form</div>
+                <div class="module-desc">I7-IV7-V7 in Bb, the form, feel the loop</div>
+            </div>
+            <span class="module-status soon">soon</span>
+        </a>
+        <a class="module-card locked" href="#">
+            <span class="module-num">3</span>
+            <div class="module-info">
+                <div class="module-title">Blues Scale</div>
+                <div class="module-desc">minor pentatonic + blue notes over changes</div>
+            </div>
+            <span class="module-status soon">soon</span>
+        </a>
+    </div>
+    <p style="color: var(--text-faint); font-size: 0.85rem; margin-top: 0.8rem; font-family: 'SF Mono', monospace; font-size: 0.65rem; letter-spacing: 0.05em;">
+        9 modules total &mdash; unlocks after EDM.4
+    </p>
+</div>
+
+</div>
+
+<!-- RIDE -->
+<div class="tab-content" id="tab-ride">
+    <div class="placeholder">
+        <span class="soon-tag">coming soon</span>
+    </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+    <p>hljóð &mdash; <a href="https://peleke.me">peleke</a> &mdash; built with <a href="https://strudel.cc">strudel</a> + <a href="https://hydra.ojack.xyz">hydra</a></p>
+</div>
+
+</div><!-- /container -->
+
+<!-- Scripts -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+<script>
+// Tabs
+function showTab(name) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector(`#tab-${name}`).classList.add('active');
+    document.querySelector(`.tab[onclick*="${name}"]`).classList.add('active');
+}
+
+// Ambient hydra (no audio, just visuals)
+try {
+    const hydra = new Hydra({
+        canvas: document.getElementById('hydra-canvas'),
+        detectAudio: false,
+        makeGlobal: false,
+        autoLoop: true,
+        width: window.innerWidth,
+        height: window.innerHeight,
+        precision: 'mediump'
+    });
+    const h = hydra.synth;
+    h.osc(8, 0.04, 1.2)
+        .color(1.0, 0.42, 0.22)
+        .rotate(0.1, 0.01)
+        .modulateScale(h.osc(3, 0.1).rotate(0.3), 0.15)
+        .scale(1.02)
+        .saturate(1.3)
+        .kaleid(3)
+        .out();
+
+    window.addEventListener('resize', () => {
+        hydra.setResolution(window.innerWidth, window.innerHeight);
+    });
+} catch(e) {}
+</script>
+
+</body></html>
