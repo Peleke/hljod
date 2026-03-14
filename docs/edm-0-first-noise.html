@@ -276,8 +276,8 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 <h1>First <span class="accent">Noise</span></h1>
 <div class="subtitle">EDM.0 &mdash; the part where you make sound come out of the computer</div>
 
-<p>Strudel is a live coding instrument in your browser. Type patterns. Press play. Sound happens.
-No install, no plugins, no waiting.</p>
+<p>Strudel is a live coding instrument in your browser. Type a pattern, press play, and sound comes out.
+No install. Runs in a tab.</p>
 
 <p>Every code block below is a live editor. Change anything, hit the play button, hear what breaks.
 That&rsquo;s the whole method.</p>
@@ -304,7 +304,7 @@ s("bd")
     </strudel-editor>
 </div>
 
-<p>A kick drum. <code>s()</code> plays a sample. <code>"bd"</code> is that sample&rsquo;s name &mdash; <em>bass drum</em>.</p>
+<p>A kick drum. <code>s()</code> plays a sample. <code>"bd"</code> is that sample&rsquo;s name: <em>bass drum</em>.</p>
 
 <div class="try-this">
     <span class="label">tweak it</span>
@@ -333,7 +333,7 @@ Fewer sounds, more time each.</p>
 
 <div class="concept">
     <span class="c-label">pattern</span>
-    <p>What you just played is a <em>pattern</em> &mdash; events spread across a repeating cycle.
+    <p>What you just played is a <em>pattern</em>: events spread across a repeating cycle.
     Sounds, notes, effects: everything in strudel is a pattern. The cycle is the clock.</p>
 </div>
 </section>
@@ -342,9 +342,9 @@ Fewer sounds, more time each.</p>
 <section id="pattern-language">
 <h2><span class="num">02</span>The Pattern Language</h2>
 
-<p>The text inside the quotes is <em>mini-notation</em> &mdash; a tiny language for shaping patterns. Five tools.</p>
+<p>The text inside the quotes is <em>mini-notation</em>, a tiny language for shaping patterns. Five tools.</p>
 
-<h3>Brackets &mdash; subdivide a slot</h3>
+<h3>Brackets: subdivide a slot</h3>
 
 <p>Cram two sounds where one used to be. <code>[ ]</code> splits a slot&rsquo;s time between everything inside.</p>
 
@@ -362,7 +362,7 @@ s("bd [sd sd] hh oh")
     <p>Nest them: <code>s("bd [sd [hh hh]] oh cp")</code>. Brackets inside brackets. Each level subdivides further.</p>
 </div>
 
-<h3>Multiply &mdash; repeat fast</h3>
+<h3>Multiply: repeat fast</h3>
 
 <p><code>*8</code> crams the sound in eight times, all within one cycle. Hi-hat rolls come from this.</p>
 
@@ -375,7 +375,7 @@ s("hh*8")
     </strudel-editor>
 </div>
 
-<h3>Rest &mdash; leave a gap</h3>
+<h3>Rest: leave a gap</h3>
 
 <p>Tilde <code>~</code> holds a slot open but plays nothing. Without gaps, everything runs together. The rest gives each hit space.</p>
 
@@ -388,7 +388,7 @@ s("bd ~ sd ~")
     </strudel-editor>
 </div>
 
-<h3>Euclidean &mdash; let math place the hits</h3>
+<h3>Euclidean: let math place the hits</h3>
 
 <p><code>(3,8)</code> distributes three kicks as evenly as possible across eight slots.
 The math picks the spacing. It ends up sounding good because even distribution tends to.</p>
@@ -412,7 +412,7 @@ s("bd(3,8)")
 <details class="rabbit-hole">
     <summary>rabbit hole &mdash; euclidean rhythms, the algorithm, and 500 years of rhythm</summary>
     <div class="rh-body">
-        <h4>E(3,8) &mdash; the tresillo</h4>
+        <h4>E(3,8): the tresillo</h4>
         <p>Hear that pattern you just played? That&rsquo;s the tresillo. Three hits, eight slots, spaced as evenly as possible.</p>
 
         <!-- === INTERACTIVE EUCLIDEAN CIRCLE === -->
@@ -592,10 +592,10 @@ s("bd(3,8)")
         })();
         </script>
 
-        <p style="font-size: 0.95rem; margin: 1rem 0;">What you&rsquo;re looking at is a <em>rhythm necklace</em> &mdash; a circular pattern where rotation doesn&rsquo;t change the shape, only where beat 1 falls. Every row in the table above is a different necklace. The tresillo and the son clave are the same necklace, worn differently.</p>
+        <p style="font-size: 0.95rem; margin: 1rem 0;">What you&rsquo;re looking at is a <em>rhythm necklace</em>: a circular pattern where rotation doesn&rsquo;t change the shape, only where beat 1 falls. Every row in the table above is a different necklace. The tresillo and the son clave are the same necklace, worn differently.</p>
 
         <h4>The algorithm</h4>
-        <p>Distribute 3 hits across 8 slots as evenly as possible. The gaps between hits can only ever be two sizes &mdash; here, 3 and 2. That&rsquo;s maximal evenness.</p>
+        <p>Distribute 3 hits across 8 slots as evenly as possible. The gaps between hits can only ever be two sizes (here, 3 and 2). That&rsquo;s maximal evenness.</p>
         <p style="font-family: 'SF Mono', monospace; color: var(--cool); font-size: 0.95rem; letter-spacing: 0.05em;">[x . . x . . x .]</p>
 
         <h4>Where these patterns show up</h4>
@@ -604,7 +604,7 @@ s("bd(3,8)")
             <tbody>
             <tr><td>(3,8)</td><td>Tresillo</td><td>Cuban / West African</td><td>The backbone of Afro-Cuban music. Claves, cowbell, bass.</td></tr>
             <tr><td>(5,8)</td><td>Cinquillo</td><td>Cuban contradanza</td><td>Tresillo&rsquo;s denser cousin. Timbales, guiro.</td></tr>
-            <tr><td>(3,4)</td><td>Cumbia</td><td>Colombian / Persian</td><td>Nearly full &mdash; three hits, one gap.</td></tr>
+            <tr><td>(3,4)</td><td>Cumbia</td><td>Colombian / Persian</td><td>Nearly full: three hits, one gap.</td></tr>
             <tr><td>(7,12)</td><td>West African bell</td><td>Ashanti / Yoruba / Ewe</td><td>The standard bell pattern. Everything else plays around it.</td></tr>
             <tr><td>(5,16)</td><td>Bossa nova</td><td>Brazilian</td><td>Two bars of floating syncopation.</td></tr>
             <tr><td>(7,16)</td><td>Samba</td><td>Brazilian</td><td>Dense, driving agogo bell pattern.</td></tr>
@@ -612,7 +612,7 @@ s("bd(3,8)")
         </table>
 
         <h4>Rotation</h4>
-        <p><code>(3,8,2)</code> is the same three hits, started from a different position. Same necklace, different downbeat. The tresillo and the son clave are rotations of each other &mdash; same math, different groove.</p>
+        <p><code>(3,8,2)</code> is the same three hits, started from a different position. Same necklace, different downbeat. The tresillo and the son clave are rotations of each other. Same math, different groove.</p>
 
         <div class="strudel-block">
             <div class="strudel-label"><span>rotation comparison &mdash; same hits, different start</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
@@ -628,7 +628,7 @@ stack(
     </div>
 </details>
 
-<h3>Angle brackets &mdash; alternate per cycle</h3>
+<h3>Angle brackets: alternate per cycle</h3>
 
 <p><code>&lt; &gt;</code> rotates through its options, one per cycle. Snare, clap, snare, clap.</p>
 
@@ -697,7 +697,7 @@ stack(
     </strudel-editor>
 </div>
 
-<p>C in the second octave. <code>.s("sawtooth")</code> swaps the sample for a synthesizer &mdash; a raw buzzy wave.
+<p>C in the second octave. <code>.s("sawtooth")</code> swaps the sample for a synthesizer, a raw buzzy wave.
 <code>.lpf(500)</code> chops the harsh highs. <code>.decay()</code> and <code>.sustain(0)</code> make it short and punchy.</p>
 
 <!-- Synth/filter rabbit hole -->
@@ -705,7 +705,7 @@ stack(
     <summary>rabbit hole &mdash; samples vs synths, wave shapes, and filters</summary>
     <div class="rh-body">
         <h4>Samples vs synths</h4>
-        <p><code>s()</code> plays a recording &mdash; someone hit a drum, we play it back. <code>note()</code> generates a wave from scratch &mdash; no recording, just math. Samples sound &ldquo;real.&rdquo; Synths sound &ldquo;electronic.&rdquo; Both are patterns.</p>
+        <p><code>s()</code> plays a recording. Someone hit a drum, we play it back. <code>note()</code> generates a wave from scratch. No recording, just math. Samples sound &ldquo;real.&rdquo; Synths sound &ldquo;electronic.&rdquo; Both are patterns.</p>
 
         <h4>Wave types</h4>
         <table>
@@ -821,7 +821,7 @@ stack(
         </script>
 
         <h4>Filters</h4>
-        <p>A filter removes frequencies. <code>.lpf(500)</code> = low-pass filter at 500hz &mdash; everything above 500hz gets cut. The number is the cutoff. Lower number = darker sound. Higher = brighter.</p>
+        <p>A filter removes frequencies. <code>.lpf(500)</code> = low-pass filter at 500hz. Everything above 500hz gets cut. The number is the cutoff. Lower number = darker sound. Higher = brighter.</p>
         <table>
             <thead><tr><th>filter</th><th>does</th><th>code</th></tr></thead>
             <tbody>
@@ -937,7 +937,7 @@ stack(
 <div class="concept">
     <span class="c-label">method chaining</span>
     <p>Chain effects with dots: <code>note("c2").s("sawtooth").lpf(500)</code>.
-    Each one adds something &mdash; sound, filter, envelope. Order barely matters.</p>
+    Each one adds something: sound, filter, envelope. Order barely matters.</p>
 </div>
 </section>
 
@@ -973,7 +973,7 @@ stack(
     <span class="ex-label">compose &mdash; make it yours</span>
     <ol>
         <li>Rewrite the bass line. Try <code>note("&lt;c2 [c2 eb2] f2 [eb2 c2]&gt;")</code></li>
-        <li>Add a layer &mdash; a euclidean clap: <code>s("cp(3,8)").gain(.4)</code></li>
+        <li>Add a layer (a euclidean clap): <code>s("cp(3,8)").gain(.4)</code></li>
         <li>Alternate the hats: <code>s("&lt;hh*8 hh*16&gt;")</code></li>
         <li>When it sounds right, hit the <em>share</em> button. Day 1 post.</li>
     </ol>

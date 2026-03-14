@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.2 — The Bass</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+/* Reduce internal padding/space in the strudel component */
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#low-end">Low End</a>
+    <a href="#wave-shape">Waves</a>
+    <a href="#the-reese">Reese</a>
+    <a href="#filtering">Filters</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1>The <span class="accent">Bass</span></h1>
+<div class="subtitle">EDM.2 &mdash; sub bass, reese, and filtering</div>
+
+<p>DnB has two load-bearing walls: drums and bass. You built the drums. Now the other half.</p>
+
+<p>Bass in DnB lives below 200Hz. It&rsquo;s physical. You feel it in your chest before you hear it in your ears. This lesson starts with a single low note and ends with a filtered reese sitting under your EDM.1 breakbeat.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm()</code>,
+    mini-notation (<code>[] * ~ () &lt;&gt;</code>), <code>.gain()</code>,
+    <code>.lpf()</code>, <code>.decay()</code>, <code>.sustain()</code>,
+    and the DnB breakbeat from EDM.1.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: THE LOW END ============ -->
+<section id="low-end">
+<h2><span class="num">00</span>The Low End</h2>
+
+<h3>One note, all the way down</h3>
+
+<p>C in the first octave. A sine wave. The simplest possible bass sound.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>sub bass</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-sub">
+    <!--
+note("c1").s("sine")
+    -->
+    </strudel-editor>
+</div>
+
+<p>If your speakers are small, you might barely hear it. That&rsquo;s normal. C1 is 32.7Hz. Most laptop speakers roll off around 80Hz. Headphones or a subwoofer will make this lesson significantly more educational.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Change <code>c1</code> to <code>c2</code>. Then <code>c3</code>. Each octave doubles the frequency.
+    C2 is 65Hz. C3 is 131Hz. Notice how the higher you go, the less you feel it and the more you hear it.</p>
+</div>
+
+<div class="concept">
+    <span class="c-label">octaves</span>
+    <p>An octave is a doubling of frequency. <code>c1</code> = 32.7Hz. <code>c2</code> = 65.4Hz. <code>c3</code> = 130.8Hz. Same note name, different register. DnB sub bass typically lives around C1&ndash;C2.</p>
+</div>
+
+<h3>Hold it longer: attack, decay, sustain</h3>
+
+<p>The default synth envelope is short; the note fades quickly. For bass, you want it to sustain.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>sustained sub</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-sustain">
+    <!--
+note("c1").s("sine")
+  .attack(0.01).decay(0.1)
+  .sustain(1).release(0.1)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Now it holds. <code>.sustain(1)</code> means full volume for the duration of the note. The sine just sits there, steady and heavy.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Drop <code>.sustain(1)</code> to <code>.sustain(0.3)</code>. The note dips after the attack. That&rsquo;s the decay working. Useful for plucky bass, but for sub bass, keep sustain high.</p>
+</div>
+
+<h3>A pattern in the basement</h3>
+
+<p>One note repeating isn&rsquo;t a bassline. Two notes and a rest. Now it moves.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>simple bassline</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-pattern">
+    <!--
+setcpm(42.5)
+note("c1 ~ eb1 ~").s("sine")
+  .attack(0.01).decay(0.1)
+  .sustain(0.8).release(0.1)
+    -->
+    </strudel-editor>
+</div>
+
+<p>C and Eb. A minor third apart. The rests (<code>~</code>) give the pattern space to breathe. At 170bpm this is already bouncing.</p>
+
+<div class="concept">
+    <span class="c-label">sub bass</span>
+    <p>A sine wave below ~100Hz. Pure fundamental, no harmonics. Felt more than heard. The foundation that everything else sits on top of. In a club, this is what makes your ribcage vibrate.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: WAVE SHAPE ============ -->
+<section id="wave-shape">
+<h2><span class="num">01</span>Wave Shape</h2>
+
+<h3>Same note, different character</h3>
+
+<p>Swap <code>sine</code> for <code>sawtooth</code>. Same C2, completely different sound.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>sine bass</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1-sine">
+    <!--
+note("c2").s("sine")
+  .sustain(1).release(0.1)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>sawtooth bass</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1-saw">
+    <!--
+note("c2").s("sawtooth")
+  .sustain(1).release(0.1)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>square bass</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1-square">
+    <!--
+note("c2").s("square")
+  .sustain(1).release(0.1)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Sine is smooth and round. Sawtooth is buzzy and aggressive, full of overtones. Square sits somewhere between, hollow like a clarinet. Play all three back to back. That difference is <strong>timbre</strong>.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>triangle</code> too. It&rsquo;s like a fatter sine. The four basic wave shapes (<code>sine</code>, <code>sawtooth</code>, <code>square</code>, <code>triangle</code>) are the building blocks of synthesis.</p>
+</div>
+
+<div class="concept">
+    <span class="c-label">timbre</span>
+    <p>Same pitch, different sound. Timbre (pronounced &ldquo;TAM-ber&rdquo;) is what makes a guitar and a piano playing the same note sound different. In synthesis, wave shape determines timbre. More harmonics = brighter and buzzier.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole &mdash; why waveforms sound different</summary>
+    <div class="rh-body">
+        <h4>Harmonics</h4>
+        <p>A sine wave is a single frequency. A sawtooth contains every harmonic: the fundamental plus 2x, 3x, 4x, 5x&hellip; all stacked up, each quieter than the last. A square wave has only the odd harmonics (1x, 3x, 5x, 7x). That&rsquo;s why it sounds hollow.</p>
+
+        <h4>See it</h4>
+        <p>Click a wave shape to draw it and hear a 1-second tone.</p>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem;">
+            <button class="ctrl-btn wave-btn active" onclick="showWave('sine')">sine</button>
+            <button class="ctrl-btn wave-btn" onclick="showWave('sawtooth')">sawtooth</button>
+            <button class="ctrl-btn wave-btn" onclick="showWave('square')">square</button>
+            <button class="ctrl-btn wave-btn" onclick="showWave('triangle')">triangle</button>
+        </div>
+        <canvas id="wave-canvas" width="800" height="120" style="width: 100%; background: var(--surface); border-radius: 4px;"></canvas>
+        <p style="margin-top: 0.8rem;">The sine is just one bump. The sawtooth ramps up and drops. All those harmonics create the sharp edge. The square jumps between two levels. The triangle climbs and descends smoothly, like a gentler sawtooth.</p>
+
+        <h4>Harmonics table</h4>
+        <table>
+            <thead><tr><th>wave</th><th>harmonics</th><th>character</th></tr></thead>
+            <tbody>
+            <tr><td>sine</td><td>fundamental only</td><td>pure, round, sub bass</td></tr>
+            <tr><td>sawtooth</td><td>all (1x, 2x, 3x, 4x&hellip;)</td><td>bright, buzzy, aggressive</td></tr>
+            <tr><td>square</td><td>odd only (1x, 3x, 5x&hellip;)</td><td>hollow, woody</td></tr>
+            <tr><td>triangle</td><td>odd only, quieter</td><td>soft, muted</td></tr>
+            </tbody>
+        </table>
+
+        <script>
+        (function() {
+            const canvas = document.getElementById('wave-canvas');
+            const ctx = canvas.getContext('2d');
+            let waveCtx = null;
+
+            function drawWave(type) {
+                ctx.clearRect(0, 0, 800, 120);
+                ctx.strokeStyle = '#ff6b35';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                const cycles = 3;
+                for (let x = 0; x < 800; x++) {
+                    const t = (x / 800) * cycles * Math.PI * 2;
+                    let y;
+                    if (type === 'sine') {
+                        y = Math.sin(t);
+                    } else if (type === 'sawtooth') {
+                        const phase = ((t / (Math.PI * 2)) % 1);
+                        y = 2 * phase - 1;
+                    } else if (type === 'square') {
+                        y = Math.sin(t) >= 0 ? 1 : -1;
+                    } else {
+                        const phase = ((t / (Math.PI * 2)) % 1);
+                        y = phase < 0.5 ? (4 * phase - 1) : (3 - 4 * phase);
+                    }
+                    const py = 60 - y * 45;
+                    if (x === 0) ctx.moveTo(x, py);
+                    else ctx.lineTo(x, py);
+                }
+                ctx.stroke();
+                // zero line
+                ctx.strokeStyle = '#5a584f';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.moveTo(0, 60);
+                ctx.lineTo(800, 60);
+                ctx.stroke();
+            }
+
+            function playTone(type) {
+                try {
+                    const ac = new (window._OrigAC || window.AudioContext || window.webkitAudioContext)();
+                    const osc = ac.createOscillator();
+                    const gain = ac.createGain();
+                    osc.type = type;
+                    osc.frequency.value = 130.81; // C3
+                    gain.gain.setValueAtTime(0.3, ac.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 1);
+                    osc.connect(gain);
+                    gain.connect(ac.destination);
+                    osc.start();
+                    osc.stop(ac.currentTime + 1);
+                } catch(e) {}
+            }
+
+            window.showWave = function(type) {
+                drawWave(type);
+                playTone(type);
+                document.querySelectorAll('.wave-btn').forEach(b => b.classList.remove('active'));
+                document.querySelector(`.wave-btn[onclick*="${type}"]`).classList.add('active');
+            };
+
+            // Draw initial sine
+            drawWave('sine');
+        })();
+        </script>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 2: THE REESE ============ -->
+<section id="the-reese">
+<h2><span class="num">02</span>The Reese</h2>
+
+<h3>One sawtooth is a buzz. Two is a weapon.</h3>
+
+<p>Play this. One sawtooth at C2.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>one saw</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2-one-saw">
+    <!--
+note("c2").s("sawtooth")
+  .sustain(1).release(0.1)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Now two saws stacked, but the second one is slightly detuned, a quarter-tone flat.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>two detuned saws</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2-reese">
+    <!--
+stack(
+  note("c2").s("sawtooth")
+    .sustain(1).release(0.1),
+  note("c2").s("sawtooth")
+    .sustain(1).release(0.1)
+    .add(note(0.15))
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>That slow, churning movement. The two frequencies are close enough to fight each other. The result is a pulsing, phasing texture. More alive than a single saw.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Change <code>0.15</code> to <code>0.5</code> for wider detune and faster beating. Try <code>0.05</code> for a tighter, slower throb. The sweet spot for a classic reese is somewhere between <code>0.1</code> and <code>0.3</code>.</p>
+</div>
+
+<div class="concept">
+    <span class="c-label">reese bass</span>
+    <p>Two detuned sawtooth oscillators. Named after Kevin Saunderson&rsquo;s 1988 track &ldquo;Just Want Another Chance&rdquo; (released as Reese). The reese became a staple of jungle and DnB. Most modern bass patches start here.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole &mdash; why detuning creates movement</summary>
+    <div class="rh-body">
+        <h4>Beating frequencies</h4>
+        <p>When two tones are close in pitch, their peaks align and misalign at a regular rate. When peaks align: louder. When they oppose: quieter. This cycling between loud and quiet is called <strong>beating</strong>.</p>
+
+        <p>The beat rate equals the frequency difference. Two saws at 130Hz and 131Hz produce a 1Hz beat, one pulse per second. At 130Hz and 135Hz, the beating is 5Hz: five pulses per second, which sounds like a fast wobble.</p>
+
+        <h4>The math</h4>
+        <table>
+            <thead><tr><th>detune</th><th>beat rate</th><th>character</th></tr></thead>
+            <tbody>
+            <tr><td>+1 Hz</td><td>1 Hz</td><td>slow throb, chorus-like</td></tr>
+            <tr><td>+3 Hz</td><td>3 Hz</td><td>medium pulse, classic reese</td></tr>
+            <tr><td>+5 Hz</td><td>5 Hz</td><td>fast wobble, aggressive</td></tr>
+            <tr><td>+10 Hz</td><td>10 Hz</td><td>rough, almost dissonant</td></tr>
+            </tbody>
+        </table>
+
+        <p>In the strudel editor above, <code>.add(note(0.15))</code> adds 0.15 semitones to the pitch. At C2 (65.4Hz), that&rsquo;s roughly a 0.6Hz difference: a slow, deep throb. The exact Hz depends on the base frequency, which is why the same detune amount sounds different in different octaves.</p>
+
+        <h4>Why sawtooth specifically?</h4>
+        <p>Sawtooths have the most harmonics of any basic wave shape. When two of them beat against each other, the beating happens at every harmonic simultaneously. The fundamental beats, the second harmonic beats, the third, and so on. The result is thick, complex movement across the whole spectrum. Two sines beating just gives you a simple volume pulse. Two saws give you the reese.</p>
+    </div>
+</details>
+
+<h3>The reese as a pattern</h3>
+
+<p>Same two-note bassline from earlier, but with the reese instead of a bare sine.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>reese bassline</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2-reese-pattern">
+    <!--
+setcpm(42.5)
+stack(
+  note("c2 ~ eb2 ~").s("sawtooth")
+    .sustain(0.8).release(0.1),
+  note("c2 ~ eb2 ~").s("sawtooth")
+    .sustain(0.8).release(0.1)
+    .add(note(0.15))
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Aggressive. Raw. Also way too bright. It&rsquo;s eating the whole frequency spectrum.</p>
+</section>
+
+<!-- ============ SECTION 3: FILTERING ============ -->
+<section id="filtering">
+<h2><span class="num">03</span>Filtering</h2>
+
+<h3>Lowpass: cut everything above</h3>
+
+<p>A lowpass filter removes frequencies above a cutoff point. Apply one to the reese:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>filtered reese</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-lpf">
+    <!--
+setcpm(42.5)
+stack(
+  note("c2 ~ eb2 ~").s("sawtooth")
+    .sustain(0.8).release(0.1)
+    .lpf(400),
+  note("c2 ~ eb2 ~").s("sawtooth")
+    .sustain(0.8).release(0.1)
+    .add(note(0.15))
+    .lpf(400)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Darker. The top end is gone. <code>.lpf(400)</code> lets through everything below 400Hz and attenuates the rest. The reese still has movement from the detuning, but it&rsquo;s tamed.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Change <code>400</code> to <code>2000</code>. Bright and aggressive again. Try <code>200</code>: dark and subby, almost back to a sine. The cutoff frequency is a volume knob for brightness.</p>
+</div>
+
+<h3>Resonance: boost the cutoff point</h3>
+
+<p><code>.lpq()</code> adds resonance at the cutoff frequency. A boost right at the edge, from gentle warmth to nasal honk.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>resonant filter</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-res">
+    <!--
+setcpm(42.5)
+stack(
+  note("c2 ~ eb2 ~").s("sawtooth")
+    .sustain(0.8).release(0.1)
+    .lpf(600).lpq(8),
+  note("c2 ~ eb2 ~").s("sawtooth")
+    .sustain(0.8).release(0.1)
+    .add(note(0.15))
+    .lpf(600).lpq(8)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Hear that acidic edge? The resonance boosts frequencies right at 600Hz. Higher Q values make the peak sharper and more aggressive. Low Q (1&ndash;3) is subtle. High Q (8+) is a statement.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Push <code>.lpq()</code> up to <code>15</code> or <code>20</code>. It starts to ring and whistle. That&rsquo;s self-oscillation territory: the filter feeding back on itself. Useful in acid techno, dangerous in DnB.</p>
+</div>
+
+<h3>Moving the cutoff: filter sweeps</h3>
+
+<p>A static filter is fine. A moving filter is alive. Use a signal to sweep the cutoff.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>filter sweep</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-sweep">
+    <!--
+setcpm(42.5)
+stack(
+  note("c2 ~ eb2 ~").s("sawtooth")
+    .sustain(0.8).release(0.1)
+    .lpf(sine.range(200, 2000).slow(4))
+    .lpq(4),
+  note("c2 ~ eb2 ~").s("sawtooth")
+    .sustain(0.8).release(0.1)
+    .add(note(0.15))
+    .lpf(sine.range(200, 2000).slow(4))
+    .lpq(4)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p><code>sine.range(200, 2000).slow(4)</code>: a sine wave that sweeps from 200Hz to 2000Hz over 4 cycles. The bass breathes open and closed. Dark, bright, dark, bright.</p>
+
+<div class="concept">
+    <span class="c-label">lowpass filter</span>
+    <p><code>.lpf(freq)</code> passes frequencies below <code>freq</code> and cuts the rest. <code>.lpq(q)</code> adds resonance, a volume boost at the cutoff frequency. Low cutoff = dark and subby. High cutoff = bright and present. Move the cutoff over time and you get a filter sweep.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole &mdash; filter types and frequency response</summary>
+    <div class="rh-body">
+        <h4>Lowpass vs. highpass</h4>
+        <p>Two sides of the same idea. A lowpass lets the low end through and cuts the top. A highpass does the opposite: cuts the low end and lets the top through.</p>
+
+        <div style="display: flex; gap: 2rem; flex-wrap: wrap; margin: 1rem 0;">
+            <div style="flex: 1; min-width: 250px;">
+                <p style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem;">lowpass (.lpf)</p>
+                <svg viewBox="0 0 300 120" style="width: 100%; background: var(--surface); border-radius: 4px;">
+                    <text x="150" y="14" fill="#5a584f" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">frequency →</text>
+                    <text x="8" y="70" fill="#5a584f" font-family="SF Mono, monospace" font-size="7" transform="rotate(-90, 8, 70)">vol</text>
+                    <!-- pass region fill -->
+                    <path d="M 30 30 L 180 30 Q 210 30 230 80 L 230 100 L 30 100 Z" fill="#ff6b3515"/>
+                    <!-- curve -->
+                    <path d="M 30 30 L 180 30 Q 210 30 230 80 L 270 95" fill="none" stroke="#ff6b35" stroke-width="2"/>
+                    <!-- cutoff line -->
+                    <line x1="180" y1="20" x2="180" y2="100" stroke="#4fc3f7" stroke-width="0.5" stroke-dasharray="3"/>
+                    <text x="180" y="115" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">cutoff</text>
+                    <!-- labels -->
+                    <text x="100" y="55" fill="#8a8780" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">pass</text>
+                    <text x="250" y="75" fill="#5a584f" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">cut</text>
+                </svg>
+            </div>
+            <div style="flex: 1; min-width: 250px;">
+                <p style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--accent); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem;">highpass (.hpf)</p>
+                <svg viewBox="0 0 300 120" style="width: 100%; background: var(--surface); border-radius: 4px;">
+                    <text x="150" y="14" fill="#5a584f" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">frequency →</text>
+                    <text x="8" y="70" fill="#5a584f" font-family="SF Mono, monospace" font-size="7" transform="rotate(-90, 8, 70)">vol</text>
+                    <!-- pass region fill -->
+                    <path d="M 120 30 Q 90 80 70 95 L 70 100 L 270 100 L 270 30 Z" fill="#ff6b3515"/>
+                    <!-- curve -->
+                    <path d="M 30 95 L 70 95 Q 90 80 120 30 L 270 30" fill="none" stroke="#ff6b35" stroke-width="2"/>
+                    <!-- cutoff line -->
+                    <line x1="120" y1="20" x2="120" y2="100" stroke="#4fc3f7" stroke-width="0.5" stroke-dasharray="3"/>
+                    <text x="120" y="115" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">cutoff</text>
+                    <!-- labels -->
+                    <text x="50" y="75" fill="#5a584f" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">cut</text>
+                    <text x="200" y="55" fill="#8a8780" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">pass</text>
+                </svg>
+            </div>
+        </div>
+
+        <p>In strudel: <code>.lpf(1000)</code> = lowpass at 1kHz. <code>.hpf(200)</code> = highpass at 200Hz. You can use both on the same sound to create a <strong>bandpass</strong> effect, only letting through a narrow range.</p>
+
+        <h4>Resonance shape</h4>
+        <p>When you add <code>.lpq()</code>, the frequency response curve gets a bump right at the cutoff. Low Q = gentle slope. High Q = sharp peak. At very high Q, the peak is so tall the filter starts to ring on its own.</p>
+
+        <table>
+            <thead><tr><th>Q value</th><th>character</th><th>use</th></tr></thead>
+            <tbody>
+            <tr><td>0&ndash;1</td><td>gentle rolloff</td><td>subtle darkening</td></tr>
+            <tr><td>2&ndash;5</td><td>noticeable peak</td><td>presence, warmth</td></tr>
+            <tr><td>5&ndash;10</td><td>nasal, honky</td><td>acid bass, lead sounds</td></tr>
+            <tr><td>10+</td><td>ringing, whistling</td><td>acid techno, special effects</td></tr>
+            </tbody>
+        </table>
+
+        <h4>Why DnB producers love lowpass</h4>
+        <p>The reese has harmonics stretching to 20kHz. Without a filter, it eats the entire mix. A lowpass at 400&ndash;800Hz keeps the weight and movement but leaves room for drums, hats, and vocals above. The filter IS the mix tool.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 4: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">04</span>Drums + Bass</h2>
+
+<p>The two pillars. Your EDM.1 breakbeat on top, the filtered reese underneath. This is the skeleton of every DnB track.</p>
+
+<div class="punchline">
+    <p><strong>Everything combined.</strong> The DnB breakbeat from EDM.1 (kick, snare, hats) stacked with a filtered reese bass. Two detuned saws, lowpassed, moving under programmed drums at 170bpm.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>drums + bass</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(42.5)
+stack(
+  // kick
+  s("bd ~ ~ ~ bd ~ ~ ~")
+    .gain(0.9),
+  // snare
+  s("~ ~ ~ ~ sd ~ ~ ~")
+    .gain(0.85),
+  // hats
+  s("hh*8")
+    .gain("0.4 0.6 0.5 0.7 0.4 0.6 0.5 0.8"),
+  // reese saw 1
+  note("c2 ~ eb2 ~").s("sawtooth")
+    .sustain(0.8).release(0.1)
+    .lpf(sine.range(300, 1200).slow(8))
+    .lpq(3)
+    .gain(0.7),
+  // reese saw 2 (detuned)
+  note("c2 ~ eb2 ~").s("sawtooth")
+    .sustain(0.8).release(0.1)
+    .add(note(0.15))
+    .lpf(sine.range(300, 1200).slow(8))
+    .lpq(3)
+    .gain(0.7)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try a different bassline: <code>"c2 ~ g1 ~ eb2 ~ f1 ~"</code>. Or change the filter range: <code>sine.range(200, 800)</code> for darker, <code>sine.range(400, 3000)</code> for more bite. Adjust <code>.gain()</code> on the bass vs. drums to find your balance.</p>
+</div>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Replace the hi-hat pattern with <code>s("[hh hh hh oh]*2")</code>: open hat on every fourth hit. Adjust <code>.gain()</code> so the open hat is louder.</li>
+        <li>Add a second bass note: change <code>"c2 ~ eb2 ~"</code> to <code>"c2 c2 eb2 ~"</code>. The double C2 gives the bassline more urgency.</li>
+        <li>Drop the bass an octave. Change <code>c2</code> to <code>c1</code> and <code>eb2</code> to <code>eb1</code>. Notice how it gets muddier? That&rsquo;s why most DnB bass sits at C2, not C1.</li>
+        <li>Add a sub layer: put <code>note("c1 ~ eb1 ~").s("sine").gain(0.5).sustain(0.8)</code> as another line in the stack. Sub sine underneath the reese. Two frequency ranges, one bass.</li>
+    </ol>
+</div>
+
+<!-- What you earned -->
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>.s("sine")</td><td>sine wave synth, pure sub bass</td><td><code>note("c1").s("sine")</code></td></tr>
+        <tr><td>.s("sawtooth")</td><td>sawtooth wave, bright, all harmonics</td><td><code>note("c2").s("sawtooth")</code></td></tr>
+        <tr><td>.s("square")</td><td>square wave, hollow, odd harmonics</td><td><code>note("c2").s("square")</code></td></tr>
+        <tr><td>.s("triangle")</td><td>triangle wave, soft, muted</td><td><code>note("c2").s("triangle")</code></td></tr>
+        <tr><td>.attack()</td><td>fade-in time</td><td><code>.attack(0.01)</code></td></tr>
+        <tr><td>.decay()</td><td>fade from peak to sustain level</td><td><code>.decay(0.1)</code></td></tr>
+        <tr><td>.sustain()</td><td>held volume level (0&ndash;1)</td><td><code>.sustain(0.8)</code></td></tr>
+        <tr><td>.release()</td><td>fade-out after note ends</td><td><code>.release(0.1)</code></td></tr>
+        <tr><td>.lpf()</td><td>lowpass filter, cut highs</td><td><code>.lpf(400)</code></td></tr>
+        <tr><td>.lpq()</td><td>filter resonance (Q)</td><td><code>.lpq(5)</code></td></tr>
+        <tr><td>.hpf()</td><td>highpass filter, cut lows</td><td><code>.hpf(200)</code></td></tr>
+        <tr><td>.add(note())</td><td>detune / pitch offset</td><td><code>.add(note(0.15))</code></td></tr>
+        <tr><td>sine.range()</td><td>signal mapped to a value range</td><td><code>sine.range(200, 2000)</code></td></tr>
+        <tr><td>.slow()</td><td>stretch signal over N cycles</td><td><code>sine.range(200, 2000).slow(4)</code></td></tr>
+        </tbody>
+    </table>
+    <p class="earned-next">Next: <em>Layers</em>. Polyrhythm, euclidean patterns, hi-hat rolls, and building a full arrangement.</p>
+    </div>
+</details>
+
+<!-- Synth + filter reference -->
+<details class="earned">
+    <summary>synth + filter cheat sheet</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>parameter</th><th>range</th><th>notes</th></tr></thead>
+        <tbody>
+        <tr><td>.lpf()</td><td>20&ndash;20000 Hz</td><td>lowpass cutoff. 200 = dark sub. 2000 = present. 10000+ = wide open.</td></tr>
+        <tr><td>.lpq()</td><td>0&ndash;30+</td><td>resonance. 0&ndash;3 = gentle. 5&ndash;10 = nasal. 15+ = ringing.</td></tr>
+        <tr><td>.hpf()</td><td>20&ndash;20000 Hz</td><td>highpass cutoff. Use to thin out low end.</td></tr>
+        <tr><td>.attack()</td><td>0&ndash;2+ sec</td><td>0.001 = instant. 0.5 = slow fade in.</td></tr>
+        <tr><td>.decay()</td><td>0&ndash;2+ sec</td><td>time from peak to sustain level.</td></tr>
+        <tr><td>.sustain()</td><td>0&ndash;1</td><td>held level. 1 = full. 0 = silent after decay.</td></tr>
+        <tr><td>.release()</td><td>0&ndash;2+ sec</td><td>fade out after note ends.</td></tr>
+        </tbody>
+    </table>
+    <div class="concept">
+        <span class="c-label">reese recipe</span>
+        <p>Two <code>sawtooth</code> oscillators. Detune the second by <code>.add(note(0.1))</code> to <code>.add(note(0.3))</code>. Lowpass both at 400&ndash;1200Hz. Add <code>.lpq(3)</code> for presence. Done.</p>
+    </div>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(12, 0.06, 1.8)
+            .color(0.3, 0.6, 1.0)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.3)
+            .modulateScale(
+                h.osc(4, 0.15).rotate(0.2),
+                () => 0.1 + window._audioData.fft[1] * 0.6
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.4)
+            .saturate(() => 1.0 + window._audioData.fft[2] * 2.5)
+            .kaleid(() => 2 + Math.floor(window._audioData.fft[3] * 3))
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    // Try known StrudelMirror / CodeMirror accessors
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    // Fallback: read from attribute or inner HTML comment
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    // Stop all others
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        // Fallback: open in new tab
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>
