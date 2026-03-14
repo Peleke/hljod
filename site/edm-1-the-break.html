@@ -257,6 +257,7 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 <div class="progress-bar" id="progress"></div>
 <nav class="top-nav"><div class="top-nav-inner">
     <a href="index.html" class="back">&larr;</a>
+    <a href="#the-kit">Kit</a>
     <a href="#tempo">Tempo</a>
     <a href="#kick">Kick</a>
     <a href="#snare">Snare</a>
@@ -292,19 +293,174 @@ then stacks them into something that actually grooves.</p>
 </div>
 </section>
 
+<!-- ============ SECTION 0: THE KIT ============ -->
+<section id="the-kit">
+<h2><span class="num">00</span>The Kit</h2>
+
+<h3>What&rsquo;s a drum break?</h3>
+
+<p>A section of a song where the band drops out and the drummer plays alone. In the 60s and 70s, DJs
+would loop these sections on two turntables &mdash; extending a 4-second solo into a 4-minute groove.
+That loop is &ldquo;the break.&rdquo;</p>
+
+<p>DnB, jungle, hip-hop &mdash; they all grew out of looping breaks. The entire genre is built on
+taking a drummer&rsquo;s solo and making it the whole song.</p>
+
+<h3>The kit &mdash; what each drum sounds like</h3>
+
+<p>Five sounds. That&rsquo;s all you need. Play each one:</p>
+
+<p><strong>Kick</strong> (<code>bd</code>) &mdash; The big low one. Boom. Floor of the beat.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>kick</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-kick">
+    <!--
+s("bd")
+    -->
+    </strudel-editor>
+</div>
+
+<p><strong>Snare</strong> (<code>sd</code>) &mdash; The crack. Sharp, mid-range.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>snare</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-snare">
+    <!--
+s("sd")
+    -->
+    </strudel-editor>
+</div>
+
+<p><strong>Hi-hat closed</strong> (<code>hh</code>) &mdash; Tick tick tick. Metallic, short.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>closed hi-hat</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-hh">
+    <!--
+s("hh")
+    -->
+    </strudel-editor>
+</div>
+
+<p><strong>Hi-hat open</strong> (<code>oh</code>) &mdash; Tssss. Same cymbal, held open. Longer.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>open hi-hat</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-oh">
+    <!--
+s("oh")
+    -->
+    </strudel-editor>
+</div>
+
+<p><strong>Clap</strong> (<code>cp</code>) &mdash; Like a snare but more air.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>clap</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-clap">
+    <!--
+s("cp")
+    -->
+    </strudel-editor>
+</div>
+
+<p>All five in sequence, so you can hear each one back to back:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>the whole kit</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-all">
+    <!--
+s("bd sd hh oh cp")
+    -->
+    </strudel-editor>
+</div>
+
+<h3>Bars and beats</h3>
+
+<p>A <strong>bar</strong> is a container for beats. Most music uses 4 beats per bar.
+In strudel, one <strong>cycle</strong> = one bar.</p>
+
+<p>You divide the bar into <strong>slots</strong>. 4 slots = quarter notes. 8 slots = eighth notes.
+16 slots = sixteenth notes. More slots means more resolution &mdash; more places to put sounds.</p>
+
+<p><code>~</code> is a rest. Nothing plays on that slot. So <code>s("bd ~ sd ~")</code> is 4 slots:
+kick on 1, rest, snare on 3, rest.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>4 slots &mdash; quarter notes</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-4slots">
+    <!--
+s("bd ~ sd ~")
+    -->
+    </strudel-editor>
+</div>
+
+<p>Same kick and snare, but now in 8 slots. You have more room to put things between them:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>8 slots &mdash; eighth notes (same rhythm, more resolution)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-8slots">
+    <!--
+s("bd ~ ~ ~ sd ~ ~ ~")
+    -->
+    </strudel-editor>
+</div>
+
+<p>Play both. They sound the same. The 8-slot version just has empty spaces you can fill later.</p>
+
+<h3>Common patterns</h3>
+
+<p><strong>Four-on-the-floor</strong> &mdash; Kick on every beat. House, techno, disco.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>four-on-the-floor</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-fotf">
+    <!--
+s("bd bd bd bd")
+    -->
+    </strudel-editor>
+</div>
+
+<p><strong>Backbeat</strong> &mdash; Snare on beats 2 and 4. Rock, pop, hip-hop.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>backbeat</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-backbeat">
+    <!--
+s("bd sd bd sd")
+    -->
+    </strudel-editor>
+</div>
+
+<p><strong>Half-time</strong> &mdash; Snare on beat 3 only. DnB, trap.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>half-time</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0-halftime">
+    <!--
+s("bd ~ sd ~")
+    -->
+    </strudel-editor>
+</div>
+
+<p>Play all three back to back. Four-on-the-floor drives. Backbeat bounces. Half-time swings.</p>
+
+<div class="concept">
+    <span class="c-label">checkpoint</span>
+    <p>A break is a looped drum pattern. The kit is the set of sounds. A bar is 4 beats.
+    Slots subdivide the bar. Now you know enough to build a DnB break.</p>
+</div>
+</section>
+
 <!-- ============ SECTION 1: THE TEMPO ============ -->
 <section id="tempo">
 <h2><span class="num">01</span>The Tempo</h2>
 
-<p>Strudel&rsquo;s default speed is around 120bpm. DnB runs at 170. To change tempo, you set the
-<em>cycles per minute</em>.</p>
-
-<p>One cycle = one bar = 4 beats. So 170 beats per minute / 4 beats per cycle = 42.5 cycles per minute.</p>
-
-<p>A basic four-on-the-floor at default speed:</p>
+<p>Play these two. Same pattern, different speed:</p>
 
 <div class="strudel-block">
-    <div class="strudel-label"><span>default tempo &mdash; ~120bpm</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <div class="strudel-label"><span>default speed</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
     <strudel-editor id="ed-1a">
     <!--
 s("bd sd hh oh")
@@ -312,10 +468,8 @@ s("bd sd hh oh")
     </strudel-editor>
 </div>
 
-<p>Now the same pattern at 170bpm:</p>
-
 <div class="strudel-block">
-    <div class="strudel-label"><span>170bpm &mdash; setcpm(42.5)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <div class="strudel-label"><span>170bpm</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
     <strudel-editor id="ed-1b">
     <!--
 setcpm(42.5)
@@ -324,14 +478,18 @@ s("bd sd hh oh")
     </strudel-editor>
 </div>
 
-<p>Faster. Same pattern, different clock speed. <code>setcpm(42.5)</code> is 170bpm.
-That&rsquo;s the number you&rsquo;ll use for every editor in this lesson.</p>
+<p>The second one is faster. That&rsquo;s 170 beats per minute &mdash; DnB tempo.</p>
 
 <div class="try-this">
     <span class="label">tweak it</span>
-    <p>Try <code>setcpm(32)</code> &mdash; that&rsquo;s 128bpm, house tempo. Then <code>setcpm(45)</code> &mdash; 180bpm,
-    fast DnB. Feel the difference in your chest.</p>
+    <p>Change <code>42.5</code> to <code>32</code>. That&rsquo;s 128bpm &mdash; house tempo. Try <code>45</code> &mdash; that&rsquo;s 180, fast DnB.
+    The number controls the speed.</p>
 </div>
+
+<p>The number is <em>cycles per minute</em> &mdash; how many times the pattern repeats in 60 seconds.
+One cycle = one bar = 4 beats. So 170bpm &divide; 4 = 42.5 cpm. That&rsquo;s the conversion.</p>
+
+<p><code>setcpm(42.5)</code> is the number you&rsquo;ll use for every editor in this lesson.</p>
 
 <details class="rabbit-hole">
     <summary>rabbit hole &mdash; bpm, cpm, and what &ldquo;cycle&rdquo; actually means</summary>
@@ -614,6 +772,12 @@ stack(
     <table>
         <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
         <tbody>
+        <tr><td>bd</td><td>kick drum sample</td><td><code>s("bd")</code></td></tr>
+        <tr><td>sd</td><td>snare drum sample</td><td><code>s("sd")</code></td></tr>
+        <tr><td>hh</td><td>closed hi-hat sample</td><td><code>s("hh")</code></td></tr>
+        <tr><td>oh</td><td>open hi-hat sample</td><td><code>s("oh")</code></td></tr>
+        <tr><td>cp</td><td>clap sample</td><td><code>s("cp")</code></td></tr>
+        <tr><td>bar</td><td>one cycle = 4 beats</td><td>one repetition of the pattern</td></tr>
         <tr><td>setcpm()</td><td>sets the tempo in cycles per minute</td><td><code>setcpm(42.5)</code></td></tr>
         <tr><td>.gain("pattern")</td><td>per-step volume with a pattern string</td><td><code>.gain(".4 .7 .4 .9")</code></td></tr>
         </tbody>
