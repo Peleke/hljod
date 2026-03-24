@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.9f: Melodic Development</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Reference table --- */
+.ref-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 1.5rem 0; }
+.ref-table th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+.ref-table td { padding: 0.45rem 0.6rem; border-bottom: 1px solid #111115; font-size: 0.9rem; }
+.ref-table tr:nth-child(even) td { background: var(--table-row); }
+.ref-table td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#motive">The Motive</a>
+    <a href="#reveal">The Reveal</a>
+    <a href="#development">Development</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">Melodic Development</span></h1>
+<div class="subtitle">EDM.9f: every strudel transform is a 300-year-old composition technique</div>
+
+<p>You&rsquo;ve been composing classically. Every transform you&rsquo;ve used since EDM.5&mdash;<code>.rev()</code>, <code>.fast()</code>, <code>.slow()</code>, <code>.off()</code>, <code>.add(note())</code>&mdash;has a name in composition textbooks. Centuries-old names. Bach used them. Mozart used them. You&rsquo;ve been using them on phonk beats. This lesson connects the two worlds.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>cat()</code>, <code>setcpm(35)</code>,
+    mini-notation (<code>~ * [] &lt;&gt; / @</code>),
+    <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>,
+    <code>.every()</code>, <code>.sometimes()</code>, <code>.jux()</code>, <code>.off()</code>,
+    <code>.rev()</code>, <code>.fast()</code>, <code>.slow()</code>, <code>.add(note())</code>, <code>.superimpose()</code>,
+    arrangement with <code>cat()</code> and gain automation,
+    scales, modes, chords, intervals, non-chord tones, diatonic harmony, ii&ndash;V&ndash;I, cadences, form, and the phonk palette from EDM.4&ndash;9d.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: THE MOTIVE ============ -->
+<section id="motive">
+<h2><span class="num">00</span>The Motive</h2>
+
+<p>Four notes. That&rsquo;s all you need. A motive is the smallest meaningful musical idea&mdash;a few notes with a shape. Hit play:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>a 4-note motive</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(35)
+note("c4 eb4 d4 g4").s("sawtooth")
+  .lpf(2000).decay(0.08).sustain(0.2).gain(0.4)
+    -->
+    </strudel-editor>
+</div>
+
+<p>C up to Eb&mdash;minor 3rd. Back down to D&mdash;a step. Up to G&mdash;perfect 4th. Four notes. A shape: rise, dip, leap. That shape is the DNA. Everything in this lesson grows from it.</p>
+
+<div class="concept">
+    <span class="c-label">motive</span>
+    <p>The smallest meaningful melodic idea. Three to seven notes, usually. A motive has a distinctive shape&mdash;defined by its intervals and rhythm. Everything in a composition can grow from this seed. Beethoven&rsquo;s Fifth Symphony grows from 4 notes. Your EDM.9c monster grew from <code>n("0(3,8)")</code>.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Write your own 4-note motive. Pick any 4 notes from C minor (C, D, Eb, F, G, Ab, Bb). The intervals between them define its character. Replace the notes in the editor and listen. Keep the one you like&mdash;you&rsquo;ll need it later.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: THE REVEAL ============ -->
+<section id="reveal">
+<h2><span class="num">01</span>The Reveal</h2>
+
+<p>Five operations you already know. Five names that have been in music theory textbooks for centuries.</p>
+
+<h3>Retrograde = rev</h3>
+
+<p>The motive, then its mirror. Original in center. Reversed copy panned right:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>motive + retrograde</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(35)
+stack(
+  note("c4 eb4 d4 g4").s("sawtooth")
+    .lpf(2000).decay(0.08).sustain(0.2).gain(0.4),
+  note("c4 eb4 d4 g4").s("sawtooth")
+    .lpf(2000).decay(0.08).sustain(0.2).gain(0.25).pan(0.7)
+    .rev()
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The reversed version plays G D Eb C&mdash;same notes, backward. In classical music, this is called <strong>retrograde</strong>. Bach used it in fugues. You&rsquo;ve been using <code>.rev()</code> since EDM.5.</p>
+
+<h3>Augmentation = slow, Diminution = fast</h3>
+
+<p>Same motive at three speeds. Original, stretched, compressed:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>original, augmented, diminished</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(35)
+cat(
+  note("c4 eb4 d4 g4").s("sawtooth").lpf(2000).decay(0.08).sustain(0.2).gain(0.4),
+  note("c4 eb4 d4 g4").s("sawtooth").lpf(2000).decay(0.08).sustain(0.2).gain(0.4).slow(2),
+  note("c4 eb4 d4 g4").s("sawtooth").lpf(2000).decay(0.08).sustain(0.2).gain(0.4).fast(2)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Cycle 1: original (1 cycle). Cycles 2&ndash;3: augmented&mdash;stretched to 2 cycles with <code>.slow(2)</code>. Cycle 4: diminished&mdash;compressed to half a cycle with <code>.fast(2)</code>. Same motive at three speeds. <strong>Augmentation</strong> stretches time. <strong>Diminution</strong> compresses it. Composers have used both since the 14th century.</p>
+
+<h3>Transposition = add(note())</h3>
+
+<p>Same shape, different starting pitch. The motive at three pitch levels:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>original, up a 4th, up a 5th</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1c">
+    <!--
+setcpm(35)
+cat(
+  note("c4 eb4 d4 g4").s("sawtooth").lpf(2000).decay(0.08).sustain(0.2).gain(0.4),
+  note("c4 eb4 d4 g4").s("sawtooth").lpf(2000).decay(0.08).sustain(0.2).gain(0.4).add(note(5)),
+  note("c4 eb4 d4 g4").s("sawtooth").lpf(2000).decay(0.08).sustain(0.2).gain(0.4).add(note(7))
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Original. Then transposed up a perfect 4th (5 semitones). Then up a perfect 5th (7 semitones). Same shape, different starting point. This is <strong>transposition</strong>&mdash;and when you repeat a motive at different pitch levels in sequence, that&rsquo;s called a <strong>sequence</strong>. It&rsquo;s how melodies move through chord changes.</p>
+
+<h3>Canon = off</h3>
+
+<p>The motive starts. A quarter-cycle later, a copy starts a fifth higher. Two voices, staggered:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>canon at the fifth</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1d">
+    <!--
+setcpm(35)
+note("c4 eb4 d4 g4 c4 eb4 d4 g4").s("sawtooth")
+  .lpf(2000).decay(0.08).sustain(0.2).gain(0.4)
+  .off(1/4, add(note(7)))
+    -->
+    </strudel-editor>
+</div>
+
+<p>Two voices playing the same thing, offset in time. That&rsquo;s a <strong>canon</strong>&mdash;one of the oldest forms of counterpoint. &ldquo;Row, Row, Row Your Boat&rdquo; is a canon. <code>.off()</code> has been creating canons since EDM.5.</p>
+
+<div class="concept">
+    <span class="c-label">the classical toolkit</span>
+    <p>Five operations. Five words from music theory textbooks. <strong>Retrograde</strong> (<code>.rev()</code>)&mdash;play backward. <strong>Augmentation</strong> (<code>.slow()</code>)&mdash;stretch in time. <strong>Diminution</strong> (<code>.fast()</code>)&mdash;compress in time. <strong>Transposition</strong> (<code>.add(note())</code>)&mdash;shift pitch. <strong>Canon</strong> (<code>.off()</code>)&mdash;delayed copy. You&rsquo;ve been using all of them. The Monster from 9c IS motivic development&mdash;a seed transformed by operations until it becomes something complex.</p>
+</div>
+
+<table class="ref-table">
+    <thead><tr><th>strudel</th><th>classical</th><th>what it does</th></tr></thead>
+    <tbody>
+    <tr><td>.rev()</td><td>retrograde</td><td>play backward</td></tr>
+    <tr><td>.slow(N)</td><td>augmentation</td><td>stretch in time</td></tr>
+    <tr><td>.fast(N)</td><td>diminution</td><td>compress in time</td></tr>
+    <tr><td>.add(note(N))</td><td>transposition</td><td>shift pitch</td></tr>
+    <tr><td>.off(t, fn)</td><td>canon</td><td>delayed copy</td></tr>
+    <tr><td>.jux(fn)</td><td>inversion (spatial)</td><td>mirror in stereo</td></tr>
+    <tr><td>.superimpose(fn)</td><td>counterpoint</td><td>simultaneous voices</td></tr>
+    </tbody>
+</table>
+
+</section>
+
+<!-- ============ SECTION 2: DEVELOPMENT ============ -->
+<section id="development">
+<h2><span class="num">02</span>Development</h2>
+
+<p>Take the motive. Transform it once per bar across an 8-bar phrase. The harmony underneath is the phonk progression. Each bar uses the same 4-note shape, bent to fit:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>motivic development &mdash; 8 bars</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+setcpm(35)
+stack(
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3] [c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [c3,eb3,g3]>")
+    .s("sawtooth").lpf(800).attack(0.2).sustain(0.6).release(0.5).room(0.5).size(0.8).gain(0.2),
+  note("<[c4 eb4 d4 g4] [ab3 c4 bb3 eb4] [bb3 d4 c4 f4] [g3 b3 a3 d4] [g4 d4 eb4 c4] [eb4 c4 d4 ab3] [f4 d4 c4 bb3] [c4 eb4 g4 c5]>")
+    .s("sawtooth").lpf(2000).decay(0.06).sustain(0).gain(0.3).pan(0.6)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Bar 1: the motive, original. Bar 2: transposed to Ab. Bar 3: transposed to Bb. Bar 4: transposed to G. Bar 5: retrograde. Bar 6: retrograde, transposed down. Bar 7: another transposition. Bar 8: wider intervals, resolving up to C5&mdash;octave above where it started. Each bar uses the same shape, transformed. The melody develops <em>through</em> the harmony.</p>
+
+<div class="concept">
+    <span class="c-label">motivic development</span>
+    <p>Transforming a motive across a phrase or piece. State it, transpose it, reverse it, stretch it, compress it. The listener hears <strong>unity</strong> (same shape) and <strong>variety</strong> (different presentations). This is how composers build large structures from small seeds. A 4-note motive can generate an entire symphony.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Take your own 4-note motive from Section 0. State it in bar 1. Transpose it to the next chord in bar 2. Retrograde in bar 3. Resolve in bar 4. Replace the melody line in the editor above. Keep the pad underneath&mdash;just change the notes inside the <code>&lt;&gt;</code> brackets on the melody line.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole &mdash; Bach&rsquo;s Art of Fugue</summary>
+    <div class="rh-body">
+        <h4>One subject, infinite transformations</h4>
+        <p>Bach&rsquo;s final work. Unfinished. Fourteen fugues and four canons, all built from one subject&mdash;a single melodic idea in D minor. Every technique in this lesson appears: retrograde, augmentation, diminution, inversion, stretto (overlapping canons with tighter and tighter entries). The most extreme motivic development ever written.</p>
+
+        <h4>The subject</h4>
+        <p>D, A, F, D, C#, D, E, F, G, F, E, D. That&rsquo;s it. Twelve notes. From these twelve notes, Bach generated over an hour of music. Each fugue transforms the subject differently. Some stretch it to twice its length. Some compress it. Some play it backward. Some play it upside down. Some combine three or four transformations at once.</p>
+
+        <p>A simplified version of the subject, then its retrograde:</p>
+
+        <div class="strudel-block">
+            <div class="strudel-label"><span>fugue subject + retrograde</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-fugue">
+            <!--
+setcpm(35)
+cat(
+  note("d4 a3 f3 d3 db3 d3 e3 f3").s("sawtooth")
+    .lpf(1800).decay(0.1).sustain(0.3).gain(0.35),
+  note("f3 e3 d3 db3 d3 f3 a3 d4").s("sawtooth")
+    .lpf(1800).decay(0.1).sustain(0.3).gain(0.35)
+)
+            -->
+            </strudel-editor>
+        </div>
+
+        <p>First cycle: the subject. Second cycle: retrograde. Same notes, reversed. Bach wrote entire fugues where the subject appears in both directions simultaneously. The same operation as <code>.rev()</code>.</p>
+
+        <h4>Why it matters</h4>
+        <p>Bach proved that constraint breeds creativity. One motive. A handful of operations. Infinite music. That&rsquo;s the same principle behind live coding&mdash;start with a seed, transform it, let the system generate complexity. The tools are different. The thinking is identical.</p>
+    </div>
+</details>
+
+</section>
+
+<!-- ============ SECTION 3: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">03</span>Melodic Development</h2>
+
+<div class="punchline">
+    <p><strong>A phonk track where the lead melody is built entirely from motivic development of a 4-note seed.</strong> The motive plays as a canon (<code>.off()</code> creates a fifth above, delayed). Every 4th cycle it retrogrades (<code>.every(4, rev)</code>). The same 4 notes, endlessly developed by the transforms. Classical composition through live coding.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: melodic development</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9),
+  s("~ ~ ~ ~ cp ~ ~ ~").room(0.3).size(0.5).gain(0.85),
+  s("hh*16").gain("0.3 0.5 0.3 0.8").pan(0.35),
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4)
+    .delay(0.2).delaytime(0.125).delayfeedback(0.3).pan(0.6),
+  note("<c2 ab1 bb1 g1 c2 ab1 f1 c2>").s("sine")
+    .decay(0.3).sustain(0.2).release(0.1).distort(0.3).gain(0.8),
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3] [c3,eb3,g3] [ab2,c3,eb3] [f3,ab3,c4] [c3,eb3,g3]>")
+    .s("sawtooth").lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5).room(0.5).size(0.8).gain(0.2),
+  note("c4 eb4 d4 g4 c4 eb4 d4 g4").s("sawtooth")
+    .lpf(2000).decay(0.06).sustain(0)
+    .gain(0.3).pan(0.65)
+    .off(1/4, add(note(7)))
+    .every(4, rev)
+    .delay(0.15).delaytime(0.125).delayfeedback(0.2)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The motive loops twice per cycle: C Eb D G C Eb D G. The <code>.off(1/4, add(note(7)))</code> creates a canon&mdash;a copy a fifth higher, delayed by a quarter cycle. <code>.every(4, rev)</code> retrogrades the whole thing every 4th cycle. Delay smears the notes across time. The pad sweeps underneath. The same 4 notes, endlessly developed by the transforms you&rsquo;ve had all along.</p>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Write your own 4-note motive and replace the melody. Change both <code>note()</code> patterns on the lead line (the last <code>note()</code> in the stack). Keep the <code>.off()</code> and <code>.every()</code>&mdash;they&rsquo;ll transform whatever you write.</li>
+        <li>Add an augmented shadow voice. After the <code>.every(4, rev)</code> line, add <code>.superimpose(x =&gt; x.slow(2).gain(0.2))</code>. A stretched ghost of the motive plays underneath.</li>
+        <li>Try periodic transposition. Replace <code>.every(4, rev)</code> with <code>.every(3, x =&gt; x.add(note(5)))</code>. Every 3rd cycle, the motive jumps up a perfect 4th.</li>
+        <li>Share it. You just did motivic development. The same 4 notes, transformed by operations with 300-year-old names.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>concept</th><th>means</th><th>strudel</th></tr></thead>
+        <tbody>
+        <tr><td>motive</td><td>smallest meaningful melodic idea &mdash; a few notes with a shape</td><td><code>note("c4 eb4 d4 g4")</code></td></tr>
+        <tr><td>retrograde</td><td>play the motive backward</td><td><code>.rev()</code></td></tr>
+        <tr><td>augmentation</td><td>stretch the motive in time</td><td><code>.slow(2)</code></td></tr>
+        <tr><td>diminution</td><td>compress the motive in time</td><td><code>.fast(2)</code></td></tr>
+        <tr><td>transposition</td><td>shift the motive to a different pitch level</td><td><code>.add(note(5))</code></td></tr>
+        <tr><td>canon</td><td>delayed copy &mdash; same melody offset in time</td><td><code>.off(1/4, add(note(7)))</code></td></tr>
+        <tr><td>motivic development</td><td>transforming a motive across a phrase or piece</td><td>state, transpose, reverse, stretch, compress</td></tr>
+        <tr><td>sequence</td><td>same motive repeated at different pitch levels</td><td><code>.add(note(N))</code> applied progressively</td></tr>
+        </tbody>
+    </table>
+    <div class="concept" style="margin: 1rem 0 0; border-radius: 6px;">
+        <span class="c-label">the bridge</span>
+        <p>Every strudel pattern transform maps to a classical composition technique. <code>.rev()</code> = retrograde. <code>.slow()</code> = augmentation. <code>.fast()</code> = diminution. <code>.add(note())</code> = transposition. <code>.off()</code> = canon. <code>.jux()</code> = spatial inversion. <code>.superimpose()</code> = counterpoint. The tools changed. The thinking didn&rsquo;t.</p>
+    </div>
+    <p class="earned-next">Next: <em>The Set</em>. Everything combined. A 2&ndash;3 minute piece.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The idea that a whole piece can grow from a small seed &mdash; a motive &mdash; is one of the most powerful concepts in music. It connects Beethoven to hip-hop to generative code.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Beethoven&rsquo;s Fifth (1808)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Four notes: G G G Eb. Short-short-short-long. Beethoven built an entire symphony from this cell. The motive appears transposed, inverted, augmented, diminished, fragmented, and recombined across four movements. The first movement alone contains over 200 statements of the motive in various forms. This is motivic development at its most extreme &mdash; total unity from minimal material.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">The Art of Fugue (1742&ndash;1749)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Bach&rsquo;s final major work uses a single subject (D minor, simple and vocal) as the basis for 14 fugues and 4 canons. Each piece transforms the subject through retrograde, inversion, augmentation, diminution, stretto (overlapping entries), and combinations thereof. The final fugue, which introduces Bach&rsquo;s own name as a counter-subject (B-A-C-H in German note names = Bb-A-C-B), breaks off mid-measure &mdash; he died before completing it. The work is a catalog of every motivic transformation technique and reads as a textbook written in music.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Hip-hop and the loop as motive</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">In sample-based hip-hop, the loop IS the motive. A 2-bar soul sample, chopped and rearranged, becomes the harmonic and melodic seed of the entire track. DJ Premier&rsquo;s production for Gang Starr layers the same sample at different chop points &mdash; motivic development through sampling. Madlib&rsquo;s <em>Madvillainy</em> (2004) applies the same principle: each beat is a motive (sampled loop) developed through filtering, pitch-shifting, and rearrangement.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Hopkins, <em>The Nine Symphonies of Beethoven</em> (1981); Hofstadter, <em>G&ouml;del, Escher, Bach</em> (1979); Yearsley, <em>Bach and the Meanings of Counterpoint</em> (2002); Schloss, <em>Making Beats</em> (2004).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(5, 0.04, 0.6)
+            .color(0.8, 0.2, 0.1)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.3)
+            .modulateScale(
+                h.osc(3, 0.06).rotate(0.6),
+                () => 0.2 + window._audioData.fft[1] * 0.5
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.4)
+            .saturate(() => 0.5 + window._audioData.fft[2] * 1.0)
+            .kaleid(() => 2 + Math.floor(window._audioData.fft[3] * 4))
+            .contrast(1.5)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>

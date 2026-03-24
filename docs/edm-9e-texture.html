@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.9e: Texture + Accompaniment</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#walking">Walking Bass</a>
+    <a href="#world">World Rhythms</a>
+    <a href="#accompaniment">Accompaniment Patterns</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">Texture + Accompaniment</span></h1>
+<div class="subtitle">EDM.9e: walking bass, son clave, and the patterns underneath</div>
+
+<p>A chord progression is four chords. How you <strong>deliver</strong> those chords&mdash;all at once, one note at a time, stepwise through the bass&mdash;changes everything. Same notes, completely different feel. This lesson covers three accompaniment textures (block chords, arpeggiated, walking bass), two rhythmic foundations (son clave, afterbeats), and how to combine them.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>cat()</code>, <code>setcpm(35)</code>,
+    mini-notation (<code>~ * [] &lt;&gt; / @</code>),
+    <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>,
+    <code>.every()</code>, <code>.sometimes()</code>, <code>.jux()</code>, <code>.off()</code>,
+    arrangement with <code>cat()</code> and gain automation,
+    scales, modes, chords, intervals, non-chord tones, diatonic harmony,
+    ii&ndash;V&ndash;I, cadences, and the phonk palette from EDM.4&ndash;9d.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: WALKING BASS ============ -->
+<section id="walking">
+<h2><span class="num">00</span>Walking Bass</h2>
+
+<p>One note per beat. Mostly by step&mdash;scale tones, chord tones, passing tones. The bass doesn&rsquo;t sit on the root. It <strong>walks</strong> through the chord, connecting one harmony to the next. Hit play:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>walking bass &mdash; Cm &rarr; Ab &rarr; Bb &rarr; G</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(35)
+note("<[c2 d2 eb2 g2] [ab1 bb1 c2 eb2] [bb1 c2 d2 f2] [g1 a1 b1 d2]>")
+  .s("sine").decay(0.2).sustain(0.3).release(0.1)
+  .gain(0.7)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Four bars. Each bar starts on the chord root, then walks through scale tones and chord tones, landing on a note that leads into the next chord&rsquo;s root. Bar 1: C&ndash;D&ndash;Eb&ndash;G (Cm chord tones and a passing D). Bar 2: Ab&ndash;Bb&ndash;C&ndash;Eb (stepping up through Ab major). The bass <strong>connects</strong> the chords by moving through them.</p>
+
+<p>Now add drums and a pad on top:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>walking bass + pad + drums</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.8),
+  s("~ ~ ~ ~ cp ~ ~ ~").room(0.3).gain(0.75),
+  s("hh*8").gain(0.4),
+  note("<[c2 d2 eb2 g2] [ab1 bb1 c2 eb2] [bb1 c2 d2 f2] [g1 a1 b1 d2]>")
+    .s("sine").decay(0.2).sustain(0.3).release(0.1).gain(0.7),
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>").s("sawtooth")
+    .lpf(800).attack(0.2).sustain(0.6).release(0.5).room(0.5).size(0.8).gain(0.2)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The pad holds each chord as a block. The bass walks underneath it. Two different textures delivering the same harmony&mdash;one vertical (pad), one horizontal (bass). The bass implies the chords without stating them.</p>
+
+<div class="concept">
+    <span class="c-label">walking bass</span>
+    <p>A bass line that moves mostly by step (scale tones) through chord changes, one note per beat. Starts on the root, passes through chord tones and scale tones, lands on a note that leads to the next chord&rsquo;s root. Connects chords <strong>horizontally</strong> rather than just hitting roots. The walk implies the harmony without stating it. Foundation of jazz, blues, and funk bass.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Reverse the walk direction in bar 2: change <code>[ab1 bb1 c2 eb2]</code> to <code>[eb2 c2 bb1 ab1]</code>&mdash;descending walk. Or add a chromatic approach note: change bar 1 to <code>[c2 d2 eb2 e2]</code> where the E natural approaches F (if the next chord were Fm). Chromatic approach notes add tension right before the resolution.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: WORLD RHYTHMS ============ -->
+<section id="world">
+<h2><span class="num">01</span>World Rhythms</h2>
+
+<h3>Son Clave (3+3+2)</h3>
+
+<p>Eight pulses. Not grouped 4+4 like a march. Grouped 3+3+2. The asymmetry is the engine of Afro-Cuban music. Hit play:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>3-2 son clave</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(35)
+s("cp ~ ~ cp ~ ~ cp ~ ~ ~ cp ~ cp ~ ~ ~")
+  .gain(0.7)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Three hits in the first half, two in the second. Or count it differently: groups of 3, 3, and 2 eighth notes. The pattern is asymmetric&mdash;it doesn&rsquo;t divide evenly into 4+4. That lopsidedness is what makes salsa, samba, reggaeton, and a huge amount of pop feel the way they do.</p>
+
+<p>Apply that 3+3+2 grouping to a kick pattern:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>3+3+2 phonk beat</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(35)
+stack(
+  s("[bd ~ ~ bd ~ ~ bd ~]*2").gain(0.9),
+  s("~ ~ ~ ~ cp ~ ~ ~").room(0.3).gain(0.85),
+  s("hh*16").gain("0.3 0.5 0.3 0.8"),
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The kick follows 3+3+2 grouping instead of straight four-on-the-floor. Same eight slots, different emphasis. The groove shifts from march to dance. The cowbell fills in the offbeats, reinforcing the asymmetry.</p>
+
+<div class="concept">
+    <span class="c-label">son clave</span>
+    <p>An asymmetric rhythmic cell: <strong>3+3+2</strong> grouping within 8 pulses. Foundational to Afro-Cuban music. The lopsided grouping creates a forward-leaning feel that drives motion. Habanera, reggaeton, bossa nova, and much of modern pop all derive from clave patterns. Compare to the even 4+4 grouping of a march or four-on-the-floor.</p>
+</div>
+
+<h3>Afterbeats and Offbeats</h3>
+
+<p>Chords between the beats instead of on them. That&rsquo;s reggae:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>reggae skank &mdash; chords on the offbeat</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1c">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ ~ ~").gain(0.8),
+  note("~ [c3,eb3,g3] ~ [c3,eb3,g3] ~ [c3,eb3,g3] ~ [c3,eb3,g3]")
+    .s("sawtooth").lpf(1500).decay(0.05).sustain(0).gain(0.4)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The chords land BETWEEN the beats. The kick marks the downbeat. The chords avoid it. That gap is the reggae skank. Offbeat emphasis creates a laid-back, swinging feel&mdash;the opposite of a driving four-on-the-floor.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Move the chord stabs to different positions. Try polka afterbeats: replace the note line with <code>s("~ cp ~ cp ~ cp ~ cp")</code> to hear every offbeat accented. Or try putting chords on beats 2 and 4 only: <code>note("~ [c3,eb3,g3] ~ ~ ~ [c3,eb3,g3] ~ ~")</code>&mdash;backbeat chords, classic rock rhythm guitar.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole &mdash; pulse groupings and genre origins</summary>
+    <div class="rh-body">
+        <h4>3+3+3+3+2+2 and other groupings</h4>
+        <p>Take 16 pulses. Group them differently. Each combination of 2s and 3s produces a distinct rhythmic feel:</p>
+
+        <table>
+            <thead><tr><th>grouping</th><th>pattern</th><th>genre</th></tr></thead>
+            <tbody>
+            <tr><td>4+4+4+4</td><td>x...x...x...x...</td><td>Four-on-the-floor (house, disco)</td></tr>
+            <tr><td>3+3+2+3+3+2</td><td>x..x..x.x..x..x.</td><td>West African bell pattern</td></tr>
+            <tr><td>3+3+2+2+3+3</td><td>x..x..x.x.x..x..</td><td>Afro-Cuban rumba</td></tr>
+            <tr><td>3+3+2</td><td>x..x..x.</td><td>Son clave, tresillo, reggaeton</td></tr>
+            <tr><td>3+3+3+3+2+2</td><td>x..x..x..x..x.x.</td><td>Aksak (Balkan)</td></tr>
+            <tr><td>2+2+2+2+2+2+2+2</td><td>x.x.x.x.x.x.x.x.</td><td>Straight eighth notes</td></tr>
+            </tbody>
+        </table>
+
+        <p>Every grouping is a different way to divide the same number of pulses. The asymmetric ones (containing both 2s and 3s) feel like they lean forward&mdash;they create expectation. The symmetric ones (all 2s or all 4s) feel stable, predictable. EDM typically starts symmetric and borrows asymmetric groupings for variation. Latin and West African music starts asymmetric&mdash;the clave IS the groove.</p>
+
+        <h4>The tresillo</h4>
+        <p>3+3+2 specifically. Eight pulses, three groups. It predates the son clave&mdash;it&rsquo;s the rhythmic DNA of the habanera, the Bo Diddley beat, the reggaeton dembow, and thousands of pop songs. When you hear a kick pattern that feels &ldquo;Latin&rdquo; or &ldquo;bouncy&rdquo; in a pop song, it&rsquo;s usually tresillo underneath.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 2: ACCOMPANIMENT PATTERNS ============ -->
+<section id="accompaniment">
+<h2><span class="num">02</span>Accompaniment Patterns</h2>
+
+<h3>Block Chords</h3>
+
+<p>All notes at once. Every beat. The simplest possible accompaniment:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>block chords &mdash; quarter notes</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+setcpm(35)
+note("[c3,eb3,g3] [c3,eb3,g3] [c3,eb3,g3] [c3,eb3,g3]")
+  .s("sawtooth").lpf(1200).decay(0.05).sustain(0).gain(0.35)
+    -->
+    </strudel-editor>
+</div>
+
+<p>C minor, four times. Vertical. All three notes hit together. Punchy and rhythmic, but static&mdash;nothing moves between the beats.</p>
+
+<h3>Arpeggiated (Alberti Bass)</h3>
+
+<p>Same three notes. Rearranged into a rolling pattern&mdash;bottom, top, middle, top:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>Alberti bass &mdash; bottom-top-middle-top</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+setcpm(35)
+note("c3 g3 eb3 g3 c3 g3 eb3 g3").s("sawtooth")
+  .lpf(1200).decay(0.1).sustain(0.2).gain(0.35)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Same C, Eb, G as the block chord. But now they roll: C&ndash;G&ndash;Eb&ndash;G, repeating. Mozart used this pattern constantly. It creates rhythmic motion from a static chord&mdash;the harmony doesn&rsquo;t change, but the texture makes it feel like something is happening.</p>
+
+<div class="concept">
+    <span class="c-label">Alberti bass</span>
+    <p>An arpeggiated accompaniment pattern: <strong>bottom&ndash;top&ndash;middle&ndash;top</strong>. Named after Domenico Alberti (18th century). Creates rhythmic motion from a static chord. The notes are the same as a block chord, just reordered in time. Compare to block chords (all notes at once) and walking bass (stepwise through chords). Three textures, same harmony.</p>
+</div>
+
+<p>All three accompaniment types, one after the other. Same chord, three textures:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>block &rarr; Alberti &rarr; walking bass</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2c">
+    <!--
+setcpm(35)
+cat(
+  note("[c3,eb3,g3] [c3,eb3,g3] [c3,eb3,g3] [c3,eb3,g3]").s("sawtooth")
+    .lpf(1200).decay(0.05).sustain(0).gain(0.35),
+  note("c3 g3 eb3 g3 c3 g3 eb3 g3").s("sawtooth")
+    .lpf(1200).decay(0.1).sustain(0.2).gain(0.35),
+  note("c2 d2 eb2 g2").s("sine")
+    .decay(0.2).sustain(0.3).release(0.1).gain(0.6)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Cycle 1: block chords. All notes at once&mdash;vertical. Cycle 2: Alberti pattern. Notes one at a time in a rolling order&mdash;diagonal. Cycle 3: walking bass. Stepwise motion through scale tones&mdash;horizontal. Three completely different characters from the same C minor harmony.</p>
+
+<div class="concept">
+    <span class="c-label">texture</span>
+    <p>How accompaniment is organized in time. <strong>Block chords</strong> = vertical (all notes at once). <strong>Arpeggiated</strong> = diagonal (notes in sequence from a chord). <strong>Walking bass</strong> = horizontal (stepwise melodic line in the bass). Mixing textures across sections creates contrast. A verse might use arpeggiated texture; the chorus switches to block chords for impact.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 3: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">03</span>Texture + Accompaniment</h2>
+
+<div class="punchline">
+    <p><strong>Clave kick pattern. Walking bass. Alberti-style arpeggiated pad.</strong> Three textures layered: horizontal bass moving stepwise through chord changes, diagonal pad rolling through chord tones, rhythmic drums grouped in 3+3+2. The same four chords delivered through three different lenses at once.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: texture + accompaniment</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(35)
+stack(
+  s("[bd ~ ~ bd ~ ~ bd ~]*2").gain(0.9),
+  s("~ ~ ~ ~ cp ~ ~ ~").room(0.3).size(0.5).gain(0.85),
+  s("hh*16").gain("0.3 0.5 0.3 0.8").pan(0.35),
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4)
+    .delay(0.2).delaytime(0.125).delayfeedback(0.3).pan(0.6),
+  note("<[c2 d2 eb2 g2] [ab1 bb1 c2 eb2] [bb1 c2 d2 f2] [g1 a1 b1 d2]>")
+    .s("sine").decay(0.2).sustain(0.3).release(0.1).gain(0.7),
+  note("<[c3 g3 eb3 g3 c3 g3 eb3 g3] [ab2 eb3 c3 eb3 ab2 eb3 c3 eb3] [bb2 f3 d3 f3 bb2 f3 d3 f3] [g2 d3 b2 d3 g2 d3 b2 d3]>")
+    .s("sawtooth").lpf(1000).decay(0.08).sustain(0.2)
+    .room(0.4).size(0.6).gain(0.25).pan(0.6)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The kick follows 3+3+2 clave grouping. The bass walks stepwise through Cm&rarr;Ab&rarr;Bb&rarr;G, one note per beat. The pad arpeggiates each chord in Alberti pattern&mdash;root, fifth, third, fifth. Three textures, one progression. The horizontal bass, diagonal pad, and rhythmic drums each deliver the harmony differently.</p>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Replace the clave kick with a straight pattern: <code>s("bd ~ ~ ~ bd ~ [~ bd] ~")</code>. Listen to how the groove changes from asymmetric to square. Switch back. The clave version leans forward.</li>
+        <li>Reverse the Alberti pattern to high&ndash;low&ndash;mid&ndash;low. Change bar 1 of the pad to <code>[g3 c3 eb3 c3 g3 c3 eb3 c3]</code>. Different character, same notes.</li>
+        <li>Add the melody from 8c over the top. Layer a <code>note()</code> line on the Cm&ndash;Ab&ndash;Bb&ndash;G changes. The walking bass and arpeggiated pad handle the harmony&mdash;the melody is free to do whatever it wants.</li>
+        <li>Share it.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>concept</th><th>means</th><th>example</th></tr></thead>
+        <tbody>
+        <tr><td>walking bass</td><td>stepwise bass line, one note per beat, connects chords horizontally</td><td><code>[c2 d2 eb2 g2]</code> over Cm</td></tr>
+        <tr><td>son clave (3+3+2)</td><td>asymmetric rhythmic cell&mdash;3+3+2 pulses instead of 4+4</td><td><code>[bd ~ ~ bd ~ ~ bd ~]</code></td></tr>
+        <tr><td>afterbeats / offbeats</td><td>accents between beats, not on them</td><td>reggae skank: chords on the &ldquo;and&rdquo;</td></tr>
+        <tr><td>block chords</td><td>all chord tones at once&mdash;vertical texture</td><td><code>[c3,eb3,g3]</code> repeated</td></tr>
+        <tr><td>Alberti bass</td><td>arpeggiated pattern: bottom&ndash;top&ndash;middle&ndash;top&mdash;diagonal texture</td><td><code>c3 g3 eb3 g3</code></td></tr>
+        <tr><td>texture</td><td>how accompaniment is organized: vertical (block), diagonal (arpeggio), horizontal (walking)</td><td>three textures, one chord</td></tr>
+        </tbody>
+    </table>
+    <p class="earned-next">Next: <em>Melodic Development</em>. Every strudel transform is a classical composition technique.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">How notes are organized in time and register &mdash; texture &mdash; determines genre as much as the notes themselves.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">The walking bass in jazz (1930s&ndash;present)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The jazz walking bass emerged from New Orleans tuba players who &ldquo;walked&rdquo; through chord changes in marching bands. When string bass replaced tuba in the 1920s&ndash;30s, the walking convention transferred. Jimmy Blanton, playing with Duke Ellington (1939&ndash;1941), transformed the bass from a time-keeping instrument into a melodic voice. His 2-year tenure (cut short by tuberculosis at age 23) established the walking bass as a foundational jazz texture. Paul Chambers continued this with Miles Davis, and the walking bass became inseparable from the jazz sound.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Son clave and the African diaspora</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The clave pattern traces from West African bell patterns through the Middle Passage to Cuba, where it became the organizational principle of son cubano. The &ldquo;3-2 son clave&rdquo; (<code>x..x..x.x.x.....</code> in 16 pulses) and its reverse (&ldquo;2-3 clave&rdquo;) underpin salsa, mambo, cha-cha-ch&aacute;, and their descendants. The tresillo (3+3+2 in 8 pulses) is the stripped-down version that appears in New Orleans second line, reggaeton, and, as of EDM.9e, your phonk beat.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Alberti bass and classical convention</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Domenico Alberti (c. 1710&ndash;1740) didn&rsquo;t invent the broken-chord accompaniment pattern, but he used it so obsessively that it was named after him. Mozart adopted it wholesale &mdash; the first movement of Sonata K.545 (&ldquo;the easy sonata&rdquo;) opens with an Alberti bass. The pattern&rsquo;s genius is efficiency: it implies harmony, provides rhythm, and fills register &mdash; all from a single hand.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Goldsby, <em>The Jazz Bass Book</em> (2002); Maule&oacute;n, <em>Salsa Guidebook</em> (1993); Washburne, &ldquo;The Clave of Jazz&rdquo; (1997); Rosen, <em>The Classical Style</em> (1971).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(5, 0.04, 0.6)
+            .color(0.8, 0.2, 0.1)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.3)
+            .modulateScale(
+                h.osc(3, 0.06).rotate(0.6),
+                () => 0.2 + window._audioData.fft[1] * 0.5
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.4)
+            .saturate(() => 0.5 + window._audioData.fft[2] * 1.0)
+            .kaleid(() => 2 + Math.floor(window._audioData.fft[3] * 4))
+            .contrast(1.5)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>

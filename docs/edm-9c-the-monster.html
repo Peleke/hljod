@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.9c: The Monster</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#chunk">Chunk</a>
+    <a href="#superimpose">Superimpose</a>
+    <a href="#composition">Composition</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">The Monster</span></h1>
+<div class="subtitle">EDM.9c: every tool, one original composition, built from nothing</div>
+
+<p>You have the full toolkit. Euclidean rhythms, filter sweeps, stereo splits, stutters, sine-driven modulation, chunked variation, stacked layers. This lesson uses all of it. Three notes in eight slots become a living texture. One line of code becomes seven transforms deep. Then that line joins the full band.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>n()</code>, <code>stack()</code>, <code>cat()</code>, <code>setcpm(35)</code>,
+    mini-notation (<code>~ * [] &lt;&gt; / @ (k,n)</code>),
+    <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, <code>.scale()</code>, voice-led chord voicings,
+    <code>.every()</code>, <code>.sometimes()</code>,
+    <code>.jux()</code>, <code>.juxBy()</code>, <code>.off()</code>, <code>.add(note())</code>,
+    <code>.rev()</code>, <code>.fast()</code>, <code>.slow()</code>, <code>.ply()</code>,
+    <code>.speed()</code>, <code>sine.range()</code>,
+    chord progressions with <code>&lt;&gt;</code>, and the full EDM palette from 0&ndash;9b.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: CHUNK ============ -->
+<section id="chunk">
+<h2><span class="num">00</span>Chunk</h2>
+
+<p>Sixteen hats, steady. One quarter doubles speed&mdash;and it rotates. First beat, then second, then third, then fourth:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>chunked hats</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(35)
+s("hh*16").gain("0.3 0.5 0.3 0.8")
+  .chunk(4, fast(2))
+    -->
+    </strudel-editor>
+</div>
+
+<p>One quarter goes double-time. Next cycle, the next quarter. A scanning variation that moves across the pattern like a spotlight. Four cycles, the whole thing has been hit once.</p>
+
+<p>Now on a melodic line instead of drums:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>chunked melody</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+setcpm(35)
+n("0 2 4 7 4 2 0 7").scale("C:minor").s("sawtooth")
+  .lpf(1200).decay(0.1).sustain(0.3)
+  .gain(0.4)
+  .chunk(4, fast(2))
+    -->
+    </strudel-editor>
+</div>
+
+<p>Same melody, but one quarter at a time gets doubled. The rest plays normally. Every four cycles it comes back around. Variation without randomness&mdash;the scanning is deterministic.</p>
+
+<div class="concept">
+    <span class="c-label">.chunk(N, fn)</span>
+    <p><code>.chunk(N, fn)</code> divides the pattern into N equal chunks. Each cycle, it applies the transform to one chunk, rotating which chunk gets hit. Cycle 1: chunk 1 transforms. Cycle 2: chunk 2. And so on. Creates a sweeping variation that moves across the pattern.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.chunk(8, rev)</code> for finer rotation&mdash;eight slices, each one reversed in turn. Or <code>.chunk(4, x =&gt; x.speed(2).gain(0.3))</code> for pitched-up ghost echoes scanning across each chunk.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: SUPERIMPOSE ============ -->
+<section id="superimpose">
+<h2><span class="num">01</span>Superimpose</h2>
+
+<p>The original melody, plus a copy a fifth above. Two voices from one line:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>superimposed fifth</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(35)
+n("0 2 4 7").scale("C:minor").s("sawtooth")
+  .lpf(1200).decay(0.1).sustain(0.3)
+  .gain(0.35)
+  .superimpose(x => x.add(note(7)).gain(0.2))
+    -->
+    </strudel-editor>
+</div>
+
+<p>Both play at the same time. No delay, no stereo split. The copy is just transposed and quieter. Compare that to <code>.off()</code>, which shifts the copy in time, or <code>.jux()</code>, which splits it across stereo. <code>.superimpose()</code> stacks them directly on top of each other.</p>
+
+<p>Now a copy that runs double-time and pans right:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>superimposed double-time</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(35)
+n("0 2 4 7").scale("C:minor").s("sawtooth")
+  .lpf(1200).decay(0.1).sustain(0.3)
+  .gain(0.35)
+  .superimpose(x => x.fast(2).gain(0.2).pan(0.7))
+    -->
+    </strudel-editor>
+</div>
+
+<div class="concept">
+    <span class="c-label">.superimpose(fn)</span>
+    <p><code>.superimpose(fn)</code> plays the original pattern plus a transformed copy simultaneously. Unlike <code>.off()</code> (time-delayed copy) or <code>.jux()</code> (stereo-split copy), superimpose stacks both in the same time and space. The transform function creates all the difference between the two layers.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.superimpose(rev)</code> for original plus reversed simultaneously. Or <code>.superimpose(x =&gt; x.add(note(12)).fast(2).gain(0.15))</code> for an octave-up double-time ghost.</p>
+</div>
+
+<h3>Function composition</h3>
+
+<p>Chain multiple transforms into a single function. Inside a chunk, one arrow function does two things at once:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>composed transforms inside chunk</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1c">
+    <!--
+setcpm(35)
+n("0 2 4 7 4 2 0 7").scale("C:minor").s("sawtooth")
+  .lpf(1200).decay(0.1).sustain(0.3).gain(0.35)
+  .chunk(4, x => x.fast(2).add(note(7)).gain(0.2))
+    -->
+    </strudel-editor>
+</div>
+
+<p>Inside the chunk, the function does two things: doubles speed AND adds a fifth. The chunked section plays twice as fast and a fifth higher. The rest of the pattern stays normal.</p>
+
+<div class="concept">
+    <span class="c-label">function composition</span>
+    <p>Building complex transforms from simple ones. <code>x =&gt; x.fast(2).add(note(7)).gain(0.2)</code> reads: take the pattern, speed it up, transpose it, quiet it. Each method chains onto the last. One arrow function, three operations. This is how you build monsters&mdash;by composing small transforms into one.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 2: BUILDING THE BEAST ============ -->
+<section id="composition">
+<h2><span class="num">02</span>Building the Beast</h2>
+
+<p>One line. Start simple. Add one transform at a time until it becomes something no single tool could produce.</p>
+
+<p>The seed. A euclidean melody in C minor&mdash;three notes distributed across eight slots:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>the seed</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+setcpm(35)
+n("0(3,8)").scale("C:minor").s("sawtooth")
+  .lpf(1200).sustain(0.3)
+  .gain(0.5)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Three notes in eight slots. That&rsquo;s the seed. Everything grows from here.</p>
+
+<p>Add speed alternation. Even cycles at normal pitch, odd cycles an octave up:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>+ speed alternation</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+setcpm(35)
+n("0(3,8)").scale("C:minor").s("sawtooth")
+  .lpf(1200).sustain(0.3)
+  .speed("<1 2>")
+  .gain(0.5)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Every other cycle jumps an octave. Two-bar phrase from one character of code.</p>
+
+<p>Add ply and chunk. One quarter of the pattern stutters eight times. The rest stays clean:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>+ chunk with ply</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2c">
+    <!--
+setcpm(35)
+n("0(3,8)").scale("C:minor").s("sawtooth")
+  .lpf(1200).sustain(0.3)
+  .speed("<1 2>")
+  .gain(0.5)
+  .chunk(4, x => x.ply(8).gain(0.3))
+    -->
+    </strudel-editor>
+</div>
+
+<p>Chunk rotates which quarter gets ply&rsquo;d. That quarter stutters eight times. The rest plays normally. Scanning texture.</p>
+
+<p>Add speed modulation with sine inside the chunk. Pitch bending within the stutters:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>+ sine-driven pitch in chunk</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2d">
+    <!--
+setcpm(35)
+n("0(3,8)").scale("C:minor").s("sawtooth")
+  .lpf(1200).sustain(0.3)
+  .speed("<1 2>")
+  .gain(0.5)
+  .chunk(4, x => x.ply(8).speed(sine.range(0.5, 2)).gain(0.3))
+    -->
+    </strudel-editor>
+</div>
+
+<p>Inside the chunked section, speed sweeps from half to double via sine. Pitch bending within the stutters. The texture becomes alive.</p>
+
+<p>Add juxBy for stereo width. Left channel: original. Right channel: reversed:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>+ stereo split</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2e">
+    <!--
+setcpm(35)
+n("0(3,8)").scale("C:minor").s("sawtooth")
+  .lpf(1200).sustain(0.3)
+  .speed("<1 2>")
+  .gain(0.5)
+  .chunk(4, x => x.ply(8).speed(sine.range(0.5, 2)).gain(0.3))
+  .juxBy(0.6, rev)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The pattern splits across the stereo field. Width. Headphones make this obvious.</p>
+
+<p>Add a sweeping filter, resonance, release, and reverb. The monster:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// THE MONSTER</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2f">
+    <!--
+setcpm(35)
+n("0(3,8)").scale("C:minor").s("sawtooth")
+  .lpf(sine.range(400, 2000).slow(8)).lpq(3)
+  .sustain(0.3).release(0.1)
+  .speed("<1 2>")
+  .gain(0.5)
+  .chunk(4, x => x.ply(8).speed(sine.range(0.5, 2)).gain(0.3))
+  .juxBy(0.6, rev)
+  .room(0.3).size(0.5)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Filter sweeps slowly across eight cycles. Resonance adds bite at the cutoff. Stereo split. Chunked ply with sine-driven pitch. Alternating octaves. Reverb tail. All from three notes in eight slots.</p>
+
+<p>That&rsquo;s seven transforms on a single pattern. Each one is a tool you earned. Together they create something no single tool could. The euclidean seed is still there&mdash;<code>n("0(3,8)")</code>&mdash;but it&rsquo;s been processed into a living texture.</p>
+</section>
+
+<!-- ============ SECTION 3: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">03</span>The Monster</h2>
+
+<div class="punchline">
+    <p><strong>The monster in full context.</strong> Drums, bass, pad, and the monster voice together. Kicks with variation. Claps sometimes drenched in reverb. Hats chunked and stereo-split. Cowbell with delay. 808 bass walking the progression. Pad with an offset octave. And on top of it all, the monster&mdash;euclidean seed, seven transforms deep, its melody evolving across four bars.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: the monster</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(35)
+stack(
+  // kick
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9)
+    .every(4, fast(2)),
+  // clap — sometimes drenched
+  s("~ ~ ~ ~ cp ~ ~ ~")
+    .room(0.3).size(0.5).gain(0.85)
+    .sometimes(x => x.room(0.8).size(0.9)),
+  // hats — chunked variation
+  s("hh*16").gain("0.3 0.5 0.3 0.8")
+    .chunk(4, rev)
+    .juxBy(0.4, fast(2)),
+  // cowbell — degraded
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4)
+    .delay(0.2).delaytime(0.125).delayfeedback(0.3)
+    .sometimes(rev).pan(0.6),
+  // 808 bass
+  note("<[c2 ~ c2 ~ ~ ~ eb2 ~] [ab1 ~ ab1 ~ ~ ~ c2 ~] [bb1 ~ bb1 ~ ~ ~ d2 ~] [g1 ~ g1 ~ ~ ~ b1 ~]>")
+    .s("sine").decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  // pad with offset octave — Cm -> Ab -> Bb -> G via chord() + .voicing()
+  chord("<Cm Ab Bb G>").voicing().s("sawtooth")
+    .lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8).gain(0.2)
+    .off(1/2, add(note(12))),
+  // THE MONSTER: euclidean melody with everything
+  n("<0 [0 4] [0 2 4] [0 4 7 4]>(3,8)").scale("C:minor").s("sawtooth")
+    .lpf(sine.range(400, 2000).slow(8)).lpq(3)
+    .sustain(0.3).release(0.1)
+    .speed("<1 2>")
+    .gain(0.35)
+    .chunk(4, x => x.ply(8).speed(sine.range(0.5, 2)).gain(0.2))
+    .juxBy(0.6, rev)
+    .room(0.3).size(0.5)
+    .color("orange")._spiral()
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Count the tools: <code>stack</code>, <code>every</code>, <code>fast</code>, <code>sometimes</code>, <code>chunk</code>, <code>rev</code>, <code>juxBy</code>, <code>off</code>, <code>add(note)</code>, <code>ply</code>, <code>speed</code> with sine modulation, voice-led chord voicings, euclidean rhythms, <code>&lt;&gt;</code> alternation, scale degrees, explicit note arrays, reverb, delay, distortion, filter sweep, pan. Nearly every tool from the entire course in one piece.</p>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Change the monster seed from <code>"0(3,8)"</code> to <code>"0(5,8)"</code> or <code>"0(7,16)"</code>. The euclidean pattern changes everything downstream. More hits, denser texture. Fewer hits, more space.</li>
+        <li>Add <code>.degradeBy(0.3)</code> to the monster voice. 30% of notes randomly drop out. The texture thins and breathes unpredictably.</li>
+        <li>Replace <code>.chunk(4, ...)</code> with <code>.chunk(8, ...)</code> for finer scanning. Eight slices instead of four. The spotlight moves faster.</li>
+        <li>Write your own monster from scratch. Pick a seed&mdash;any euclidean pattern, any scale. Add transforms one by one until it sounds right. Stop when removing anything would make it worse.</li>
+        <li>Share it. This one is yours.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>.chunk(N, fn)</td><td>apply transform to 1/Nth of pattern, rotating each cycle</td><td><code>.chunk(4, fast(2))</code></td></tr>
+        <tr><td>.superimpose(fn)</td><td>play original + transformed copy simultaneously</td><td><code>.superimpose(x =&gt; x.add(note(7)).gain(0.2))</code></td></tr>
+        <tr><td>function composition</td><td>chain multiple transforms in one arrow function</td><td><code>x =&gt; x.fast(2).add(note(7)).gain(0.2)</code></td></tr>
+        <tr><td>.degrade()</td><td>randomly drop 50% of events</td><td><code>.degrade()</code></td></tr>
+        <tr><td>.degradeBy(n)</td><td>randomly drop n% of events</td><td><code>.degradeBy(0.3)</code></td></tr>
+        <tr><td>building from a seed</td><td>start minimal, add transforms one at a time</td><td><code>n("0(3,8)") + 7 transforms</code></td></tr>
+        </tbody>
+    </table>
+    <p class="earned-next">Next: <em>The Set</em>. Everything you&rsquo;ve built, arranged into a performance.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td>Aphex Twin</td><td>Vordhosbn (2001)</td><td>(IDM) inhuman layered complexity</td></tr>
+        <tr><td>Venetian Snares</td><td>Hajnal (2005)</td><td>(breakcore) Bart&oacute;k + amen = breakcore</td></tr>
+        <tr><td>Squarepusher</td><td>Ultravisitor (2004)</td><td>(glitch) noise + ambient + glitch + wild breaks</td></tr>
+        <tr><td>Brian Eno</td><td>Music for Airports 1/1 (1978)</td><td>(IDM) generative systems: tape loops of coprime lengths producing non-repeating music</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Building music from rules instead of note-by-note composition has a lineage running from medieval canons to Brian Eno to your strudel editor.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Canon and fugue (1300&ndash;1750)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">A canon is the simplest generative structure: a melody plays, then a copy of itself starts later. The composer writes ONE line; the system generates the second (and third, and fourth). Bach&rsquo;s <em>Musical Offering</em> (1747) includes canons where the second voice plays the original backward (retrograde), upside down (inversion), or at half speed (augmentation). <code>.off()</code>, <code>.rev()</code>, and <code>.slow()</code> are these operations in code.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Brian Eno and generative systems (1975&ndash;present)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Eno&rsquo;s <em>Discreet Music</em> (1975) used two melodic loops of different lengths playing through a delay system. Because the loops were different lengths, they never exactly repeated the same alignment. <em>Music for Airports</em> (1978) extended this with tape loops of different durations playing simultaneously. Eno called it &ldquo;generative music&rdquo; &mdash; music that is &ldquo;ever-different and changing.&rdquo; The composer sets up a system; the system produces the music.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">TidalCycles and Strudel (2009&ndash;present)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Alex McLean created TidalCycles as part of his PhD research at Goldsmiths, University of London. His thesis (<em>Making Programming Languages to Dance to</em>, 2014) argued that pattern is the fundamental unit of musical thought, not the note. TidalCycles models music as functions of time, not sequences of events. Strudel (Felix Roos, 2022) ports these ideas to JavaScript, making them accessible in a browser. The <code>.chunk()</code>, <code>.every()</code>, and <code>.superimpose()</code> functions are pattern transformations &mdash; the same class of operations Bach used, formalized as code.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Hofstadter, <em>G&ouml;del, Escher, Bach</em> (1979); Eno, &ldquo;Generative Music&rdquo; (1996); McLean, <em>Making Programming Languages to Dance to</em> (2014); Roos, &ldquo;Strudel&rdquo; (2022).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: generative music</summary>
+    <div class="rh-body">
+        <h4>Music for Airports (1978)</h4>
+        <p>Brian Eno used tape loops of different lengths playing simultaneously. A piano phrase on a loop of 17 seconds. A vocal tone on a loop of 23 seconds. A synth pad on a loop of 29 seconds. Because the lengths are coprime, the combination never exactly repeats. The pattern is always familiar, never identical.</p>
+
+        <h4>Rules, not notes</h4>
+        <p>That&rsquo;s generative music. You define a system&mdash;a set of rules, constraints, and processes&mdash;and the music emerges from the system running. You don&rsquo;t write every note. You write the conditions under which notes appear.</p>
+
+        <p>The monster works the same way. <code>n("0(3,8)")</code> is a rule: three notes, eight slots, maximally even. <code>.chunk(4, x =&gt; x.ply(8).speed(sine.range(0.5, 2)).gain(0.3))</code> is a rule: one quarter stutters with pitch modulation, rotating. <code>.juxBy(0.6, rev)</code> is a rule: left plays forward, right plays backward. <code>.speed("&lt;1 2&gt;")</code> is a rule: alternate octaves every cycle.</p>
+
+        <p>None of those rules specify exact notes at exact times. They specify processes that generate notes. The result is music that varies without randomness&mdash;deterministic but too complex to predict by ear. That&rsquo;s what makes it feel alive.</p>
+
+        <h4>Strudel as generative instrument</h4>
+        <p>Strudel is a generative instrument. Every pattern is a rule. Every transform modifies the rule. <code>.every()</code>, <code>.sometimes()</code>, <code>.chunk()</code>, euclidean rhythms, sine modulation&mdash;these are all rule-based. You built a generative composition. The monster is proof.</p>
+    </div>
+</details>
+
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(3, 0.06, 0.8)
+            .color(0.2, 0.6, 1.0)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.2)
+            .modulateScale(
+                h.osc(7, 0.08).rotate(0.4),
+                () => 0.15 + window._audioData.fft[1] * 0.4
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.3)
+            .saturate(() => 0.6 + window._audioData.fft[2] * 1.2)
+            .kaleid(() => 4 + Math.floor(window._audioData.fft[3] * 3))
+            .contrast(1.4)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>
