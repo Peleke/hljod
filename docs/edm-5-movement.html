@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.5: Movement</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#every">Every</a>
+    <a href="#sometimes">Sometimes</a>
+    <a href="#splits">Splits</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">Movement</span></h1>
+<div class="subtitle">EDM.5: transforms, probability, and stereo splits</div>
+
+<p>Your EDM.4 capstone is a phonk track. Play it twice and you hear the seam. Every cycle is identical. Real tracks shift. Strudel has tools for that.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm(35)</code>,
+    mini-notation, <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>, and the phonk palette from EDM.4.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: EVERY ============ -->
+<section id="every">
+<h2><span class="num">00</span>Conditional Repeats</h2>
+
+<p>The hi-hat pattern from EDM.4. Steady, unchanging:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>steady hats</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(35)
+s("hh*16").gain("0.3 0.5 0.3 0.8")
+    -->
+    </strudel-editor>
+</div>
+
+<p>Same pattern, but every 4th cycle the accents reverse:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>hats + .every(4, rev)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+setcpm(35)
+s("hh*16").gain("0.3 0.5 0.3 0.8")
+  .every(4, rev)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Three cycles forward. One cycle reversed. The accent pattern flips. Your ear catches the difference, then the regularity returns.</p>
+
+<div class="concept">
+    <span class="c-label">.every()</span>
+    <p><code>.every(N, transform)</code>: apply a transform every Nth cycle. The rest of the time, the pattern plays normally. Predictable variation&mdash;surprise you can count on.</p>
+</div>
+
+<h3>Stacking transforms</h3>
+
+<p>Different elements, different periods. The kick doubles every 4th cycle. The cowbell reverses every 3rd:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>layered .every()</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0c">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9)
+    .every(4, fast(2)),
+  s("~ ~ ~ ~ cp ~ ~ ~").gain(0.85),
+  s("hh*16").gain("0.3 0.5 0.3 0.8")
+    .every(4, rev),
+  s("~ cb ~ cb ~ cb cb ~").gain(0.5)
+    .every(3, rev)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The kick doubles every 4 cycles. The cowbell reverses every 3. They realign every 12 cycles. Different periods create a longer arc&mdash;the pattern takes 12 cycles before it truly repeats.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Replace <code>fast(2)</code> with <code>ply(2)</code>&mdash;repeats each hit instead of speeding the whole pattern. Try <code>.every(8, rev)</code> for less frequent variation. Or <code>.every(2, fast(2))</code> on the cowbell for something aggressive.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: SOMETIMES ============ -->
+<section id="sometimes">
+<h2><span class="num">01</span>Probability</h2>
+
+<p><code>.every()</code> is a clock. <code>.sometimes()</code> is a coin flip:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>sometimes fast hats</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(35)
+s("hh*16").gain("0.3 0.5 0.3 0.8")
+  .sometimes(fast(2))
+    -->
+    </strudel-editor>
+</div>
+
+<p>Each cycle, roughly 50/50 whether the hats double. You can&rsquo;t predict when. The pattern breathes differently every time.</p>
+
+<div class="concept">
+    <span class="c-label">.sometimes() / .often() / .rarely()</span>
+    <p><code>.sometimes(transform)</code>: ~50% chance per cycle. <code>.often()</code>: ~75%. <code>.rarely()</code>: ~25%. The pattern makes choices. Non-deterministic. It sounds live because it is.</p>
+</div>
+
+<h3>Probability across layers</h3>
+
+<p>Different elements, different odds. The clap sometimes drenches in reverb, the hats rarely double, the cowbell often echoes:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>probability stack</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9),
+  s("~ ~ ~ ~ cp ~ ~ ~")
+    .room(0.3).size(0.5).gain(0.85)
+    .sometimes(x => x.room(0.7).size(0.9)),
+  s("hh*16").gain("0.3 0.5 0.3 0.8")
+    .rarely(fast(2)),
+  s("~ cb ~ cb ~ cb cb ~").gain(0.5)
+    .often(x => x.delay(0.2).delaytime(0.125).delayfeedback(0.3))
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The clap sometimes gets drenched, the hats rarely double, and the cowbell often echoes. Each element has its own odds. The beat drifts instead of looping.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Change <code>.rarely(fast(2))</code> to <code>.often(fast(2))</code>&mdash;the hats get manic. Try <code>.sometimes(rev)</code> on the kick for unexpected rhythm flips. Chain both: <code>.every(4, fast(2)).sometimes(rev)</code> on a single pattern.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: determinism and live coding</summary>
+    <div class="rh-body">
+        <h4>Why randomness matters</h4>
+        <p>A looping pattern is a machine. A pattern with probability is a system. Same difference as a metronome vs. a drummer. The drummer makes micro-decisions on every hit. <code>.sometimes()</code> is the cheapest way to get that quality. No two listens are the same.</p>
+
+        <h4>Algorave</h4>
+        <p>Live coding communities (Algorave, TOPLAP) build entire performances from transforms like these. The performer writes code in real time. The audience watches the screen and dances. Strudel and TidalCycles are the two main instruments. <code>.every()</code> and <code>.sometimes()</code> are standard vocabulary: set up a system, then nudge it, rather than programming every note.</p>
+
+        <h4>Mixing .every and .sometimes</h4>
+        <div class="strudel-block">
+            <div class="strudel-label"><span>combined transforms</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-combo">
+            <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9)
+    .every(4, fast(2))
+    .rarely(rev),
+  s("~ ~ ~ ~ cp ~ ~ ~").gain(0.85)
+    .sometimes(x => x.room(0.6).size(0.9)),
+  s("hh*16").gain("0.3 0.5 0.3 0.8")
+    .every(3, rev)
+    .sometimes(fast(2))
+)
+            -->
+            </strudel-editor>
+        </div>
+        <p>The kick doubles on a schedule AND rarely reverses. The hats reverse on a schedule AND sometimes double. Layered rules produce patterns no single rule could.</p>
+
+        <h4>Steve Reich</h4>
+        <p>In 1965, Steve Reich made &ldquo;It&rsquo;s Gonna Rain&rdquo; by playing two identical tape loops on slightly different machines. They started in sync and slowly drifted apart. Phasing. <code>.every()</code> with different periods on different layers does the same thing&mdash;patterns that share a downbeat but disagree on when to change. Reich called it &ldquo;the process.&rdquo; Strudel calls it a one-liner.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 2: SPLITS ============ -->
+<section id="splits">
+<h2><span class="num">02</span>Stereo Splits</h2>
+
+<p><code>.pan()</code> from EDM.3 places a sound left or right. <code>.jux()</code> splits the pattern in two: original in one ear, a transformed copy in the other.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>jux: L=forward, R=reversed</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+setcpm(35)
+s("hh*16").gain("0.3 0.5 0.3 0.8")
+  .jux(rev)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Left ear: forward accents. Right ear: reversed accents. Same hits, mirrored in stereo. The hat rolls weave from side to side. Use headphones.</p>
+
+<div class="concept">
+    <span class="c-label">.jux()</span>
+    <p><code>.jux(transform)</code>: play the original pattern on the left, a transformed copy on the right. Short for &ldquo;juxtapose.&rdquo; <code>.juxBy(amount, transform)</code> controls how far apart: <code>0.5</code> means half-panned instead of hard L/R.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.juxBy(0.3, rev)</code> for a subtler split. Or <code>.jux(fast(2))</code>&mdash;normal speed left, double speed right. Apply it to the cowbell: <code>s("~ cb ~ cb ~ cb cb ~").gain(0.5).jux(rev)</code>.</p>
+</div>
+
+<h3>Offset layering</h3>
+
+<p><code>.off()</code> copies the pattern, delays it by a fraction of the cycle, and transforms the copy. Both play at once:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>pad + octave echo</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+setcpm(35)
+note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+  .s("sawtooth")
+  .lpf(800).lpq(2)
+  .attack(0.2).sustain(0.6).release(0.5)
+  .room(0.5).size(0.8)
+  .gain(0.25)
+  .off(1/2, add(note(12)))
+    -->
+    </strudel-editor>
+</div>
+
+<p>The pad plays its chord. Half a cycle later, a copy plays the same chord an octave higher (<code>add(note(12))</code> = 12 semitones up). Two layers from one line. The pad thickens without writing a second pattern.</p>
+
+<div class="concept">
+    <span class="c-label">.off()</span>
+    <p><code>.off(time, transform)</code>: copy the pattern, delay it by <code>time</code> (fraction of a cycle), apply <code>transform</code>, stack both. <code>.off(1/8, add(note(7)))</code> creates a canon at the fifth, offset by an eighth note.</p>
+</div>
+
+<h3>Offset as harmony</h3>
+
+<p>A fifth above (7 semitones) instead of an octave. Offset by an eighth note instead of half a bar:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>pad + delayed fifth</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2c">
+    <!--
+setcpm(35)
+note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+  .s("sawtooth")
+  .lpf(800).lpq(2)
+  .attack(0.2).sustain(0.6).release(0.5)
+  .room(0.5).size(0.8)
+  .gain(0.25)
+  .off(1/8, add(note(7)))
+    -->
+    </strudel-editor>
+</div>
+
+<p>The offset copy is a fifth higher and arrives a beat later. The chords cascade. <code>.off()</code> turned one pad into two voices.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.off(1/4, x =&gt; x.add(note(12)).gain(0.15).pan(0.8))</code>&mdash;the offset copy is an octave up, quieter, and panned right. Or stack offsets: <code>.off(1/8, add(note(7))).off(1/4, add(note(12)))</code> for two shadow copies.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 3: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">03</span>Movement</h2>
+
+<div class="punchline">
+    <p><strong>The EDM.4 track, alive.</strong> Kicks that double, hats that split, a clap that drifts between dry and drenched, a cowbell that reverses, and a pad echoing itself an octave up. Same chords, same key. Transforms make it breathe.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: movement</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(35)
+stack(
+  // kick — double-time every 4th cycle
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9)
+    .every(4, fast(2)),
+  // clap — sometimes extra reverb
+  s("~ ~ ~ ~ cp ~ ~ ~")
+    .room(0.3).size(0.5).gain(0.85)
+    .sometimes(x => x.room(0.8).size(0.9)),
+  // hats — stereo split
+  s("hh*16").gain("0.3 0.5 0.3 0.8")
+    .juxBy(0.5, rev),
+  // cowbell — reversed every 3rd + delay
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4)
+    .delay(0.2).delaytime(0.125).delayfeedback(0.3)
+    .every(3, rev).pan(0.6),
+  // 808 bass
+  note("<[c2 ~ c2 ~ ~ ~ eb2 ~] [ab1 ~ ab1 ~ ~ ~ c2 ~] [bb1 ~ bb1 ~ ~ ~ d2 ~] [g1 ~ g1 ~ ~ ~ b1 ~]>")
+    .s("sine").decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  // pad — offset octave echo
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth")
+    .lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8)
+    .gain(0.25)
+    .off(1/2, add(note(12)))
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Add <code>.sometimes(rev)</code> to the 808 bass. The melody contour reverses at random&mdash;different shape, same notes.</li>
+        <li>Apply <code>.jux(x =&gt; x.fast(2).gain(0.3))</code> to the cowbell. Double-time ghost cowbell in the opposite ear.</li>
+        <li>Chain transforms on the hats: <code>.every(8, fast(2)).sometimes(rev).juxBy(0.5, rev)</code>. Three rules, one pattern.</li>
+        <li>Share it. The track is different every time you play it. That&rsquo;s the point.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>.every(N, fn)</td><td>transform every Nth cycle</td><td><code>.every(4, fast(2))</code></td></tr>
+        <tr><td>.sometimes(fn)</td><td>~50% chance per cycle</td><td><code>.sometimes(rev)</code></td></tr>
+        <tr><td>.often(fn)</td><td>~75% chance per cycle</td><td><code>.often(fast(2))</code></td></tr>
+        <tr><td>.rarely(fn)</td><td>~25% chance per cycle</td><td><code>.rarely(rev)</code></td></tr>
+        <tr><td>fast(N)</td><td>speed up pattern by N</td><td><code>fast(2)</code></td></tr>
+        <tr><td>rev</td><td>reverse pattern order</td><td><code>rev</code></td></tr>
+        <tr><td>ply(N)</td><td>repeat each event N times</td><td><code>ply(2)</code></td></tr>
+        <tr><td>.jux(fn)</td><td>L=original, R=transformed</td><td><code>.jux(rev)</code></td></tr>
+        <tr><td>.juxBy(n, fn)</td><td>partial stereo split</td><td><code>.juxBy(0.5, rev)</code></td></tr>
+        <tr><td>.off(t, fn)</td><td>offset copy + transform</td><td><code>.off(1/8, add(note(7)))</code></td></tr>
+        <tr><td>add(note(N))</td><td>transpose by N semitones</td><td><code>add(note(12))</code></td></tr>
+        </tbody>
+    </table>
+    <div class="concept" style="margin: 1rem 0 0; border-radius: 6px;">
+        <span class="c-label">movement checklist</span>
+        <p><code>.every()</code> for scheduled variation. <code>.sometimes()</code> for probability. <code>.jux()</code> for stereo splits. <code>.off()</code> for time-shifted harmony. Layer them. Different periods and probabilities on different elements. The complexity builds itself.</p>
+    </div>
+    <p class="earned-next">Next: <em>The Drop</em>. Arrangement, silence, tension and release.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td>DJ Rashad</td><td>Feelin (2012)</td><td>(footwork) constant rhythmic instability, scattered samples</td></tr>
+        <tr><td>Burial</td><td>Archangel (2007)</td><td>(garage) constantly shifting chopped vocals, ghostly evolution</td></tr>
+        <tr><td>Aphex Twin</td><td>Xtal (1992)</td><td>(ambient) subtle timbral shifts, generative ambient</td></tr>
+        <tr><td>Alex McLean (Yaxu)</td><td>Algorave performance (2013)</td><td>(footwork) TidalCycles live coding: .every() and .sometimes() as performance vocabulary</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The idea that rules can generate music&mdash;not specific notes, but systems that produce notes&mdash;is older than computers.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Musikalisches W&uuml;rfelspiel (1757&ndash;1790s)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">&ldquo;Musical dice games&rdquo; attributed to various composers (sometimes falsely to Mozart) let players roll dice to select pre-composed bars, assembling a minuet from random choices. The system guaranteed grammatically correct music regardless of rolls. Each roll was a <code>.sometimes()</code>&mdash;probability selecting from a curated set.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Steve Reich and phasing (1965&ndash;1968)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Reich discovered phasing accidentally when two identical tape loops on different machines slowly drifted apart. &ldquo;It&rsquo;s Gonna Rain&rdquo; (1965) and &ldquo;Come Out&rdquo; (1966) explored this. &ldquo;Piano Phase&rdquo; (1967) applied it to live performers. The principle: identical patterns at slightly different speeds generate emergent complexity. That&rsquo;s what <code>.every()</code> with different periods on different layers does&mdash;patterns that share a start point but disagree on when to change.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Live coding and TOPLAP (2003&ndash;present)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">In 2003, a group of artists including Alex McLean, Adrian Ward, and others drafted the TOPLAP manifesto at a Hamburg workshop. &ldquo;Show us your screens&rdquo; was the core demand&mdash;audiences should see the code being written. McLean went on to create TidalCycles (2009), the Haskell-based live coding language that Strudel ports to JavaScript. The Algorave movement (algorithmic rave) emerged in 2012, with performances in clubs from Sheffield to Tokyo.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Hedges, &ldquo;Dice Music in the Eighteenth Century&rdquo; (1978); Reich, <em style="color: var(--text-faint); font-style: italic;">Writings on Music</em> (2002); Collins et al., &ldquo;Live Coding in Laptop Performance&rdquo; (2003); McLean, &ldquo;Making Programming Languages to Dance to&rdquo; (2014).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(4, 0.06, 0.8)
+            .color(0.4, 0.2, 1.0)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.5)
+            .modulateScale(
+                h.osc(7, 0.15).rotate(0.3),
+                () => 0.15 + window._audioData.fft[1] * 0.4
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.3)
+            .saturate(() => 0.9 + window._audioData.fft[2] * 2.0)
+            .kaleid(() => 4 + Math.floor(window._audioData.fft[3] * 4))
+            .contrast(1.2)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>

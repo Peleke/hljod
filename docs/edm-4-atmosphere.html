@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.4: Atmosphere</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+/* Reduce internal padding/space in the strudel component */
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#ground">New Ground</a>
+    <a href="#the808">The 808</a>
+    <a href="#space">Space</a>
+    <a href="#chord">The Chord</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">Atmosphere</span></h1>
+<div class="subtitle">EDM.4: the 808, dark chords, and space</div>
+
+<p>Your EDM.3 capstone was ten layers of DnB at 170bpm. We&rsquo;re dropping the tempo. Different speed, different genre, same tools. The target is phonk.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm()</code>,
+    mini-notation (<code>[] * ~ () &lt;&gt;</code>), <code>.gain()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>, <code>.add(note())</code>,
+    <code>sine.range()</code>, <code>.slow()</code>, <code>.pan()</code>,
+    euclidean patterns, and ghost layers from EDM.0&ndash;3.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: NEW GROUND ============ -->
+<section id="ground">
+<h2><span class="num">00</span>New Ground</h2>
+
+<p>140bpm instead of 170. Four beats per cycle: 140&thinsp;/&thinsp;4&thinsp;=&thinsp;35 cycles per minute.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>140bpm kick</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(35)
+s("bd ~ ~ ~ bd ~ [~ bd] ~")
+    -->
+    </strudel-editor>
+</div>
+
+<p>Slower. Heavier. The kick has more air around it.</p>
+
+<p>Add a clap on beat 3 and hi-hats:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>phonk drums</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~"),
+  s("~ ~ ~ ~ cp ~ ~ ~").gain(0.9),
+  s("hh*16").gain("0.3 0.5 0.3 0.8")
+)
+    -->
+    </strudel-editor>
+</div>
+
+<h3>The cowbell</h3>
+
+<p>One sound that defines this genre:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>+ cowbell</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0c">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~"),
+  s("~ ~ ~ ~ cp ~ ~ ~").gain(0.9),
+  s("hh*16").gain("0.3 0.5 0.3 0.8"),
+  s("~ cb ~ cb ~ cb cb ~").gain(0.5)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Metallic, insistent, bright against dark drums. The cowbell cuts through everything.</p>
+
+<div class="concept">
+    <span class="c-label">phonk</span>
+    <p>Hip-hop subgenre rooted in Memphis rap. Heavy 808 bass, cowbell, dark atmosphere. 130&ndash;145 BPM. What you just heard is the skeleton.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>s("cb(5,8)")</code> for a euclidean cowbell. Or <code>s("cb*8").gain("0 0.5 0 0.7 0 0.5 0 0.9")</code> for accented eighth notes.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: THE 808 ============ -->
+<section id="the808">
+<h2><span class="num">01</span>The 808</h2>
+
+<p>In DnB, the bass was a reese&mdash;two detuned sawtooths. Phonk bass is simpler. A sine wave with a long tail:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>sine with decay</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(35)
+note("c2").s("sine")
+  .decay(0.5).sustain(0)
+    -->
+    </strudel-editor>
+</div>
+
+<p>A sine wave that rings and dies. That&rsquo;s an 808 bass. The Roland TR-808 drum machine used this exact circuit for its kick: an oscillator that decays. Producers started pitching it down and holding it longer. The kick became the bass.</p>
+
+<p>Give it a pattern. Two notes from C minor:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>808 in c minor</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(35)
+note("c2 ~ c2 ~ eb2 ~ c2 ~").s("sine")
+  .decay(0.3).sustain(0.2).release(0.1)
+  .gain(0.8)
+    -->
+    </strudel-editor>
+</div>
+
+<p>C, then E-flat. Root and minor third. The bass carries melody now, not just weight.</p>
+
+<div class="concept">
+    <span class="c-label">808 bass</span>
+    <p>A sine oscillator shaped by a decay envelope. Long tail, low pitch. The note carries the melody. The envelope carries the weight. Named after the Roland TR-808.</p>
+</div>
+
+<h3>Distortion</h3>
+
+<p>Clean 808s work. Distorted 808s bite:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>distorted 808</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1c">
+    <!--
+setcpm(35)
+note("c2 ~ c2 ~ eb2 ~ c2 ~").s("sine")
+  .decay(0.3).sustain(0.2).release(0.1)
+  .distort(0.4)
+  .gain(0.7)
+    -->
+    </strudel-editor>
+</div>
+
+<p><code>.distort()</code> clips the sine wave, adding harmonics. The bass gets grittier. A clean sine is a sub. A distorted sine is a phonk 808.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.distort(0.1)</code> for subtle warmth. <code>.distort(0.8)</code> for aggressive clipping. Add <code>.crush(8)</code> after distort for bit-crushing&mdash;a different kind of grit.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: the TR-808 circuit</summary>
+    <div class="rh-body">
+        <h4>The drum machine nobody wanted</h4>
+        <p>Roland released the TR-808 in 1980. It was supposed to sound like real drums. It didn&rsquo;t. The kick was a sine wave that decayed exponentially&mdash;a bridged-T oscillator circuit. Real kick drums don&rsquo;t sound like that. Roland discontinued it in 1983.</p>
+
+        <h4>The waveform</h4>
+        <p>The 808 kick produces a decaying sine:</p>
+        <canvas id="can-808" width="400" height="100" style="width: 100%; background: var(--surface); border-radius: 4px; margin: 0.5rem 0 1rem;"></canvas>
+        <script>
+        (function() {
+            const c = document.getElementById('can-808');
+            const ctx = c.getContext('2d');
+            const w = c.width, h = c.height;
+            ctx.strokeStyle = '#ff6b35';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let x = 0; x < w; x++) {
+                const t = x / w;
+                const env = Math.exp(-t * 4);
+                const wave = Math.sin(t * Math.PI * 2 * 5);
+                const y = h/2 - env * wave * (h/2 - 10);
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.strokeStyle = '#ff6b3544';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            for (let x = 0; x < w; x++) {
+                const t = x / w;
+                const env = Math.exp(-t * 4);
+                const y = h/2 - env * (h/2 - 10);
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.beginPath();
+            for (let x = 0; x < w; x++) {
+                const t = x / w;
+                const env = Math.exp(-t * 4);
+                const y = h/2 + env * (h/2 - 10);
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.font = '9px monospace';
+            ctx.fillStyle = '#8a8780';
+            ctx.fillText('time \u2192', w - 55, h - 5);
+            ctx.fillText('amplitude', 5, 12);
+        })();
+        </script>
+        <p>Orange: the actual waveform. Dashed: the exponential envelope. Same shape as <code>note("c2").s("sine").decay(0.5).sustain(0)</code>. Same math, not an approximation.</p>
+
+        <h4>Memphis</h4>
+        <p>In the early 1990s, Memphis producers (DJ Paul, Juicy J, Three 6 Mafia) started using the 808 kick as a melodic bass instrument. They tuned it, pitched it, ran patterns with it. The kick stopped being percussion and became the foundation. That lineage runs straight through trap and into phonk.</p>
+
+        <h4>Different decays</h4>
+        <div class="strudel-block">
+            <div class="strudel-label"><span>short, medium, long decay</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-decay">
+            <!--
+setcpm(35)
+stack(
+  note("c2 ~ ~ ~").s("sine")
+    .decay(0.08).sustain(0).gain(0.7),
+  note("~ ~ c2 ~").s("sine")
+    .decay(0.3).sustain(0).gain(0.7),
+  note("~ ~ ~ c2").s("sine")
+    .decay(0.6).sustain(0.1).gain(0.7)
+)
+            -->
+            </strudel-editor>
+        </div>
+        <p>Short decay: a kick. Medium: a bass hit. Long: a sub note. Same oscillator, different envelope. The decay knob decides what instrument this is.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 2: SPACE ============ -->
+<section id="space">
+<h2><span class="num">02</span>Space</h2>
+
+<p>Every sound so far is dry. No reflections, no echoes. Flat.</p>
+
+<h3>Reverb</h3>
+
+<p>A clap, raw:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>dry clap</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+setcpm(35)
+s("~ ~ ~ ~ cp ~ ~ ~")
+    -->
+    </strudel-editor>
+</div>
+
+<p>The same clap in a room:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>reverbed clap</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+setcpm(35)
+s("~ ~ ~ ~ cp ~ ~ ~")
+  .room(0.5).size(0.8)
+    -->
+    </strudel-editor>
+</div>
+
+<p><code>.room()</code> is how much reverb. <code>.size()</code> is how big the space. The clap has a tail now. It sounds like it happened somewhere.</p>
+
+<div class="concept">
+    <span class="c-label">reverb</span>
+    <p>Simulated reflections of sound in a space. <code>.room(amount)</code> sets how much signal enters the reverb. <code>.size(dimension)</code> sets the room size. Dry&thinsp;=&thinsp;original signal. Wet&thinsp;=&thinsp;reverb signal.</p>
+</div>
+
+<h3>Delay</h3>
+
+<p>Reverb is many reflections blurred. Delay is distinct echoes:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>delayed cowbell</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2c">
+    <!--
+setcpm(35)
+s("~ cb ~ cb ~ cb cb ~").gain(0.5)
+  .delay(0.3).delaytime(0.125).delayfeedback(0.4)
+    -->
+    </strudel-editor>
+</div>
+
+<p><code>.delay()</code> sets the echo level. <code>.delaytime()</code> sets the gap between echoes. <code>.delayfeedback()</code> controls how many times it repeats. The cowbell multiplies itself rhythmically.</p>
+
+<div class="concept">
+    <span class="c-label">delay</span>
+    <p>Discrete repetitions of a sound, spaced in time. <code>.delay(amount)</code> = wet level. <code>.delaytime(seconds)</code> = gap between echoes. <code>.delayfeedback(amount)</code> = how many echoes. Above 0.8, the echoes can run away.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.delaytime(0.25)</code> for quarter-note echoes. <code>.delayfeedback(0.7)</code> for a longer tail. Stack both effects: add <code>.room(0.3).size(0.6)</code> to the delayed cowbell. Reverb on the echoes.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: signal flow</summary>
+    <div class="rh-body">
+        <h4>Wet and dry</h4>
+        <svg viewBox="0 0 400 140" style="width: 100%; background: var(--surface); border-radius: 4px; margin: 0.5rem 0 1rem;">
+            <!-- Input -->
+            <rect x="10" y="55" width="60" height="30" rx="4" fill="none" stroke="#8a8780" stroke-width="1"/>
+            <text x="40" y="74" fill="#e8e6e3" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">input</text>
+            <!-- Fork -->
+            <line x1="70" y1="70" x2="120" y2="70" stroke="#8a8780" stroke-width="1"/>
+            <circle cx="120" cy="70" r="3" fill="#8a8780"/>
+            <!-- Dry path (top) -->
+            <line x1="120" y1="70" x2="120" y2="35" stroke="#4fc3f7" stroke-width="1"/>
+            <line x1="120" y1="35" x2="290" y2="35" stroke="#4fc3f7" stroke-width="1"/>
+            <text x="205" y="28" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">dry</text>
+            <!-- Wet path (bottom) -->
+            <line x1="120" y1="70" x2="120" y2="105" stroke="#ff6b35" stroke-width="1"/>
+            <line x1="120" y1="105" x2="160" y2="105" stroke="#ff6b35" stroke-width="1"/>
+            <rect x="160" y="90" width="70" height="30" rx="4" fill="none" stroke="#ff6b35" stroke-width="1"/>
+            <text x="195" y="109" fill="#ff6b35" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">effect</text>
+            <line x1="230" y1="105" x2="290" y2="105" stroke="#ff6b35" stroke-width="1"/>
+            <text x="260" y="120" fill="#ff6b35" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">wet</text>
+            <!-- Mix -->
+            <line x1="290" y1="35" x2="290" y2="60" stroke="#4fc3f7" stroke-width="1"/>
+            <line x1="290" y1="105" x2="290" y2="80" stroke="#ff6b35" stroke-width="1"/>
+            <circle cx="290" cy="70" r="10" fill="none" stroke="#66bb6a" stroke-width="1.5"/>
+            <text x="290" y="74" fill="#66bb6a" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">+</text>
+            <!-- Output -->
+            <line x1="300" y1="70" x2="340" y2="70" stroke="#8a8780" stroke-width="1"/>
+            <rect x="340" y="55" width="55" height="30" rx="4" fill="none" stroke="#8a8780" stroke-width="1"/>
+            <text x="367" y="74" fill="#e8e6e3" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">output</text>
+        </svg>
+        <p>The signal splits. The dry path is the original sound, unchanged. The wet path runs through the effect (reverb or delay). The mixer blends them. <code>.room(0.5)</code> means 50% wet, 50% dry.</p>
+
+        <h4>Delay feedback</h4>
+        <p>Delay has a feedback loop: the output of the delay feeds back into its own input. Each pass through the loop is quieter. At <code>.delayfeedback(0.5)</code>, each echo is half the volume of the previous one. At <code>0.9</code>, echoes barely die. Above <code>1.0</code>, they grow&mdash;runaway feedback.</p>
+
+        <h4>Why bass stays dry</h4>
+        <p>Same physics as why bass stays centered. Low frequencies create muddy, indistinct reverb tails. Reverb on a 50Hz sine just sounds like rumble. Keep the 808 dry. Put reverb on claps, cowbells, pads. Sounds with high-frequency content that reverb can shape.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 3: THE CHORD ============ -->
+<section id="chord">
+<h2><span class="num">03</span>The Chord</h2>
+
+<p>Everything so far is single notes and drum hits. A chord is three or more notes at once. Stack C, E-flat, and G:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>c minor chord</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3a">
+    <!--
+setcpm(35)
+note("[c3,eb3,g3]").s("sawtooth")
+  .lpf(800).lpq(2)
+  .attack(0.2).sustain(0.6).release(0.5)
+  .room(0.5).size(0.8)
+  .gain(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Dark. The sawtooth adds texture, the lowpass filter shaves the harshness, and the reverb places it in a room. Three notes, one mood.</p>
+
+<div class="concept">
+    <span class="c-label">chord / triad</span>
+    <p>Three or more notes sounding at once. A triad has three: root, third, fifth. C minor&thinsp;=&thinsp;C (root), Eb (minor third), G (fifth). The minor third (three semitones above the root instead of four) is what makes it dark.</p>
+</div>
+
+<div class="concept">
+    <span class="c-label">pad</span>
+    <p>A sustained chord sound. Slow attack, long sustain, reverb. It fills background, sets mood. In the mini-notation, commas inside brackets mean &ldquo;play simultaneously&rdquo;: <code>[c3,eb3,g3]</code>.</p>
+</div>
+
+<h3>The progression</h3>
+
+<p>One chord loops. A progression <em>moves</em>. Four chords, one per bar:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>cm &rarr; ab &rarr; bb &rarr; g</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3b">
+    <!--
+setcpm(35)
+note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+  .s("sawtooth")
+  .lpf(sine.range(400, 1000).slow(16)).lpq(2)
+  .attack(0.2).sustain(0.6).release(0.5)
+  .room(0.5).size(0.8)
+  .gain(0.3)
+  ._spiral()
+    -->
+    </strudel-editor>
+</div>
+
+<p>Cm&thinsp;&rarr;&thinsp;Ab&thinsp;&rarr;&thinsp;Bb&thinsp;&rarr;&thinsp;G. Four bars, then loop. Each chord shifts the mood. The G major at the end pulls hard back to the top. Its B natural against the C minor key creates the pull. That&rsquo;s what makes you want to hear the loop again.</p>
+
+<div class="concept">
+    <span class="c-label">chord progression</span>
+    <p>A sequence of chords that creates harmonic movement. This one is i&ndash;VI&ndash;VII&ndash;V in C minor. Roman numerals show the relationship to the key. Uppercase&thinsp;=&thinsp;major chord. Lowercase&thinsp;=&thinsp;minor. The V (G major) creates tension. The i (Cm) resolves it.</p>
+</div>
+
+<h3>Bass follows harmony</h3>
+
+<p>The 808 should match the chords. Root note of each chord, with melodic movement inside each bar:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>808 + pad</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3c">
+    <!--
+setcpm(35)
+stack(
+  // 808 bass
+  note("<[c2 ~ c2 ~ ~ ~ eb2 ~] [ab1 ~ ab1 ~ ~ ~ c2 ~] [bb1 ~ bb1 ~ ~ ~ d2 ~] [g1 ~ g1 ~ ~ ~ b1 ~]>")
+    .s("sine").decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  // pad
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth")
+    .lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8)
+    .gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>When the pad plays Ab, the bass plays Ab. When it moves to G, the bass hits G. The harmony is aligned. The 808 is tracking the chords now.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Simplify the bass: try <code>note("&lt;c2 ab1 bb1 g1&gt;")</code> for straight roots, one per bar. Or add a fifth to the Cm bar: <code>[c2 ~ g2 ~ c2 ~ eb2 ~]</code>. The fifth reinforces the chord from below.</p>
+</div>
+
+<h3>Beyond roots</h3>
+
+<p>The bass plays C for the C minor chord. That&rsquo;s the root &mdash; the bottom of the chord. But the chord has three notes:</p>
+
+<svg viewBox="0 0 120 100" style="width: 100px; display: block; margin: 0.5rem 0;">
+    <rect x="10" y="10" width="100" height="24" rx="4" fill="none" stroke="#4fc3f7" stroke-width="1.5"/>
+    <text x="60" y="26" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="11" text-anchor="middle" font-weight="600">G &larr; fifth</text>
+    <rect x="10" y="40" width="100" height="24" rx="4" fill="none" stroke="#5a584f" stroke-width="1"/>
+    <text x="60" y="56" fill="#5a584f" font-family="SF Mono, monospace" font-size="11" text-anchor="middle">Eb</text>
+    <rect x="10" y="70" width="100" height="24" rx="4" fill="none" stroke="#ff6b35" stroke-width="1.5"/>
+    <text x="60" y="86" fill="#ff6b35" font-family="SF Mono, monospace" font-size="11" text-anchor="middle" font-weight="600">C &larr; root</text>
+</svg>
+
+<p>The root is the anchor. The top note &mdash; G &mdash; is the <em>fifth</em>. It&rsquo;s the other strong note in the chord. Put both in the bass and the foundation gets wider:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>root + fifth</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3d">
+    <!--
+setcpm(35)
+stack(
+  // bass: root + fifth
+  note("<[c2 ~ g2 ~ c2 ~ g2 ~] [ab1 ~ eb2 ~ ab1 ~ eb2 ~] [bb1 ~ f2 ~ bb1 ~ f2 ~] [g1 ~ d2 ~ g1 ~ d2 ~]>")
+    .s("sine").decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  // pad
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth")
+    .lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8)
+    .gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The bass alternates between root and fifth. C and G for the C minor bar. Ab and Eb for Ab. Each pair is drawn from the chord above it. More motion, still stable.</p>
+
+<h3>Approach notes</h3>
+
+<p>One more idea. The last note of each bar can aim at the next bar&rsquo;s root &mdash; one note below, sliding up into it:</p>
+
+<svg viewBox="0 0 200 50" style="width: 180px; display: block; margin: 0.5rem 0;">
+    <text x="10" y="20" fill="#5a584f" font-family="SF Mono, monospace" font-size="9">bar 1</text>
+    <text x="110" y="20" fill="#5a584f" font-family="SF Mono, monospace" font-size="9">bar 2</text>
+    <circle cx="80" cy="35" r="5" fill="#4fc3f7"/>
+    <text x="80" y="48" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">G</text>
+    <line x1="88" y1="33" x2="108" y2="28" stroke="#66bb6a" stroke-width="1.5" marker-end="url(#arr)"/>
+    <circle cx="115" cy="26" r="5" fill="#ff6b35"/>
+    <text x="115" y="17" fill="#ff6b35" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">Ab</text>
+    <defs><marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6" fill="none" stroke="#66bb6a" stroke-width="1"/></marker></defs>
+</svg>
+
+<p>G is one note below Ab. The bass leans into the next chord. It creates a pull &mdash; you hear the bar ending and the next one arriving.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>root + fifth + approach</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3e">
+    <!--
+setcpm(35)
+stack(
+  // bass: root, fifth, approach into next root
+  note("<[c2 ~ g2 ~ c2 ~ eb2 g1] [ab1 ~ eb2 ~ ab1 ~ c2 a1] [bb1 ~ f2 ~ bb1 ~ d2 fs1] [g1 ~ d2 ~ g1 ~ b1 b0]>")
+    .s("sine").decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  // pad
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth")
+    .lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8)
+    .gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The last note of each bar is one step below the next bar&rsquo;s root. G slides up to Ab. A slides up to Bb. F# slides up to G. B slides up to C (back to the top). The bass pulls you forward through the progression.</p>
+
+<div class="concept">
+    <span class="c-label">bass movement</span>
+    <p><strong>Root</strong> = the chord&rsquo;s anchor note. <strong>Fifth</strong> = the top note of the triad, reinforces the root. <strong>Approach note</strong> = one note below the next root, creates forward motion into the next bar. Root for stability. Fifth for width. Approach for momentum.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Change the approach notes to come from ABOVE instead of below: try <code>a1</code> before <code>ab1</code> (one note above, sliding down). Different tension. Or try TWO approach notes: <code>[bb1 ~ f2 ~ bb1 d2 c2 a1]</code> &mdash; the bass walks down into the next root.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: why minor sounds dark</summary>
+    <div class="rh-body">
+        <h4>Major vs minor</h4>
+        <p>The difference is one semitone. A major third is 4 semitones above the root (C to E). A minor third is 3 (C to Eb). That single semitone shift changes the entire character of the chord.</p>
+
+        <h4>Hear it</h4>
+        <div class="strudel-block">
+            <div class="strudel-label"><span>c major then c minor</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-majmin">
+            <!--
+setcpm(20)
+note("<[c3,e3,g3] [c3,eb3,g3]>").s("sawtooth")
+  .lpf(1200)
+  .attack(0.1).sustain(0.8).release(0.3)
+  .gain(0.4)
+            -->
+            </strudel-editor>
+        </div>
+        <p>First bar: C major (C, E, G). Second bar: C minor (C, Eb, G). Only the middle note drops by one semitone. The mood flips.</p>
+
+        <h4>The V chord</h4>
+        <p>In the progression Cm&ndash;Ab&ndash;Bb&ndash;G, three chords come from C natural minor (Cm, Ab, Bb). The G major doesn&rsquo;t. It borrows from C <em>harmonic</em> minor, which raises the seventh degree (Bb&thinsp;&rarr;&thinsp;B natural). That B natural creates a leading tone&mdash;it wants to resolve up to C. The tension is physical. Your ear expects the resolution. That&rsquo;s why the loop works.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 4: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">04</span>Atmosphere</h2>
+
+<div class="punchline">
+    <p><strong>Everything combined.</strong> Phonk drums with cowbell, distorted 808 following a four-chord progression, reverbed clap, delayed cowbell, dark sawtooth pad. One key, one mood.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: atmosphere</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(35)
+stack(
+  // kick
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9),
+  // clap
+  s("~ ~ ~ ~ cp ~ ~ ~")
+    .room(0.3).size(0.5).gain(0.85),
+  // hats
+  s("hh*16").gain("0.3 0.5 0.3 0.8").pan(0.35),
+  // cowbell
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4)
+    .delay(0.2).delaytime(0.125).delayfeedback(0.3)
+    .pan(0.6),
+  // 808 bass
+  note("<[c2 ~ c2 ~ ~ ~ eb2 ~] [ab1 ~ ab1 ~ ~ ~ c2 ~] [bb1 ~ bb1 ~ ~ ~ d2 ~] [g1 ~ g1 ~ ~ ~ b1 ~]>")
+    .s("sine").decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  // dark pad
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth")
+    .lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8)
+    .gain(0.25)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Swap the progression: try <code>note("&lt;[c3,eb3,g3] [f3,ab3,c4] [ab2,c3,eb3] [bb2,d3,f3]&gt;")</code> for i&ndash;iv&ndash;VI&ndash;VII. Update the 808 roots to match: <code>&lt;[c2 ~ c2 ~ eb2 ~ c2 ~] [f1 ~ f1 ~ ab1 ~ f1 ~] [ab1 ~ ab1 ~ c2 ~ ab1 ~] [bb1 ~ bb1 ~ d2 ~ bb1 ~]&gt;</code>.</li>
+        <li>Add ghost snares from EDM.3: <code>s("sd(3,16)").gain(0.2).pan(0.4)</code>.</li>
+        <li>Layer a melodic stab: <code>note("~ &lt;eb4 g4&gt; ~ &lt;c4 eb4&gt;").s("square").lpf(2000).decay(0.06).sustain(0).gain(0.3).pan(0.65).delay(0.15).delaytime(0.125).delayfeedback(0.2)</code>.</li>
+        <li>Hit <em>share</em>. Phonk track, coded.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>.room()</td><td>reverb amount (0&ndash;1)</td><td><code>.room(0.5)</code></td></tr>
+        <tr><td>.size()</td><td>reverb room size</td><td><code>.size(0.8)</code></td></tr>
+        <tr><td>.delay()</td><td>delay wet level (0&ndash;1)</td><td><code>.delay(0.3)</code></td></tr>
+        <tr><td>.delaytime()</td><td>gap between echoes</td><td><code>.delaytime(0.125)</code></td></tr>
+        <tr><td>.delayfeedback()</td><td>echo repeats (0&ndash;1)</td><td><code>.delayfeedback(0.4)</code></td></tr>
+        <tr><td>.distort()</td><td>waveshaping distortion</td><td><code>.distort(0.4)</code></td></tr>
+        <tr><td>[a,b,c]</td><td>play notes simultaneously (chord)</td><td><code>note("[c3,eb3,g3]")</code></td></tr>
+        <tr><td>&lt;&gt; with chords</td><td>chord progression (one per cycle)</td><td><code>note("&lt;[c3,eb3,g3] [ab2,c3,eb3]&gt;")</code></td></tr>
+        <tr><td>setcpm(35)</td><td>140 BPM (phonk tempo)</td><td><code>setcpm(35)</code></td></tr>
+        </tbody>
+    </table>
+    <div class="concept" style="margin: 1rem 0 0; border-radius: 6px;">
+        <span class="c-label">phonk checklist</span>
+        <p>808 bass: sine, decayed, distorted, following chord roots. Drums: kick, clap (reverbed), hats, cowbell (delayed). Pad: sawtooth chord progression, filtered, reverbed. Everything in C minor.</p>
+    </div>
+    <p class="earned-next">Next: <em>Movement</em>. Transforms that make a track evolve.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td>Three 6 Mafia</td><td>Tear Da Club Up (1995)</td><td>(Memphis rap) foundational Memphis phonk</td></tr>
+        <tr><td>Tommy Wright III</td><td>Ashes 2 Ashes, Dust 2 Dust (1994)</td><td>(Memphis rap) bedroom lo-fi Memphis</td></tr>
+        <tr><td>DJ Smokey</td><td>Evil Wayz (2013)</td><td>(phonk) bridged classic Memphis with modern phonk</td></tr>
+        <tr><td>Kaito Shoma</td><td>Scary Garry (2016)</td><td>(drift phonk) first drift phonk, blown-out cowbell</td></tr>
+        <tr><td>DJ Paul</td><td>Wanna Go to War (1994)</td><td>(Memphis rap) solo production, the 808 as melodic instrument</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The 808 was a commercial failure. Memphis rap turned it into the most important instrument in modern music.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Roland TR-808 (1980&ndash;1983)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Ikutaro Kakehashi founded Roland in 1972. The TR-808 used analog synthesis (not samples) to generate drum sounds&mdash;a design choice driven by cost, not aesthetics. It couldn&rsquo;t sound like real drums. Musicians hated it. Roland made about 12,000 units and discontinued production. Then Marvin Gaye used it on &ldquo;Sexual Healing&rdquo; (1982), Afrika Bambaataa used it on &ldquo;Planet Rock&rdquo; (1982), and it became the backbone of electro, freestyle, and early hip-hop.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Memphis rap (1991&ndash;1997)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">DJ Paul (Paul Beauregard) and Juicy J (Jordan Houston) started making beats in North Memphis as teenagers, dubbing tapes and selling them out of car trunks. Equipment was whatever they could afford&mdash;often an 808 or SP-1200. The lo-fi quality wasn&rsquo;t a choice. They used the 808 kick as a tuned bass instrument, running melodic patterns that carried the entire low end. Three 6 Mafia&rsquo;s <em style="color: var(--text-dim); font-style: italic;">Mystic Stylez</em> (1995) codified the sound: dark samples (horror movies, soul records), heavy 808, reverb-drenched vocals. Tommy Wright III, Gangsta Pat, and Koopsta Knicca operated in the same ecosystem.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Phonk revival (2013&ndash;present)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">DJ Smokey and SpaceGhostPurrp began sampling Three 6 Mafia vocals over new production in the early 2010s, calling it &ldquo;phonk.&rdquo; Kaito Shoma&rsquo;s &ldquo;Scary Garry&rdquo; (2016) added the signature blown-out cowbell, launching &ldquo;drift phonk.&rdquo; By 2021, phonk had crossed into mainstream TikTok culture. The aesthetic is deliberately lo-fi&mdash;an homage to the Memphis tapes&rsquo; constraints.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Reid, &ldquo;History of Roland&rdquo; (2004); Miller, &ldquo;Memphis Rap&rdquo; in <em style="color: var(--text-faint); font-style: italic;">Oxford Handbook of Hip-Hop Music</em> (2022); Bein, &ldquo;How Phonk Went From Memphis Rap Underground to Global Phenomenon,&rdquo; <em style="color: var(--text-faint); font-style: italic;">Billboard</em> (2022).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(6, 0.08, 1.2)
+            .color(0.5, 0.15, 0.8)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.3)
+            .modulateScale(
+                h.osc(3, 0.12).rotate(0.5),
+                () => 0.1 + window._audioData.fft[1] * 0.6
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.4)
+            .saturate(() => 0.8 + window._audioData.fft[2] * 1.5)
+            .kaleid(() => 2 + Math.floor(window._audioData.fft[3] * 2))
+            .contrast(1.3)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>
