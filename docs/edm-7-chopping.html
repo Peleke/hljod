@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.7: Chopping</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#speed">Speed</a>
+    <a href="#chop">Chop</a>
+    <a href="#slice">Slice</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">Chopping</span></h1>
+<div class="subtitle">EDM.7: sample slicing, pitch, and the most sampled break in history</div>
+
+<p>Samples are recordings. Fixed length, fixed pitch, fixed order. Three methods turn them into something else: speed changes pitch, chop cuts them into pieces, slice rearranges those pieces. Old audio becomes new rhythm.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm(35)</code>,
+    mini-notation, <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>,
+    <code>.every()</code>, <code>.sometimes()</code>, <code>.jux()</code>, <code>.off()</code>,
+    and the phonk palette from EDM.4&ndash;6.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: SPEED ============ -->
+<section id="speed">
+<h2><span class="num">00</span>Speed</h2>
+
+<p>Same clap sample. Four different playback speeds:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>speed: 1, 2, 0.5, -1</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(35)
+s("cp cp cp cp").speed("1 2 0.5 -1")
+    -->
+    </strudel-editor>
+</div>
+
+<p>First hit: normal. Second: double speed, pitched up an octave. Third: half speed, an octave down. Fourth: reversed. Same sample, four characters.</p>
+
+<p>The phonk aesthetic is about slowing everything down. Pitched-down samples, heavy reverb:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>phonk pitch-down</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+setcpm(35)
+s("cp*4").speed(0.7).room(0.4).size(0.6)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Everything darker. The sample is longer because it&rsquo;s slower. The reverb smears it further. That&rsquo;s the trick&mdash;speed down, reverb up.</p>
+
+<div class="concept">
+    <span class="c-label">.speed()</span>
+    <p>Playback speed = pitch. <code>.speed(2)</code> = octave up, double speed. <code>.speed(0.5)</code> = octave down, half speed. <code>.speed(-1)</code> = reverse at normal pitch. Fractional values like <code>0.7</code> pitch-shift without landing on a clean interval.</p>
+</div>
+
+<h3>Mini-notation: ? and |</h3>
+
+<p>Sixteen hi-hats, but some of them vanish:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>? degrade</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0c">
+    <!--
+setcpm(35)
+s("hh*16?").gain(0.5)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Each hit has a 50% chance of playing. The pattern is different every cycle. <code>?</code> after a pattern element means &ldquo;maybe.&rdquo; Add a number for specific odds: <code>?0.3</code> means 30% chance each hit plays. The rest are silence.</p>
+
+<p>A different kind of randomness. One note per event, chosen from a set:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>| random choice</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0d">
+    <!--
+setcpm(35)
+note("c3|eb3|g3|bb3").s("sawtooth")
+  .lpf(1200).decay(0.1).sustain(0.3).gain(0.4)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Four notes. Each cycle, one is picked at random. The pipe character <code>|</code> means &ldquo;or.&rdquo; Not a sequence&mdash;a coin flip between options.</p>
+
+<div class="concept">
+    <span class="c-label">? and |</span>
+    <p>Probability inside the pattern itself. <code>?</code> drops events randomly (50% default, <code>?0.3</code> for 30%). <code>|</code> picks one option at random per event. Both make the pattern non-deterministic&mdash;different every time.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>s("hh*16?0.2")</code> for sparse dropouts&mdash;only 20% of hits survive. Or build a randomized kit: <code>s("&lt;bd|cp&gt; &lt;sd|hh&gt; &lt;bd|cp&gt; &lt;sd|oh&gt;")</code>. Each slot picks between two sounds every cycle.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: CHOP ============ -->
+<section id="chop">
+<h2><span class="num">01</span>Chop</h2>
+
+<h3>Fitting samples</h3>
+
+<p>A breakbeat sample, stretched to fit exactly 2 cycles:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>loopAt: fit to 2 cycles</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(35)
+s("break:1").loopAt(2)
+    -->
+    </strudel-editor>
+</div>
+
+<p><code>.loopAt(2)</code> adjusts playback speed so the sample spans exactly 2 cycles. The break loops in time with the tempo. No manual speed calculation.</p>
+
+<h3>Chopping</h3>
+
+<p>Same break, but cut into 8 equal pieces:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>chop into 8 slices</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(35)
+s("break:1").loopAt(2).chop(8)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Eight slices, played in order. The break sounds the same but it&rsquo;s in pieces now. Each slice is a separate event. That means you can apply effects to individual slices, or rearrange them.</p>
+
+<h3>Grab a section</h3>
+
+<p>Instead of the whole sample, play only the middle quarter:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>begin + end: middle quarter</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1c">
+    <!--
+setcpm(35)
+s("break:1").begin(0.25).end(0.5)
+    -->
+    </strudel-editor>
+</div>
+
+<p><code>.begin(0.25)</code> starts playback at 25% through the sample. <code>.end(0.5)</code> stops at 50%. Only that slice plays. Useful for isolating a specific hit or phrase from a longer recording.</p>
+
+<div class="concept">
+    <span class="c-label">.chop(), .loopAt(), .begin(), .end()</span>
+    <p><code>.chop(N)</code> slices a sample into N sequential pieces. <code>.loopAt(N)</code> fits a sample to N cycles by adjusting speed. <code>.begin()</code> and <code>.end()</code> set start and stop points as fractions (0&ndash;1). Three ways to control which part of a sample you hear.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.chop(16)</code> for finer slices&mdash;more granular, more stutter. <code>.chop(4)</code> for chunkier pieces. Replace <code>.chop(8)</code> with <code>.striate(8)</code>&mdash;striate interleaves the slices instead of playing them sequentially. The rhythm rearranges itself.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 2: SLICE ============ -->
+<section id="slice">
+<h2><span class="num">02</span>Slice</h2>
+
+<p>Chopping keeps the original order. Slicing lets you pick the order yourself:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>slice: rearranged break</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+setcpm(35)
+s("break:1").loopAt(2)
+  .slice(8, "0 3 2 7 1 5 4 6")
+    -->
+    </strudel-editor>
+</div>
+
+<p>Eight slices, numbered 0 through 7. Played in a shuffled order: 0, 3, 2, 7, 1, 5, 4, 6. The break is rearranged. New rhythm from old material. Same sounds, different sequence.</p>
+
+<p>Notice the pitch shifts. When slices are reordered, some play faster or slower to fit their new position. <code>.splice()</code> corrects for that:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>splice: pitch-corrected</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+setcpm(35)
+s("break:1").loopAt(2)
+  .splice(8, "0 3 2 7 1 5 4 6")
+    -->
+    </strudel-editor>
+</div>
+
+<p>Same slice order. But <code>.splice()</code> adjusts pitch so each slice sounds like it did in the original. The character stays. The order changes.</p>
+
+<p>Stack it with the phonk treatment. Pitched down, reverbed, rearranged:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>phonk chopped break</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2c">
+    <!--
+setcpm(35)
+s("break:1").loopAt(2)
+  .slice(8, "0 3 2 7 1 5 4 6")
+  .speed(0.8).room(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Slower. Darker. The reverb glues the rearranged slices together. This is the workflow: take a break, slice it, reorder, pitch down, add space.</p>
+
+<div class="concept">
+    <span class="c-label">.slice() and .splice()</span>
+    <p><code>.slice(N, pattern)</code> cuts a sample into N slices and plays them in the order given by the pattern. <code>.splice(N, pattern)</code> does the same but with pitch correction&mdash;slices maintain their original pitch regardless of position. Rearranging slices creates new rhythms from existing material.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Reverse some slices with speed: <code>.slice(8, "0 3 2 7").speed("1 1 -1 1")</code>. The third slice plays backward. Try euclidean slice patterns: <code>.slice(8, "0(3,8)")</code>&mdash;three hits of slice 0, euclidean-spaced across 8 slots.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: the amen break</summary>
+    <div class="rh-body">
+        <h4>Six seconds</h4>
+        <p>The Winstons. &ldquo;Amen, Brother.&rdquo; 1969. The B-side. A 6-second drum solo by Gregory Coleman between the second chorus and the outro. That&rsquo;s it.</p>
+
+        <p>Those six seconds became the backbone of jungle, drum and bass, hip-hop, breakcore, and hundreds of other genres. The most sampled break in recorded music. It appeared on thousands of tracks before anyone thought to ask who played it.</p>
+
+        <h4>Gregory Coleman</h4>
+        <p>Coleman died homeless in 2006. He never received royalties for the break. The Winstons never sued anyone over the sample&mdash;Richard Spencer, the group&rsquo;s leader, said he didn&rsquo;t believe in suing artists. The break entered public consciousness as if it had always been there. Free material. No credit, no payment, no recognition for decades.</p>
+
+        <p>In 2015, a GoFundMe raised money for a plaque honoring Coleman. The conversation about sampling ethics started late.</p>
+
+        <h4>The pattern</h4>
+        <p>A basic amen-style break. Kick, snare, hats&mdash;the skeleton of the original:</p>
+
+        <div class="strudel-block">
+            <div class="strudel-label"><span>amen-style break</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-amen">
+            <!--
+setcpm(42.5)
+stack(
+  s("bd ~ ~ ~ ~ ~ bd ~"),
+  s("~ ~ sd ~ ~ ~ ~ sd"),
+  s("hh*8").gain(0.5)
+)
+            -->
+            </strudel-editor>
+        </div>
+
+        <p>And chopped. Sliced, rearranged, pitched down&mdash;the way it sounds in a jungle track:</p>
+
+        <div class="strudel-block">
+            <div class="strudel-label"><span>chopped amen</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-amen-chop">
+            <!--
+setcpm(42.5)
+s("break:1").loopAt(1)
+  .slice(8, "0 3 2 7 4 1 6 5")
+  .sometimes(x => x.speed(-1))
+  .room(0.15)
+            -->
+            </strudel-editor>
+        </div>
+
+        <h4>Sampling ethics</h4>
+        <p>Sampling is legal when cleared (licensed from the rights holder). Uncleared sampling is copyright infringement. The culture built itself on both. The tension between creative reuse and fair compensation is unresolved. The amen break is the clearest case: infinite creative output, zero compensation for the creator.</p>
+
+        <p>When you chop a sample in strudel, you&rsquo;re working with the built-in library (Creative Commons / public domain). The ethics question applies when you load your own samples from copyrighted recordings.</p>
+    </div>
+</details>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: the SP-1200</summary>
+    <div class="rh-body">
+        <h4>The machine</h4>
+        <p>E-mu SP-1200. Released 1987. 12-bit sampling. 26.04 kHz sample rate. 10 seconds of total sample time across all pads. Ten seconds.</p>
+
+        <p>Those constraints forced a sound. Short chops. Aggressive trimming. No room for long phrases&mdash;you took the hit you needed and nothing more. The low sample rate and 12-bit depth added grit. Frequencies above 13 kHz were gone. The sound was dark, crunchy, lo-fi.</p>
+
+        <h4>DJ Paul and Three 6 Mafia</h4>
+        <p>Memphis, early 1990s. DJ Paul built the sound of Memphis rap on the SP-1200 and later the MPC. Chopped soul samples pitched down. Repetitive, hypnotic loops. The lo-fi quality wasn&rsquo;t a limitation&mdash;it was the aesthetic. Dark, slow, heavy. The direct ancestor of modern phonk.</p>
+
+        <h4>Constraints as style</h4>
+        <p>The SP-1200&rsquo;s 10-second limit meant you couldn&rsquo;t sample a whole bar of music. You sampled a single chord hit, a single drum, a vocal stab. Then you sequenced those tiny pieces into patterns. The repetition wasn&rsquo;t laziness&mdash;it was the only option. And it created a hypnotic quality that became the genre&rsquo;s signature.</p>
+
+        <p><code>.begin()</code> and <code>.end()</code> are your SP-1200 constraints. <code>.chop()</code> automates what producers did manually for hours. The workflow is the same. The tools are faster.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 3: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">03</span>Chopping</h2>
+
+<div class="punchline">
+    <p><strong>A phonk track with a chopped break at its center.</strong> Sliced, rearranged, pitched down, reverbed. The break alternates two different slice orders across cycles. Around it: 808 kick, clap, degraded hats, cowbell with delay, sub bass, and a filtered pad. Old recordings turned into new music.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: chopping</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(35)
+stack(
+  // chopped break
+  s("break:1").loopAt(2)
+    .slice(8, "<[0 3 2 7] [1 5 4 6]>")
+    .speed(0.9).gain(0.5)
+    .room(0.2),
+  // kick
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9),
+  // clap
+  s("~ ~ ~ ~ cp ~ ~ ~")
+    .room(0.3).size(0.5).gain(0.85),
+  // hats with ? degrade for texture
+  s("hh*16?0.3").gain(0.4).pan(0.35),
+  // cowbell
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4)
+    .delay(0.2).delaytime(0.125).delayfeedback(0.3),
+  // 808 bass
+  note("<[c2 ~ c2 ~ ~ ~ eb2 ~] [ab1 ~ ab1 ~ ~ ~ c2 ~] [bb1 ~ bb1 ~ ~ ~ d2 ~] [g1 ~ g1 ~ ~ ~ b1 ~]>")
+    .s("sine").decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  // pad
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth")
+    .lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8)
+    .gain(0.2)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Change the slice order. Try <code>"&lt;[7 5 3 1] [6 4 2 0]&gt;"</code> for reversed slices&mdash;the break plays back to front.</li>
+        <li>Add <code>.speed("&lt;0.8 0.9 1 0.7&gt;")</code> to the chopped break for per-cycle pitch variation. Each cycle gets a different weight.</li>
+        <li>Replace <code>break:1</code> with <code>break:0</code> or <code>break:2</code> for a different source break. Same slice pattern, different material.</li>
+        <li>Share it. The break is rearranged. The track is yours.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>.speed(N)</td><td>playback speed = pitch shift</td><td><code>.speed(0.7)</code></td></tr>
+        <tr><td>.chop(N)</td><td>slice sample into N sequential pieces</td><td><code>.chop(8)</code></td></tr>
+        <tr><td>.slice(N, pat)</td><td>slice into N, play in pattern order</td><td><code>.slice(8, "0 3 2 7")</code></td></tr>
+        <tr><td>.splice(N, pat)</td><td>slice + pitch correction</td><td><code>.splice(8, "0 3 2 7")</code></td></tr>
+        <tr><td>.striate(N)</td><td>interleaved slicing</td><td><code>.striate(8)</code></td></tr>
+        <tr><td>.loopAt(N)</td><td>fit sample to N cycles</td><td><code>.loopAt(2)</code></td></tr>
+        <tr><td>.begin(N)</td><td>start playback at fraction N</td><td><code>.begin(0.25)</code></td></tr>
+        <tr><td>.end(N)</td><td>stop playback at fraction N</td><td><code>.end(0.5)</code></td></tr>
+        <tr><td>?</td><td>degrade: random dropout (50%)</td><td><code>s("hh*16?")</code></td></tr>
+        <tr><td>?N</td><td>degrade with probability N</td><td><code>s("hh*16?0.3")</code></td></tr>
+        <tr><td>|</td><td>random choice between options</td><td><code>note("c3|eb3|g3")</code></td></tr>
+        </tbody>
+    </table>
+    <div class="concept" style="margin: 1rem 0 0; border-radius: 6px;">
+        <span class="c-label">chopping checklist</span>
+        <p><code>.speed()</code> for pitch shifting. <code>.loopAt()</code> to fit samples to the tempo. <code>.chop()</code> for sequential slicing. <code>.slice()</code> and <code>.splice()</code> for rearranging. <code>.begin()</code>/<code>.end()</code> for manual sample trimming. <code>?</code> and <code>|</code> for probability in the pattern itself.</p>
+    </div>
+    <p class="earned-next">Next: <em>The Scale</em>. Numbers become notes. Melody gets a map.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td>DJ Shadow</td><td>Building Steam with a Grain of Salt (1996)</td><td>(hip-hop) first album from samples</td></tr>
+        <tr><td>J Dilla</td><td>Workinonit (2006)</td><td>(instrumental hip-hop) king of chopping, SP-303</td></tr>
+        <tr><td>Madvillain</td><td>Accordion (2004)</td><td>(hip-hop) pitched-down chop creates new identity</td></tr>
+        <tr><td>Pierre Schaeffer</td><td>&Eacute;tude aux chemins de fer (1948)</td><td>(hip-hop) train recordings cut and rearranged: the first sample-based composition</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Before synthesizers, electronic music was made by cutting tape. The sampler returned to that idea&mdash;take a recording, cut it up, rearrange it&mdash;but at the speed of performance.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Musique concr&egrave;te (1948)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Pierre Schaeffer at RTF Paris used turntables and tape recorders to manipulate recorded sounds&mdash;train whistles, piano notes, spinning lids. He called it <em style="color: var(--text-dim); font-style: italic;">musique concr&egrave;te</em>: music made from &ldquo;concrete&rdquo; (recorded) sounds rather than &ldquo;abstract&rdquo; (notated) ones. &ldquo;&Eacute;tude aux chemins de fer&rdquo; (1948) is built entirely from train recordings, cut and rearranged. This is chopping&mdash;45 years before jungle.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">The E-mu SP-1200 (1987)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Dave Rossum&rsquo;s E-mu SP-1200 sampled at 12-bit/26kHz with a maximum of 10 seconds of sample memory. The constraints were severe&mdash;you could only store short chops. Producers had to be surgical: grab just the kick, just the snare, just 2 seconds of a horn stab. The gritty, lo-fi character wasn&rsquo;t an effect&mdash;it was the converter. Marley Marl, DJ Premier, Pete Rock, J Dilla, and the entire Native Tongues lineage produced on SP-1200s and its successors.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">J Dilla and the MPC (1996&ndash;2006)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">James Yancey (J Dilla) used Akai MPC3000 and Boss SP-303 samplers to develop a chopping style so distinctive it changed production permanently. His &ldquo;drunk&rdquo; timing&mdash;events intentionally off the quantize grid&mdash;humanized machine music. <em style="color: var(--text-dim); font-style: italic;">Donuts</em> (2006), produced on the SP-303 from a hospital bed in his final weeks, is 31 tracks of chopped soul and jazz 45s, widely regarded as one of the greatest instrumental hip-hop albums.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">The amen break in the courts</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The Winstons never copyrighted the amen break separately from the full song. When Richard Spencer (The Winstons&rsquo; frontman) tried to claim royalties in the 2000s, the legal landscape had already shifted&mdash;thousands of tracks had used it without clearance. In 2015, Spencer set up a GoFundMe for Gregory Coleman&rsquo;s family. The amen break remains unprotected, a de facto public domain artifact that shaped multiple genres.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Schaeffer, <em style="color: var(--text-faint); font-style: italic;">In Search of a Concrete Music</em> (1952/2012); Schloss, <em style="color: var(--text-faint); font-style: italic;">Making Beats</em> (2004); Charnas, <em style="color: var(--text-faint); font-style: italic;">Dilla Time</em> (2022); Harrison, &ldquo;Can I Get An Amen?&rdquo; (2004).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.noise(3, 0.08)
+            .color(0.9, 0.3, 0.15)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.3)
+            .modulateScale(
+                h.osc(2, 0.1).rotate(0.5),
+                () => 0.1 + window._audioData.fft[1] * 0.5
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.4)
+            .saturate(() => 0.7 + window._audioData.fft[2] * 1.5)
+            .contrast(1.4)
+            .posterize(6)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>
