@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>hljóð — silence and sound</title>
+<title>hljóð · silence and sound</title>
 <style>
 :root {
     --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
@@ -136,6 +136,109 @@ body {
     display: block;
 }
 
+/* --- Syllabus --- */
+.syllabus-intro { color: var(--text-dim); font-size: 0.95rem; margin-bottom: 2.5rem; }
+.syllabus-intro strong { color: var(--text); }
+.phase {
+    margin-bottom: 2.5rem; padding: 1.5rem;
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 8px;
+}
+.phase-header {
+    display: flex; align-items: baseline; gap: 0.8rem;
+    margin-bottom: 0.3rem;
+}
+.phase-name { font-size: 1.15rem; font-weight: 400; }
+.phase-tag {
+    font-family: 'SF Mono', monospace; font-size: 0.55rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.15rem 0.5rem; border-radius: 3px;
+}
+.phase-tag.done { color: var(--green); border: 1px solid var(--green-dim); background: var(--green-dim); }
+.phase-tag.building { color: var(--accent); border: 1px solid var(--accent-dim); background: var(--accent-dim); }
+.phase-tag.planned { color: var(--text-faint); border: 1px solid var(--divider); }
+.phase-desc {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--text-faint); letter-spacing: 0.04em; margin-bottom: 1rem;
+}
+.syl-row {
+    display: flex; align-items: baseline; gap: 0.8rem;
+    padding: 0.5rem 0; border-bottom: 1px solid #111115;
+}
+.syl-row:last-child { border-bottom: none; }
+.syl-num {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); min-width: 2.2rem; flex-shrink: 0;
+}
+.syl-title { font-size: 0.95rem; min-width: 10rem; flex-shrink: 0; }
+.syl-concepts {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-dim); letter-spacing: 0.03em;
+}
+.syl-status {
+    font-family: 'SF Mono', monospace; font-size: 0.55rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    margin-left: auto; flex-shrink: 0;
+    padding: 0.1rem 0.4rem; border-radius: 3px;
+}
+.syl-status.live { color: var(--green); }
+.syl-status.soon { color: var(--text-faint); }
+.theory-ref {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.8rem; color: var(--text-faint);
+}
+.theory-ref strong { color: var(--text-dim); font-weight: 600; }
+.syl-divider {
+    font-family: 'SF Mono', monospace; font-size: 0.55rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.8rem 0 0.3rem; opacity: 0.7;
+}
+/* --- Expandable lesson details --- */
+details.syl-detail { border-bottom: 1px solid #111115; }
+details.syl-detail:last-of-type { border-bottom: none; }
+details.syl-detail summary {
+    display: flex; align-items: baseline; gap: 0.8rem;
+    padding: 0.5rem 0; cursor: pointer; list-style: none;
+}
+details.syl-detail summary::-webkit-details-marker { display: none; }
+details.syl-detail summary::before {
+    content: '\25B6'; font-size: 0.4rem; color: var(--text-faint);
+    transition: transform 0.2s; flex-shrink: 0; margin-top: 0.2rem;
+}
+details.syl-detail[open] summary::before { transform: rotate(90deg); }
+details.syl-detail[open] summary { border-bottom: 1px solid var(--divider); padding-bottom: 0.5rem; }
+.syl-body { padding: 0.8rem 0 0.8rem 3rem; font-size: 0.85rem; }
+.syl-body p { margin-bottom: 0.5rem; color: var(--text-dim); }
+.syl-sec {
+    display: flex; gap: 0.4rem; align-items: baseline;
+    padding: 0.15rem 0; font-size: 0.82rem;
+}
+.syl-sec-n {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); min-width: 1.5rem; flex-shrink: 0;
+}
+.syl-sec-t { color: var(--text); }
+.syl-sec-d { color: var(--text-dim); font-size: 0.78rem; }
+.syl-sub {
+    margin-top: 0.6rem; padding-top: 0.4rem;
+    border-top: 1px solid var(--divider);
+}
+.syl-sub-label {
+    font-family: 'SF Mono', monospace; font-size: 0.5rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    margin-bottom: 0.3rem;
+}
+.syl-sub-label.rh { color: var(--purple); }
+.syl-sub-label.listen { color: var(--cool); }
+.syl-listen-item { font-size: 0.78rem; color: var(--text-dim); margin-bottom: 0.15rem; }
+.syl-listen-item strong { color: var(--text); font-weight: 400; }
+.syl-listen-item em { color: var(--text-faint); font-style: normal; }
+@media (max-width: 640px) {
+    details.syl-detail summary { flex-wrap: wrap; gap: 0.3rem; }
+    .syl-title { min-width: auto; }
+    .syl-body { padding-left: 1.5rem; }
+}
+
 /* --- Footer --- */
 .footer {
     margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--divider);
@@ -172,6 +275,8 @@ body {
 <div class="tabs">
     <button class="tab active" onclick="showTab('ramp')">Ramp</button>
     <button class="tab" onclick="showTab('ride')">Ride</button>
+    <button class="tab" onclick="showTab('syllabus')">Syllabus</button>
+    <button class="tab" onclick="window.location.href='history.html'">History</button>
 </div>
 
 <!-- RAMP -->
@@ -180,7 +285,7 @@ body {
 <div class="track">
     <div class="track-header">
         <span class="track-name">EDM Track</span>
-        <span class="track-tag">DnB-flavored &bull; strudel-native</span>
+        <span class="track-tag">DnB &rarr; phonk &bull; strudel-native</span>
     </div>
     <p class="track-desc">Learn to live-code music. Strudel is the instrument. Every lesson ends with something you can share.</p>
 
@@ -209,59 +314,139 @@ body {
             </div>
             <span class="module-status live">live</span>
         </a>
-        <a class="module-card locked" href="#">
+        <a class="module-card" href="edm-3-layers.html">
             <span class="module-num">3</span>
             <div class="module-info">
                 <div class="module-title">Layers</div>
                 <div class="module-desc">polyrhythm, euclidean, hi-hat rolls, arrangement</div>
             </div>
-            <span class="module-status soon">soon</span>
+            <span class="module-status live">live</span>
         </a>
-        <a class="module-card locked" href="#">
+        <a class="module-card" href="edm-4-atmosphere.html">
             <span class="module-num">4</span>
             <div class="module-info">
                 <div class="module-title">Atmosphere</div>
-                <div class="module-desc">pads, reverb, delay, texture</div>
+                <div class="module-desc">genre pivot to phonk, 808 bass, reverb, delay, dark chords in Cm</div>
             </div>
-            <span class="module-status soon">soon</span>
+            <span class="module-status live">live</span>
         </a>
-        <a class="module-card locked" href="#">
+        <a class="module-card" href="edm-5-movement.html">
             <span class="module-num">5</span>
             <div class="module-info">
                 <div class="module-title">Movement</div>
-                <div class="module-desc">.every(), .sometimes(), .rev(), pattern transforms</div>
+                <div class="module-desc">.every(), .sometimes(), .jux(), .off(), transforms that evolve</div>
             </div>
-            <span class="module-status soon">soon</span>
+            <span class="module-status live">live</span>
         </a>
-        <a class="module-card locked" href="#">
+        <a class="module-card" href="edm-6-the-drop.html">
             <span class="module-num">6</span>
             <div class="module-info">
                 <div class="module-title">The Drop</div>
-                <div class="module-desc">arrangement, silence, tension and release</div>
+                <div class="module-desc">arrangement, silence, cat(), filter builds, &lt;&gt; gain automation</div>
             </div>
-            <span class="module-status soon">soon</span>
+            <span class="module-status live">live</span>
         </a>
-        <a class="module-card locked" href="#">
+        <a class="module-card" href="edm-7-chopping.html">
             <span class="module-num">7</span>
             <div class="module-info">
                 <div class="module-title">Chopping</div>
-                <div class="module-desc">sample slicing, break manipulation, amen</div>
+                <div class="module-desc">chop, slice, splice, speed, the amen break</div>
             </div>
-            <span class="module-status soon">soon</span>
+            <span class="module-status live">live</span>
         </a>
-        <a class="module-card locked" href="#">
-            <span class="module-num">8</span>
+        <a class="module-card" href="edm-8a-the-scale.html">
+            <span class="module-num">8a</span>
             <div class="module-info">
-                <div class="module-title">Melodic DnB</div>
-                <div class="module-desc">scales, arpeggios, melody over beats</div>
+                <div class="module-title">The Scale</div>
+                <div class="module-desc">.scale(), major/minor, scale degrees, first melodies</div>
             </div>
-            <span class="module-status soon">soon</span>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card" href="edm-8b-modes.html">
+            <span class="module-num">8b</span>
+            <div class="module-info">
+                <div class="module-title">Modes</div>
+                <div class="module-desc">dorian, mixolydian, relative keys, pentatonic, blues scale</div>
+            </div>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card" href="edm-8c-melody-over-changes.html">
+            <span class="module-num">8c</span>
+            <div class="module-info">
+                <div class="module-title">Melody Over Changes</div>
+                <div class="module-desc">chord tones, passing tones, .struct(), melodic construction</div>
+            </div>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card" href="edm-9a-diatonic-harmony.html">
+            <span class="module-num">9a</span>
+            <div class="module-info">
+                <div class="module-title">Diatonic Harmony</div>
+                <div class="module-desc">7th chords, chord qualities, Roman numerals, .arp(), .voicings()</div>
+            </div>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card" href="edm-9b-ii-v-i.html">
+            <span class="module-num">9b</span>
+            <div class="module-info">
+                <div class="module-title">ii-V-I</div>
+                <div class="module-desc">the cadence, voice leading, Autumn Leaves analysis</div>
+            </div>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card" href="edm-9c-the-monster.html">
+            <span class="module-num">9c</span>
+            <div class="module-info">
+                <div class="module-title">The Monster</div>
+                <div class="module-desc">chunk, superimpose, function composition, the beast from scratch</div>
+            </div>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card" href="edm-8d-intervals.html">
+            <span class="module-num">8d</span>
+            <div class="module-info">
+                <div class="module-title">Intervals</div>
+                <div class="module-desc">m2&ndash;P8, quality, inversion, the tritone, V7&rarr;I</div>
+            </div>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card" href="edm-8e-non-chord-tones.html">
+            <span class="module-num">8e</span>
+            <div class="module-info">
+                <div class="module-title">Non-Chord Tones</div>
+                <div class="module-desc">neighbor, suspension, pedal point, appoggiatura, anticipation</div>
+            </div>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card" href="edm-9d-cadences-form.html">
+            <span class="module-num">9d</span>
+            <div class="module-info">
+                <div class="module-title">Cadences + Form</div>
+                <div class="module-desc">authentic/plagal/deceptive/half, verse-chorus, AABA, 12-bar blues</div>
+            </div>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card" href="edm-9e-texture.html">
+            <span class="module-num">9e</span>
+            <div class="module-info">
+                <div class="module-title">Texture + Accompaniment</div>
+                <div class="module-desc">walking bass, son clave, Alberti bass, afterbeats, stepwise</div>
+            </div>
+            <span class="module-status live">live</span>
+        </a>
+        <a class="module-card" href="edm-9f-melodic-development.html">
+            <span class="module-num">9f</span>
+            <div class="module-info">
+                <div class="module-title">Melodic Development</div>
+                <div class="module-desc">motive, retrograde=rev, augmentation=slow, diminution=fast, canon=off</div>
+            </div>
+            <span class="module-status live">live</span>
         </a>
         <a class="module-card locked" href="#">
-            <span class="module-num">9</span>
+            <span class="module-num">10</span>
             <div class="module-info">
                 <div class="module-title">The Set</div>
-                <div class="module-desc">transitions, chaining, live performance</div>
+                <div class="module-desc">transitions, long-form composition, live performance</div>
             </div>
             <span class="module-status soon">soon</span>
         </a>
@@ -302,7 +487,7 @@ body {
         </a>
     </div>
     <p style="color: var(--text-faint); font-size: 0.85rem; margin-top: 0.8rem; font-family: 'SF Mono', monospace; font-size: 0.65rem; letter-spacing: 0.05em;">
-        9 modules total &mdash; unlocks after EDM.4
+        9 modules total &bull; unlocks after EDM.4
     </p>
 </div>
 
@@ -315,9 +500,352 @@ body {
     </div>
 </div>
 
+<!-- SYLLABUS -->
+<div class="tab-content" id="tab-syllabus">
+
+<p class="syllabus-intro">
+    <strong>hljóð</strong> teaches music theory and live coding simultaneously. You learn by hearing, then coding, then naming.
+    Every lesson ends with a shareable track. The curriculum covers rhythm, synthesis, harmony, melody, arrangement, and improvisation
+    across four tracks: EDM (production + theory), Blues (functional harmony + guitar), Jazz (standards + improvisation), and Classical (form + counterpoint).
+    Built on <a href="https://strudel.cc" style="color: var(--cool);">strudel</a>.
+</p>
+
+<!-- Phase 1 -->
+<div class="phase">
+    <div class="phase-header">
+        <span class="phase-name">Phase 1: The Beat</span>
+        <span class="phase-tag done">complete</span>
+    </div>
+    <div class="phase-desc">DnB &rarr; Phonk. Pattern construction, synthesis, effects, arrangement, sampling.</div>
+
+    <details class="syl-detail"><summary><span class="syl-num">0</span><span class="syl-title">First Noise</span><span class="syl-concepts">s(), note(), stack(), setcpm(), mini-notation, samples vs synths</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">Sound</span> <span class="syl-sec-d">&mdash; s(), first sample, play/stop/share</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">Pattern</span> <span class="syl-sec-d">&mdash; sequences, [], *, ~, rests, grouping</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Synth</span> <span class="syl-sec-d">&mdash; note(), waveform types, stacking with stack()</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; a weird intentional loop</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div>
+            <p>Euclidean rhythms (clickable SVG circle + Bjorklund algorithm), Waveform visualizer (canvas + WebAudio playback), LPF/HPF frequency response curves (SVG), ADSR envelope shape (SVG)</p>
+        </div>
+        <div class="syl-sub"><div class="syl-sub-label listen">listening</div>
+            <div class="syl-listen-item"><strong>Kraftwerk</strong> &mdash; &ldquo;Numbers&rdquo; (1981) <em>minimal pattern construction from drum machine loops</em></div>
+            <div class="syl-listen-item"><strong>Derrick May</strong> &mdash; &ldquo;Strings of Life&rdquo; (1987) <em>a piano loop becomes one of the greatest dance tracks</em></div>
+            <div class="syl-listen-item"><strong>New Order</strong> &mdash; &ldquo;Blue Monday&rdquo; (1983) <em>programmed loop as complete track, best-selling 12&Prime;</em></div>
+        </div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">1</span><span class="syl-title">The Break</span><span class="syl-concepts">DnB groove (170bpm), half-time snare, kick placement, !</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">Tempo</span> <span class="syl-sec-d">&mdash; setcpm(42.5), BPM&harr;CPM conversion</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">Kick</span> <span class="syl-sec-d">&mdash; placement, syncopation, ghost kicks</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Snare</span> <span class="syl-sec-d">&mdash; half-time (beat 3), the DnB feel vs house</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Hats</span> <span class="syl-sec-d">&mdash; *16, velocity patterns, open hat</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">04</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; a proper DnB drum pattern</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>BPM&harr;CPM math + genre tempo table, The amen break (history, 1969, Gregory Coleman)</p></div>
+        <div class="syl-sub"><div class="syl-sub-label listen">listening</div>
+            <div class="syl-listen-item"><strong>The Winstons</strong> &mdash; &ldquo;Amen, Brother&rdquo; (1969) <em>the 7-second break that built jungle and DnB</em></div>
+            <div class="syl-listen-item"><strong>Shy FX &amp; UK Apache</strong> &mdash; &ldquo;Original Nuttah&rdquo; (1994) <em>chopped amen + dancehall, crossover jungle anthem</em></div>
+            <div class="syl-listen-item"><strong>Roni Size / Reprazent</strong> &mdash; &ldquo;Brown Paper Bag&rdquo; (1997) <em>live bass over programmed breaks, Mercury Prize</em></div>
+            <div class="syl-listen-item"><strong>Origin Unknown</strong> &mdash; &ldquo;Valley of the Shadows&rdquo; (1993) <em>processed breaks + atmospheric arps, early jungle landmark</em></div>
+        </div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">2</span><span class="syl-title">The Bass</span><span class="syl-concepts">waveforms, ADSR, .lpf(), .lpq(), .hpf(), reese, harmonics</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">Low End</span> <span class="syl-sec-d">&mdash; sine C1, ADSR envelope shaping</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">Wave Shape</span> <span class="syl-sec-d">&mdash; sine/saw/square/tri comparison</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">The Reese</span> <span class="syl-sec-d">&mdash; two detuned saws, beating frequencies</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Filtering</span> <span class="syl-sec-d">&mdash; lowpass cutoff, resonance, sweeps with signals</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">04</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; drums + filtered reese</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>Beating frequencies &amp; detuning, Harmonics table, What harmonics actually are (interactive canvas: toggle harmonics 1&ndash;8, see sine&rarr;sawtooth&rarr;square emerge)</p></div>
+        <div class="syl-sub"><div class="syl-sub-label listen">listening</div>
+            <div class="syl-listen-item"><strong>Reese (Kevin Saunderson)</strong> &mdash; &ldquo;Just Want Another Chance&rdquo; (1988) <em>the literal origin of the Reese bass</em></div>
+            <div class="syl-listen-item"><strong>Renegade (Ray Keith)</strong> &mdash; &ldquo;Terrorist&rdquo; (1994) <em>sampled Reese + amen = instant jungle anthem</em></div>
+            <div class="syl-listen-item"><strong>Ed Rush &amp; Optical</strong> &mdash; &ldquo;Wormhole&rdquo; (1998) <em>first neurofunk record, filter sweeps + resampled bass</em></div>
+            <div class="syl-listen-item"><strong>Goldie</strong> &mdash; &ldquo;Inner City Life&rdquo; (1995) <em>sub-bass carrying emotional weight beneath orchestral strings</em></div>
+        </div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">3</span><span class="syl-title">Layers</span><span class="syl-concepts">polyrhythm, euclidean, ghost notes, .pan(), .gain() patterns, stereo</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">Three Against Four</span> <span class="syl-sec-d">&mdash; polyrhythm, euclidean layers</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">Ghost Notes</span> <span class="syl-sec-d">&mdash; quiet euclidean patterns under main hits</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Width</span> <span class="syl-sec-d">&mdash; .pan(), stereo hats, moving pan with signals</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; 10-layer DnB arrangement</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>West African polyrhythm &amp; Ewe bell patterns (SVG diagram), Why bass stays centered (wavelength physics)</p></div>
+        <div class="syl-sub"><div class="syl-sub-label listen">listening</div>
+            <div class="syl-listen-item"><strong>Photek</strong> &mdash; &ldquo;Ni-Ten-Ichi-Ryu&rdquo; (1997) <em>drum programming so intricate it seemed inhuman</em></div>
+            <div class="syl-listen-item"><strong>Goldie</strong> &mdash; &ldquo;Timeless&rdquo; (1995) <em>21 minutes of impossibly detailed layered production</em></div>
+            <div class="syl-listen-item"><strong>Noisia</strong> &mdash; &ldquo;Stigma&rdquo; (2007) <em>polyrhythmic interplay that reframes the groove on each entry</em></div>
+        </div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">4</span><span class="syl-title">Atmosphere</span><span class="syl-concepts">phonk pivot (140bpm), 808, .distort(), .room(), .delay(), chords, Cm&ndash;Ab&ndash;Bb&ndash;G</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">New Ground</span> <span class="syl-sec-d">&mdash; tempo drop to 140bpm, phonk drums, cowbell</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">The 808</span> <span class="syl-sec-d">&mdash; sine + decay + distort = bass as melody</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Space</span> <span class="syl-sec-d">&mdash; .room(), .size(), .delay(), .delaytime(), .delayfeedback()</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">The Chord</span> <span class="syl-sec-d">&mdash; triads, [a,b,c] notation, Cm&rarr;Ab&rarr;Bb&rarr;G progression, bass follows harmony</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">04</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; full phonk track in C minor</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>TR-808 circuit (canvas: decaying sine waveform), Signal flow SVG (wet/dry), Why minor sounds dark (major vs minor 3rd, harmonic minor V chord)</p></div>
+        <div class="syl-sub"><div class="syl-sub-label listen">listening</div>
+            <div class="syl-listen-item"><strong>Three 6 Mafia</strong> &mdash; &ldquo;Tear Da Club Up&rdquo; (1995) <em>foundational Memphis phonk: 808s, dark reverb</em></div>
+            <div class="syl-listen-item"><strong>Tommy Wright III</strong> &mdash; &ldquo;Ashes 2 Ashes, Dust 2 Dust&rdquo; (1994) <em>bedroom lo-fi Memphis, warped piano + 808</em></div>
+            <div class="syl-listen-item"><strong>DJ Smokey</strong> &mdash; &ldquo;Evil Wayz&rdquo; (2013) <em>bridged classic Memphis samples with modern phonk filtering</em></div>
+            <div class="syl-listen-item"><strong>Kaito Shoma</strong> &mdash; &ldquo;Scary Garry&rdquo; (2016) <em>first drift phonk track, blown-out cowbell + distorted bass</em></div>
+        </div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">5</span><span class="syl-title">Movement</span><span class="syl-concepts">.every(), .sometimes(), .jux(), .juxBy(), .off(), add(note()), fast(), rev, ply()</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">Conditional Repeats</span> <span class="syl-sec-d">&mdash; .every(N, fn), stacking different periods</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">Probability</span> <span class="syl-sec-d">&mdash; .sometimes(), .often(), .rarely(), non-determinism</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Stereo Splits</span> <span class="syl-sec-d">&mdash; .jux(rev), .juxBy(), .off() for offset harmony</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; EDM.4 phonk track with transforms layered</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>Algorave &amp; live coding culture (TOPLAP), Steve Reich phasing (&ldquo;It&rsquo;s Gonna Rain&rdquo;)</p></div>
+        <div class="syl-sub"><div class="syl-sub-label listen">listening</div>
+            <div class="syl-listen-item"><strong>DJ Rashad</strong> &mdash; &ldquo;Feelin&rdquo; (2012) <em>constant rhythmic instability, scattered vocal samples</em></div>
+            <div class="syl-listen-item"><strong>Burial</strong> &mdash; &ldquo;Archangel&rdquo; (2007) <em>constantly shifting chopped vocals, ghostly evolution</em></div>
+            <div class="syl-listen-item"><strong>Aphex Twin</strong> &mdash; &ldquo;Xtal&rdquo; (1992) <em>subtle timbral shifts create generative-feeling ambient</em></div>
+        </div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">6</span><span class="syl-title">The Drop</span><span class="syl-concepts">cat(), &lt;&gt; gain automation, filter builds, silence as tension, / @</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">Silence</span> <span class="syl-sec-d">&mdash; removing elements, the power of absence</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">The Build</span> <span class="syl-sec-d">&mdash; filter sweeps, snare rolls, density increase</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Sections</span> <span class="syl-sec-d">&mdash; cat(), / (slow), @ (elongate), multi-section arrangement</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; intro&rarr;build&rarr;drop with &lt;&gt; gain automation</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>Arrangement forms in electronic music (SVG energy curves for house/DnB/phonk)</p></div>
+        <div class="syl-sub"><div class="syl-sub-label listen">listening</div>
+            <div class="syl-listen-item"><strong>The Prodigy</strong> &mdash; &ldquo;Firestarter&rdquo; (1996) <em>filter sweep build into vocal explosion</em></div>
+            <div class="syl-listen-item"><strong>Chase &amp; Status</strong> &mdash; &ldquo;Blind Faith&rdquo; (2011) <em>textbook DnB buildup and drop choreography</em></div>
+            <div class="syl-listen-item"><strong>DVRST</strong> &mdash; &ldquo;Close Eyes&rdquo; (2021) <em>drift phonk build-drop that went mass</em></div>
+        </div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">7</span><span class="syl-title">Chopping</span><span class="syl-concepts">.chop(), .slice(), .splice(), .speed(), .loopAt(), .begin/.end, ? |</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">Speed</span> <span class="syl-sec-d">&mdash; .speed() pitch shift, phonk pitch-down, ? degrade, | random</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">Chop</span> <span class="syl-sec-d">&mdash; .loopAt(), .chop(), .begin()/.end(), .striate()</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Slice</span> <span class="syl-sec-d">&mdash; .slice() rearrange, .splice() pitch-corrected, phonk treatment</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; chopped-sample phonk track</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>The amen break (Winstons 1969, Gregory Coleman, sampling ethics), The SP-1200 (12-bit, 10-second limit, Memphis rap lo-fi aesthetic)</p></div>
+        <div class="syl-sub"><div class="syl-sub-label listen">listening</div>
+            <div class="syl-listen-item"><strong>DJ Shadow</strong> &mdash; &ldquo;Building Steam with a Grain of Salt&rdquo; (1996) <em>first album made entirely from samples</em></div>
+            <div class="syl-listen-item"><strong>J Dilla</strong> &mdash; &ldquo;Workinonit&rdquo; (2006) <em>king of chopping, SP-303 from a hospital bed</em></div>
+            <div class="syl-listen-item"><strong>Madvillain</strong> &mdash; &ldquo;Accordion&rdquo; (2004) <em>pitched-down chopped sample creates new melodic identity</em></div>
+        </div>
+    </div></details>
+
+    <div class="theory-ref"><strong>Music theory covered:</strong> rhythm &amp; meter (Ch 4), basic waveform physics, stereo imaging, arrangement form, sampling history</div>
+</div>
+
+<!-- Phase 2 -->
+<div class="phase">
+    <div class="phase-header">
+        <span class="phase-name">Phase 2: The Harmony</span>
+        <span class="phase-tag building">in progress</span>
+    </div>
+    <div class="phase-desc">Scales, modes, melody, diatonic harmony, voice leading, cadences, form, motivic development.</div>
+
+    <div class="syl-divider">scales + melody</div>
+
+    <details class="syl-detail"><summary><span class="syl-num">8a</span><span class="syl-title">The Scale</span><span class="syl-concepts">.scale(), n() with degrees, major vs minor, W-W-H-W-W-W-H</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">Scale Degrees</span> <span class="syl-sec-d">&mdash; numbers map to notes via .scale()</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">Major + Minor</span> <span class="syl-sec-d">&mdash; same numbers, different mood. The 3rd/6th/7th shift.</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">First Melodies</span> <span class="syl-sec-d">&mdash; melody over the phonk beat using scale degrees</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; phonk track with a scale-degree melodic lead</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>Equal temperament (why 12 notes, frequency ratios, octave as 2:1)</p></div>
+        <div class="syl-sub"><div class="syl-sub-label listen">listening</div>
+            <div class="syl-listen-item"><strong>Nujabes</strong> &mdash; &ldquo;Feather&rdquo; (2005) <em>Modal Soul &mdash; modal/scalar harmony in beat music</em></div>
+            <div class="syl-listen-item"><strong>LTJ Bukem</strong> &mdash; &ldquo;Demon&rsquo;s Theme&rdquo; (1992) <em>genesis of atmospheric DnB, melodic layers over breaks</em></div>
+        </div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">8b</span><span class="syl-title">Modes</span><span class="syl-concepts">all 7 modes, relative major/minor, pentatonic, blues scale</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">The Modes</span> <span class="syl-sec-d">&mdash; same 7 notes, different starting point = different mood</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">Relative Keys</span> <span class="syl-sec-d">&mdash; C major = A minor, Eb major = C minor</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Pentatonic + Blues</span> <span class="syl-sec-d">&mdash; 5-note safety net, the blue note</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; phonk track with blues-scale melody</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>Modal jazz &amp; Kind of Blue (Miles Davis 1959, horizontal vs vertical improvisation)</p></div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">8c</span><span class="syl-title">Melody Over Changes</span><span class="syl-concepts">chord tones, passing tones, .struct(), boolean gating</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">Chord Tones</span> <span class="syl-sec-d">&mdash; land on chord notes on strong beats</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">Passing Tones</span> <span class="syl-sec-d">&mdash; scale notes between chord tones, smooth motion</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Rhythmic Gating</span> <span class="syl-sec-d">&mdash; .struct(&quot;1 0 1 0&quot;), euclidean struct, separation of pitch and time</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; phonk track with harmony-tracking gated melody</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>Counterpoint (melody against harmony, canon via .off())</p></div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">8d</span><span class="syl-title">Intervals</span><span class="syl-concepts">m2&ndash;P8, quality, inversion, the tritone, consonance vs dissonance</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <p><strong>Build plan:</strong> Name every interval (m2, M2, m3, M3, P4, tritone, P5, m6, M6, m7, M7, P8). Hear each one. Measure them in semitones. Interval quality. Inversion (M3 inverts to m6). The tritone as the most unstable interval &mdash; and why V7&rarr;I resolves (the tritone inside V7 resolves outward to the tonic).</p>
+        <p><strong>Theory:</strong> Ch 5 (Introduction to Intervals, quality, inversion, augmented/diminished)</p>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">8e</span><span class="syl-title">Non-Chord Tones</span><span class="syl-concepts">neighbor, suspension, pedal point, appoggiatura, anticipation</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <p><strong>Build plan:</strong> 8c taught passing tones. This lesson completes the vocabulary. Neighbor tones (step away, step back). Suspensions (hold a note from the previous chord into the new one &mdash; the clash resolves downward). Pedal point (a drone, which the learner has been doing since 8b). Appoggiatura (leap to a dissonance, resolve by step). Anticipation (arrive at the next chord&rsquo;s note early). Each type creates a different kind of tension.</p>
+        <p><strong>Theory:</strong> Ch 10 (Non-Chord Tones, all types)</p>
+    </div></details>
+
+    <div class="syl-divider">harmony + analysis</div>
+
+    <details class="syl-detail"><summary><span class="syl-num">9a</span><span class="syl-title">Diatonic Harmony</span><span class="syl-concepts">stacking thirds, 7th chords, Roman numerals, arpeggios, voicings</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">Stacking Thirds</span> <span class="syl-sec-d">&mdash; harmonize C major, all 7 diatonic 7th chords</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">The Four Qualities</span> <span class="syl-sec-d">&mdash; maj7, min7, dom7, m7b5, arpeggios (manual up/down/converge)</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Roman Numerals</span> <span class="syl-sec-d">&mdash; functional analysis, the phonk progression in Roman numerals</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; phonk track with arpeggiated diatonic chord layers</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>Circle of fifths (interactive SVG), Why V&rarr;I is the strongest resolution (overtone series)</p></div>
+        <div class="syl-sub"><div class="syl-sub-label listen">listening</div>
+            <div class="syl-listen-item"><strong>A Tribe Called Quest</strong> &mdash; &ldquo;Electric Relaxation&rdquo; (1993) <em>jazz organ sample with ambiguous root, harmonic sophistication</em></div>
+            <div class="syl-listen-item"><strong>Flying Lotus</strong> &mdash; &ldquo;Do the Astral Plane&rdquo; (2010) <em>free jazz + IDM + beat music, unconventional harmony</em></div>
+        </div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">9b</span><span class="syl-title">ii-V-I</span><span class="syl-concepts">major &amp; minor ii-V-I, voice leading, Autumn Leaves analysis</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">The Cadence</span> <span class="syl-sec-d">&mdash; ii-V-I in C major and C minor</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">Voice Leading</span> <span class="syl-sec-d">&mdash; 3rd&rarr;7th resolution, smooth inversions, SVG voice-leading diagram</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Autumn Leaves</span> <span class="syl-sec-d">&mdash; two ii-V-Is (G major + E minor), learner circles the patterns</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; Autumn Leaves with phonk drums + arpeggiated voicings</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>Why ii-V-I dominates (root motion by 5ths, overtone series, transposition table across 8 keys)</p></div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">9c</span><span class="syl-title">The Monster</span><span class="syl-concepts">.chunk(), .superimpose(), function composition, the beast from scratch</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <div class="syl-sec"><span class="syl-sec-n">00</span><span class="syl-sec-t">Chunk</span> <span class="syl-sec-d">&mdash; .chunk(N, fn), rotating transform across pattern segments</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">01</span><span class="syl-sec-t">Superimpose</span> <span class="syl-sec-d">&mdash; .superimpose(fn), function composition (chaining)</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">02</span><span class="syl-sec-t">Building the Beast</span> <span class="syl-sec-d">&mdash; 6 editors: seed &rarr; +speed &rarr; +chunk/ply &rarr; +sine pitch &rarr; +juxBy &rarr; full monster</span></div>
+        <div class="syl-sec"><span class="syl-sec-n">03</span><span class="syl-sec-t">Capstone</span> <span class="syl-sec-d">&mdash; the monster in full band context, every tool from the course</span></div>
+        <div class="syl-sub"><div class="syl-sub-label rh">rabbit holes</div><p>Generative music (Brian Eno, Music for Airports, rules vs notes)</p></div>
+        <div class="syl-sub"><div class="syl-sub-label listen">listening</div>
+            <div class="syl-listen-item"><strong>Aphex Twin</strong> &mdash; &ldquo;Vordhosbn&rdquo; (2001) <em>inhuman layered complexity, drill&rsquo;n&rsquo;bass</em></div>
+            <div class="syl-listen-item"><strong>Venetian Snares</strong> &mdash; &ldquo;Hajnal&rdquo; (2005) <em>Bartók + amen break = unparalleled breakcore</em></div>
+            <div class="syl-listen-item"><strong>Squarepusher</strong> &mdash; &ldquo;Ultravisitor&rdquo; (2004) <em>noise, ambient, glitch interrupting wild breakbeats</em></div>
+        </div>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">9d</span><span class="syl-title">Cadences + Form</span><span class="syl-concepts">authentic/plagal/deceptive/half, verse-chorus, AABA, 12-bar blues, sentence/period</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <p><strong>Build plan:</strong> Four cadence types: authentic (V&rarr;I), plagal (IV&rarr;I, the &ldquo;amen&rdquo;), deceptive (V&rarr;vi, the surprise), half (ending on V, unresolved). Then form: verse-chorus, AABA (standards), ABAC, the 12-bar blues as formal structure (the bridge to the Blues track). Sentence (1+1+2 bar phrase) vs period (antecedent-consequent). Phrases that ask questions and phrases that answer them.</p>
+        <p><strong>Theory:</strong> Ch 7.4 (Cadences), Ch 12 (Form in Popular Music), Ch 13 (Phrases in Combination)</p>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">9e</span><span class="syl-title">Texture + Accompaniment</span><span class="syl-concepts">walking bass, son clave, Alberti bass, block chords, afterbeats, stepwise</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <p><strong>Build plan:</strong> Walking bass (stepwise motion through chord tones &mdash; this is where strudel&rsquo;s stepwise functions shine). Son clave (3+3+2 rhythm, habanera, reggaeton). Alberti bass (arpeggiated accompaniment pattern). Block chord patterns. Afterbeats and offbeats (reggae, polka). The 3+3+3+3+2+2 grouping. Each texture creates a different genre feel from the same harmony.</p>
+        <p><strong>Theory:</strong> Ch 14 (Accompanimental Textures, including son clave and world rhythms)</p>
+    </div></details>
+
+    <details class="syl-detail"><summary><span class="syl-num">9f</span><span class="syl-title">Melodic Development</span><span class="syl-concepts">motive, retrograde=rev, augmentation=slow, diminution=fast, canon=off</span><span class="syl-status live">live</span></summary>
+    <div class="syl-body">
+        <p><strong>Build plan:</strong> The reveal &mdash; every strudel transform the learner knows IS a classical composition technique. <code>rev</code> = retrograde. <code>fast(2)</code> = diminution. <code>slow(2)</code> = augmentation. <code>add(note(N))</code> = transposition. <code>.off()</code> = canon. Name them. Show Bach using the same operations on paper. Build a melody through motivic development: state a motive, then develop it using transforms the learner has been using since EDM.5.</p>
+        <p><strong>Theory:</strong> Ch 11 (Melodic Analysis: motive, inversion, augmentation, diminution, retrograde, extension, ornamentation)</p>
+    </div></details>
+
+    <div class="theory-ref"><strong>Music theory covered:</strong> scales &amp; key signatures (Ch 2&ndash;3), intervals (Ch 5), triads &amp; 7th chords (Ch 6&ndash;8), Roman numerals &amp; cadences (Ch 7), harmonic progression &amp; function (Ch 9), non-chord tones (Ch 10), melodic analysis (Ch 11), form (Ch 12&ndash;13), accompaniment textures (Ch 14), creating contrast (Ch 15)</div>
+</div>
+
+<!-- EDM.10 -->
+<div class="phase">
+    <div class="phase-header">
+        <span class="phase-name">EDM.10: The Set</span>
+        <span class="phase-tag planned">planned</span>
+    </div>
+    <div class="phase-desc">Everything combined. Live performance, long-form composition, transitions.</div>
+    <div class="syl-row"><span class="syl-num">10</span><span class="syl-title">The Set</span><span class="syl-concepts">cat() for long-form sequencing, transitions, $: multi-pattern syntax, 2&ndash;3 minute capstone piece</span><span class="syl-status soon">soon</span></div>
+</div>
+
+<!-- Phase 3 -->
+<div class="phase">
+    <div class="phase-header">
+        <span class="phase-name">Phase 3: The Studio</span>
+        <span class="phase-tag planned">planned</span>
+    </div>
+    <div class="phase-desc">Advanced strudel features. Visualizations, the voicing engine, deep pattern tools.</div>
+
+    <div class="syl-row"><span class="syl-num">11a</span><span class="syl-title">Eyes</span><span class="syl-concepts">._scope(), ._pianoroll(), ._spiral(), ._pitchwheel(), ._spectrum(), ._punchcard()</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">11b</span><span class="syl-title">The Voicing Engine</span><span class="syl-concepts">chord(), .voicing(), addVoicings(), anchor(), mode(), custom voicing dictionaries</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">11c</span><span class="syl-title">Deep Patterns</span><span class="syl-concepts">stepwise, accumulation, {} polym&egrave;tre, alignment, freq(), mask, sew, stitch, pattern factories</span><span class="syl-status soon">soon</span></div>
+
+    <div class="theory-ref"><strong>Strudel features:</strong> full visualization suite, tonal extensions, advanced pattern manipulation, polym&egrave;tre vs polyrhythm</div>
+</div>
+
+<!-- Blues -->
+<div class="phase">
+    <div class="phase-header">
+        <span class="phase-name">Blues Track</span>
+        <span class="phase-tag planned">planned</span>
+    </div>
+    <div class="phase-desc">Functional harmony through the blues. Strudel as theory lab. Everything transfers to guitar.</div>
+
+    <div class="syl-row"><span class="syl-num">B.0</span><span class="syl-title">The Dominant Blues</span><span class="syl-concepts">all dom7 (I7&ndash;IV7&ndash;V7), 12-bar form in Bb, AAB phrase structure</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">B.1</span><span class="syl-title">The Blues Scale</span><span class="syl-concepts">minor pentatonic + blue notes, b3 over major chord = tension, call &amp; response</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">B.2</span><span class="syl-title">Guide Tones + Comping</span><span class="syl-concepts">shell voicings (root&ndash;3&ndash;7), invertible counterpoint, 4-part/5-part chords, voice leading</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">B.3</span><span class="syl-title">Bird Blues</span><span class="syl-concepts">Now&rsquo;s The Time, Billie&rsquo;s Bounce, Blues for Alice analysis, ii-V chains, tritone subs</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">B.4</span><span class="syl-title">Improvisation Tools</span><span class="syl-concepts">Mr. PC, Isotope analysis, pentatonic tools, rhythmic displacement, ear training</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">B.5</span><span class="syl-title">Improvising I</span><span class="syl-concepts">motivic development, guide-tone lines, chordal arpeggiation, play-along tracks</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">B.6</span><span class="syl-title">Improvising II</span><span class="syl-concepts">modal categories, scalar patterns, bebop scale, chord-scale relationships</span><span class="syl-status soon">soon</span></div>
+
+    <div class="theory-ref"><strong>Music theory covered:</strong> secondary dominants (Ch 17), mode mixture (Ch 19), jazz chord voicings (Ch 31), blues progression &amp; improvisation, chord-scale theory</div>
+</div>
+
+<!-- Jazz -->
+<div class="phase">
+    <div class="phase-header">
+        <span class="phase-name">Jazz Track</span>
+        <span class="phase-tag planned">planned</span>
+    </div>
+    <div class="phase-desc">Standards, advanced harmony, improvisation. Autumn Leaves to Giant Steps.</div>
+
+    <div class="syl-row"><span class="syl-num">J.0</span><span class="syl-title">Standards</span><span class="syl-concepts">Autumn Leaves (full performance), ii-V-I vocabulary, chord melody</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">J.1</span><span class="syl-title">Rhythm Changes</span><span class="syl-concepts">I-VI-ii-V contrafacts, bebop melody construction, bridge harmony</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">J.2</span><span class="syl-title">Modal Jazz</span><span class="syl-concepts">So What, Impressions, horizontal vs vertical improvisation</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">J.3</span><span class="syl-title">Tritone Subs</span><span class="syl-concepts">chromatic ii-V motion, reharmonization, altered dominant chords</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">J.4</span><span class="syl-title">Coltrane Changes</span><span class="syl-concepts">Giant Steps, symmetric octave division, major third cycles</span><span class="syl-status soon">soon</span></div>
+
+    <div class="theory-ref"><strong>Music theory covered:</strong> secondary dominants &amp; diminished (Ch 17&ndash;18), modulation (Ch 22), enharmonic modulation (Ch 23), extended tonality (Ch 32)</div>
+</div>
+
+<!-- Classical -->
+<div class="phase">
+    <div class="phase-header">
+        <span class="phase-name">Classical Interlude</span>
+        <span class="phase-tag planned">planned</span>
+    </div>
+    <div class="phase-desc">Form, counterpoint, and voice leading. Mozart as the original live coder.</div>
+
+    <div class="syl-row"><span class="syl-num">M.0</span><span class="syl-title">Sonata Form</span><span class="syl-concepts">exposition-development-recap, Mozart K.545, structural functions, binary/ternary/rondo</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">M.1</span><span class="syl-title">Counterpoint</span><span class="syl-concepts">species counterpoint, canon, fugue, invention expositions. .off() = canon, rev = retrograde, .jux() = inversion</span><span class="syl-status soon">soon</span></div>
+    <div class="syl-row"><span class="syl-num">M.2</span><span class="syl-title">Voice Leading</span><span class="syl-concepts">SATB voicing, parallel motion rules, Neapolitan &amp; augmented sixth chords, chromatic harmony</span><span class="syl-status soon">soon</span></div>
+
+    <div class="theory-ref"><strong>Music theory covered:</strong> voice leading triads &amp; 7ths (Ch 26&ndash;27), counterpoint (Ch 30), binary/ternary/sonata/rondo forms (Ch 24&ndash;25), Neapolitan &amp; Aug6 chords (Ch 20&ndash;21), chromatic harmony (Ch 29)</div>
+</div>
+
+<div style="margin-top: 2rem; padding: 1.2rem; background: var(--surface2); border: 1px solid var(--divider); border-radius: 6px;">
+    <p style="font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-faint); letter-spacing: 0.06em; margin-bottom: 0.5rem;">THEORY REFERENCE</p>
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 0;">
+        Music theory chapter references follow
+        <a href="https://musictheory.pugetsound.edu/mt21c/MusicTheory.html" style="color: var(--cool);">Music Theory for the 21st-Century Classroom</a>
+        (Hutchinson, University of Puget Sound). Strudel function coverage cross-references
+        <a href="https://strudel.cc/functions/intro/" style="color: var(--cool);">strudel.cc documentation</a>
+        and
+        <a href="https://tidalcycles.org/docs/patternlib/tutorials/course1/" style="color: var(--cool);">TidalCycles courses I &amp; II</a>.
+    </p>
+</div>
+
+</div>
+
 <!-- Footer -->
 <div class="footer">
-    <p>hljóð &mdash; <a href="https://peleke.me">peleke</a> &mdash; built with <a href="https://strudel.cc">strudel</a> + <a href="https://hydra.ojack.xyz">hydra</a></p>
+    <p>hljóð &bull; <a href="https://peleke.me">peleke</a> &bull; built with <a href="https://strudel.cc">strudel</a> + <a href="https://hydra.ojack.xyz">hydra</a></p>
 </div>
 
 </div><!-- /container -->

@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hljod · history</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0.12; pointer-events: none;
+}
+
+/* --- Top nav --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+    background: linear-gradient(to bottom, var(--bg) 70%, transparent);
+    padding: 0.8rem 1.5rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 1400px; margin: 0 auto;
+    display: flex; align-items: center; gap: 1rem;
+}
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.top-nav .page-title {
+    font-family: 'Georgia', serif; font-size: 1.1rem; font-weight: 200;
+    letter-spacing: 0.06em; color: var(--text); margin-left: 0.5rem;
+}
+.top-nav .page-title .accent { color: var(--accent); }
+
+/* --- Controls bar --- */
+.controls {
+    position: fixed; top: 3rem; left: 0; right: 0; z-index: 150;
+    padding: 0.6rem 1.5rem;
+    background: var(--surface); border-bottom: 1px solid var(--divider);
+    display: flex; align-items: center; gap: 1rem;
+    flex-wrap: wrap;
+}
+.controls-inner {
+    max-width: 1400px; margin: 0 auto; width: 100%;
+    display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+}
+
+/* View toggle */
+.view-toggle {
+    display: flex; gap: 0; border: 1px solid var(--divider); border-radius: 4px;
+    overflow: hidden; flex-shrink: 0;
+}
+.view-btn {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.4rem 1rem; cursor: pointer;
+    color: var(--text-dim); background: transparent;
+    border: none; transition: all 0.2s;
+}
+.view-btn:hover { color: var(--text); background: var(--surface2); }
+.view-btn.active { color: var(--accent); background: var(--accent-dim); }
+
+/* Arrow nav buttons */
+.ctrl-btn {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem;
+    padding: 0.3rem 0.6rem; cursor: pointer;
+    color: var(--text-dim); background: transparent;
+    border: 1px solid var(--divider); border-radius: 4px;
+    transition: all 0.2s; flex-shrink: 0;
+}
+.ctrl-btn:hover { color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim); }
+
+/* Filter chips */
+.filter-group {
+    display: flex; gap: 0.5rem; align-items: center;
+    margin-left: auto;
+}
+.filter-chip {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.6rem;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    padding: 0.3rem 0.7rem; border-radius: 3px;
+    cursor: pointer; border: 1px solid; transition: all 0.2s;
+    user-select: none;
+}
+.filter-chip[data-cat="electronic"] { color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim); }
+.filter-chip[data-cat="theory"] { color: var(--cool); border-color: var(--cool-dim); background: var(--cool-dim); }
+.filter-chip[data-cat="jazz"] { color: var(--purple); border-color: var(--purple-dim); background: var(--purple-dim); }
+.filter-chip[data-cat="classical"] { color: var(--green); border-color: var(--green-dim); background: var(--green-dim); }
+.filter-chip.off { opacity: 0.3; background: transparent; }
+
+/* --- Legend (inline in controls) --- */
+.legend-label {
+    font-family: 'SF Mono', monospace; font-size: 0.55rem;
+    color: var(--text-faint); letter-spacing: 0.08em; text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+/* --- Main containers --- */
+.view-container {
+    position: fixed; top: 5.5rem; left: 0; right: 0; bottom: 0;
+    overflow: hidden;
+}
+#timeline-view, #network-view {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    transition: opacity 0.4s ease;
+}
+#timeline-view.hidden, #network-view.hidden {
+    opacity: 0; pointer-events: none;
+}
+
+/* --- Timeline --- */
+#timeline-svg { width: 100%; height: 100%; cursor: grab; }
+#timeline-svg:active { cursor: grabbing; }
+
+.era-band { opacity: 0.06; }
+.era-label {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 11px; fill: var(--text-faint);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    pointer-events: none;
+}
+.year-tick { stroke: var(--text-faint); stroke-width: 0.5; opacity: 0.3; }
+.year-label {
+    font-family: 'SF Mono', monospace; font-size: 10px;
+    fill: var(--text-faint); text-anchor: middle;
+}
+
+.tl-connection {
+    fill: none; stroke-width: 1.2; opacity: 0.15;
+    transition: opacity 0.3s;
+}
+.tl-connection.highlight { opacity: 0.7; stroke-width: 2; }
+
+.tl-node { cursor: pointer; transition: transform 0.2s; }
+.tl-node circle { transition: all 0.3s; }
+.tl-node:hover circle {
+    filter: drop-shadow(0 0 8px currentColor);
+    r: 8;
+}
+.tl-node text {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 9px; fill: var(--text-dim);
+    pointer-events: none;
+}
+
+/* --- Network --- */
+#network-svg { width: 100%; height: 100%; }
+
+.net-link {
+    stroke: var(--text-faint); stroke-width: 1; opacity: 0.12;
+    transition: opacity 0.3s, stroke-width 0.3s;
+}
+.net-link.highlight { opacity: 0.6; stroke-width: 2.5; }
+
+.net-node { cursor: pointer; }
+.net-node circle { transition: all 0.3s; stroke-width: 2; }
+.net-node:hover circle {
+    filter: drop-shadow(0 0 12px currentColor);
+}
+.net-node text {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 9px; fill: var(--text-dim);
+    pointer-events: none; text-anchor: middle;
+}
+.net-node.dimmed circle { opacity: 0.15; }
+.net-node.dimmed text { opacity: 0.1; }
+
+/* --- Detail panel --- */
+.detail-panel {
+    position: fixed; top: 5.5rem; right: 0; bottom: 0; width: 360px;
+    background: var(--surface); border-left: 1px solid var(--divider);
+    z-index: 100; padding: 1.5rem;
+    transform: translateX(100%); transition: transform 0.35s ease;
+    overflow-y: auto;
+}
+.detail-panel.open { transform: translateX(0); }
+.detail-close {
+    position: absolute; top: 0.8rem; right: 0.8rem;
+    background: none; border: none; color: var(--text-dim);
+    font-size: 1.2rem; cursor: pointer; padding: 0.3rem;
+    transition: color 0.2s;
+}
+.detail-close:hover { color: var(--accent); }
+.detail-year {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    letter-spacing: 0.1em; margin-bottom: 0.3rem;
+}
+.detail-name {
+    font-size: 1.3rem; font-weight: 400; margin-bottom: 0.8rem;
+    line-height: 1.3;
+}
+.detail-desc {
+    font-size: 0.92rem; color: var(--text-dim); margin-bottom: 1.2rem;
+    line-height: 1.7;
+}
+.detail-source {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.04em;
+    margin-bottom: 1.2rem; padding: 0.6rem 0.8rem;
+    background: var(--surface2); border-radius: 4px;
+}
+.detail-lessons-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+.detail-lessons { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.2rem; }
+.lesson-badge {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px;
+    color: var(--accent); border: 1px solid var(--accent-dim);
+    background: var(--accent-dim); text-decoration: none;
+    transition: all 0.2s; cursor: pointer;
+}
+.lesson-badge:hover {
+    background: var(--accent); color: var(--bg);
+}
+.detail-connections-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    margin-bottom: 0.5rem;
+}
+.detail-conn-list { list-style: none; }
+.detail-conn-list li {
+    font-size: 0.85rem; color: var(--text-dim); padding: 0.3rem 0;
+    cursor: pointer; transition: color 0.2s;
+}
+.detail-conn-list li:hover { color: var(--accent); }
+.detail-conn-list li .arrow { color: var(--text-faint); font-size: 0.7rem; margin: 0 0.3rem; }
+
+/* --- Tooltip --- */
+.tooltip {
+    position: fixed; z-index: 300;
+    background: var(--surface2); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0.8rem 1rem;
+    pointer-events: none; opacity: 0; transition: opacity 0.15s;
+    max-width: 320px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.tooltip.visible { opacity: 1; }
+.tooltip .tt-year {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; margin-bottom: 0.2rem;
+}
+.tooltip .tt-name { font-size: 1rem; font-weight: 400; margin-bottom: 0.3rem; }
+.tooltip .tt-desc {
+    font-size: 0.82rem; color: var(--text-dim); line-height: 1.5;
+    margin-bottom: 0.4rem;
+}
+.tooltip .tt-lessons {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.05em;
+}
+
+/* --- Footer --- */
+.footer-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to top, var(--bg) 60%, transparent);
+    padding: 1rem 1.5rem 0.8rem; text-align: center;
+    pointer-events: none;
+}
+.footer-bar p {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.08em;
+}
+.footer-bar a { color: var(--text-dim); text-decoration: none; pointer-events: all; }
+.footer-bar a:hover { color: var(--accent); }
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    .detail-panel { width: 100%; }
+    .controls-inner { gap: 0.5rem; }
+    .filter-group { margin-left: 0; }
+    .top-nav .page-title { display: none; }
+}
+</style>
+</head><body>
+
+<canvas id="hydra-canvas"></canvas>
+
+<!-- Top nav -->
+<nav class="top-nav">
+    <div class="top-nav-inner">
+        <a href="index.html">&larr; hljod</a>
+        <span class="page-title">hlj<span class="accent">od</span> · history</span>
+    </div>
+</nav>
+
+<!-- Controls -->
+<div class="controls">
+    <div class="controls-inner">
+        <div class="view-toggle">
+            <button class="view-btn active" data-view="timeline">Timeline</button>
+            <button class="view-btn" data-view="network">Network</button>
+        </div>
+        <button class="ctrl-btn" id="scroll-left" onclick="scrollTimeline(-1)" title="Earlier">&#x2190;</button>
+        <button class="ctrl-btn" id="scroll-right" onclick="scrollTimeline(1)" title="Later">&#x2192;</button>
+        <span class="legend-label">filter</span>
+        <div class="filter-group">
+            <span class="filter-chip" data-cat="electronic">electronic</span>
+            <span class="filter-chip" data-cat="theory">theory</span>
+            <span class="filter-chip" data-cat="jazz">jazz</span>
+            <span class="filter-chip" data-cat="classical">classical</span>
+        </div>
+    </div>
+</div>
+
+<!-- Views -->
+<div class="view-container">
+    <div id="timeline-view">
+        <svg id="timeline-svg"></svg>
+    </div>
+    <div id="network-view" class="hidden">
+        <svg id="network-svg"></svg>
+    </div>
+</div>
+
+<!-- Detail panel -->
+<div class="detail-panel" id="detail-panel">
+    <button class="detail-close" id="detail-close">&times;</button>
+    <div class="detail-year" id="detail-year"></div>
+    <div class="detail-name" id="detail-name"></div>
+    <div class="detail-desc" id="detail-desc"></div>
+    <div class="detail-source" id="detail-source"></div>
+    <div class="detail-lessons-label">Lessons</div>
+    <div class="detail-lessons" id="detail-lessons"></div>
+    <div class="detail-connections-label">Connections</div>
+    <ul class="detail-conn-list" id="detail-connections"></ul>
+</div>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip">
+    <div class="tt-year" id="tt-year"></div>
+    <div class="tt-name" id="tt-name"></div>
+    <div class="tt-desc" id="tt-desc"></div>
+    <div class="tt-lessons" id="tt-lessons"></div>
+</div>
+
+<!-- Footer -->
+<div class="footer-bar">
+    <p>hljod · <a href="https://peleke.me">peleke</a> · built with <a href="https://strudel.cc">strudel</a> + <a href="https://d3js.org">d3</a> + <a href="https://hydra.ojack.xyz">hydra</a></p>
+</div>
+
+<!-- Hydra background -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+<script>
+try {
+    const hydra = new Hydra({
+        canvas: document.getElementById('hydra-canvas'),
+        detectAudio: false, makeGlobal: false, autoLoop: true,
+        width: window.innerWidth, height: window.innerHeight, precision: 'mediump'
+    });
+    const h = hydra.synth;
+    h.osc(6, 0.03, 0.8)
+        .color(1.0, 0.42, 0.22)
+        .rotate(0.08, 0.008)
+        .modulateScale(h.osc(2, 0.08).rotate(0.2), 0.12)
+        .scale(1.01)
+        .saturate(1.1)
+        .kaleid(4)
+        .out();
+    window.addEventListener('resize', () => hydra.setResolution(window.innerWidth, window.innerHeight));
+} catch(e) {}
+</script>
+
+<script>
+// =========================================================================
+// DATA
+// =========================================================================
+const events = [
+  { id: "pythagoras", name: "Pythagoras & the Monochord", year: -500, category: "theory", lessons: ["8a", "8d"], desc: "Discovered simple ratios produce consonant intervals (2:1, 3:2, 4:3). Founded the mathematical theory of music.", source: "Barker, Greek Musical Writings (1989)" },
+  { id: "church-modes", name: "Medieval Church Modes", year: 800, category: "theory", lessons: ["8b"], desc: "Eight modes classified chant melodies. Dorian, Phrygian, Lydian, Mixolydian as liturgical categories.", source: "Powers, 'Mode' in New Grove (2001)" },
+  { id: "counterpoint", name: "Counterpoint Codified", year: 1300, category: "classical", lessons: ["8c"], desc: "Rules governing independent voice movement. Contrary motion preferred, parallel fifths forbidden.", source: "Fux, Gradus ad Parnassum (1725)" },
+  { id: "fux", name: "Fux \u2014 Gradus ad Parnassum", year: 1725, category: "classical", lessons: ["8c", "8e"], desc: "The counterpoint textbook. Species counterpoint method still taught today.", source: "Fux (1725), trans. Mann (1943)" },
+  { id: "palestrina", name: "Palestrina's Suspensions", year: 1570, category: "classical", lessons: ["8e"], desc: "Chains of suspensions creating flowing, ethereal polyphony in Renaissance masses.", source: "Gauldin, 18th-Century Counterpoint (2013)" },
+  { id: "zhu-zaiyu", name: "Zhu Zaiyu \u2014 Equal Temperament", year: 1584, category: "theory", lessons: ["8a"], desc: "First precise calculation of 12-tone equal temperament using 12th root of 2.", source: "Needham, Science and Civilisation in China (1962)" },
+  { id: "rameau", name: "Rameau \u2014 Traite de l'harmonie", year: 1722, category: "theory", lessons: ["9a"], desc: "First theory of harmony based on chord roots and inversions. Created the framework for Roman numeral analysis.", source: "Christensen, Rameau and Musical Thought (1993)" },
+  { id: "bach-wtc", name: "Bach \u2014 Well-Tempered Clavier", year: 1722, category: "classical", lessons: ["8a"], desc: "Preludes and fugues in all 24 keys, demonstrating universal temperament.", source: "Isacoff, Temperament (2001)" },
+  { id: "bach-aof", name: "Bach \u2014 Art of Fugue", year: 1745, category: "classical", lessons: ["9c", "9f"], desc: "Single subject transformed through retrograde, inversion, augmentation, diminution. The ultimate motivic development.", source: "Hofstadter, Godel Escher Bach (1979)" },
+  { id: "dice-music", name: "Musikalisches Wurfelspiel", year: 1757, category: "classical", lessons: ["5"], desc: "Musical dice games \u2014 algorithmic composition via probability. Each roll selects a pre-composed bar.", source: "Hedges, 'Dice Music in the 18th Century' (1978)" },
+  { id: "beethoven-5th", name: "Beethoven \u2014 Symphony No. 5", year: 1808, category: "classical", lessons: ["9f"], desc: "Four notes (G-G-G-Eb) developed across an entire symphony. Extreme motivic development.", source: "Hopkins, Nine Symphonies of Beethoven (1981)" },
+  { id: "riemann", name: "Riemann \u2014 Functional Harmony", year: 1893, category: "theory", lessons: ["9a"], desc: "Formalized tonic/dominant/pre-dominant functions. The I-IV-V-I framework descends from here.", source: "Harrison, Harmonic Function in Chromatic Music (1994)" },
+  { id: "tin-pan-alley", name: "Tin Pan Alley \u2014 ii-V-I Industrialized", year: 1920, category: "jazz", lessons: ["9b"], desc: "Gershwin, Porter, Berlin, Rodgers. The ii-V-I wasn't invented here but was mass-produced.", source: "Forte, American Popular Ballad (1995)" },
+  { id: "bebop", name: "Bebop \u2014 Parker & Gillespie", year: 1945, category: "jazz", lessons: ["8c", "9b"], desc: "Reharmonized Tin Pan Alley with chromatic passing chords and tritone subs. Chord tone soloing.", source: "DeVeaux, Birth of Bebop (1997)" },
+  { id: "autumn-leaves", name: "Autumn Leaves Published", year: 1945, category: "jazz", lessons: ["9b"], desc: "Joseph Kosma's chanson. Became jazz standard via Miles Davis (1958). Two ii-V-Is: one major, one minor.", source: "Gioia, The Jazz Standards (2012)" },
+  { id: "musique-concrete", name: "Schaeffer \u2014 Musique Concrete", year: 1948, category: "electronic", lessons: ["7"], desc: "Pierre Schaeffer used turntables and tape to manipulate recorded sounds. Chopping 45 years before jungle.", source: "Schaeffer, In Search of a Concrete Music (1952/2012)" },
+  { id: "stockhausen", name: "Stockhausen \u2014 Studie I & II", year: 1953, category: "electronic", lessons: ["0"], desc: "First purely electronic compositions from sine generators and tape splicing at WDR Cologne.", source: "Bussy, Kraftwerk: Man, Machine and Music (2004)" },
+  { id: "kind-of-blue", name: "Miles Davis \u2014 Kind of Blue", year: 1959, category: "jazz", lessons: ["8b"], desc: "Modal jazz manifesto. 'So What' = D dorian for 16 bars. Best-selling jazz album ever (4M+ copies).", source: "Kahn, Kind of Blue (2000)" },
+  { id: "moog", name: "Bob Moog \u2014 Voltage Control Synth", year: 1964, category: "electronic", lessons: ["2"], desc: "First practical voltage-controlled synthesizer. Oscillator \u2192 filter \u2192 amplifier signal chain.", source: "Pinch & Trocco, Analog Days (2002)" },
+  { id: "reich-phasing", name: "Steve Reich \u2014 Phasing", year: 1965, category: "classical", lessons: ["5"], desc: "Two identical tape loops drifting apart. 'It's Gonna Rain' discovered phasing accidentally.", source: "Reich, Writings on Music (2002)" },
+  { id: "amen-break", name: "The Amen Break", year: 1969, category: "electronic", lessons: ["1", "7"], desc: "Gregory Coleman's 7-second drum solo on 'Amen, Brother.' Most sampled recording in history.", source: "Harrison, 'Can I Get An Amen?' (2004)" },
+  { id: "eno-generative", name: "Brian Eno \u2014 Generative Music", year: 1975, category: "electronic", lessons: ["9c"], desc: "Discreet Music: two loops of different lengths through delay. 'Ever-different and changing.'", source: "Eno, 'Generative Music' talk (1996)" },
+  { id: "kraftwerk", name: "Kraftwerk \u2014 Trans-Europe Express", year: 1977, category: "electronic", lessons: ["0"], desc: "Custom Synthanorma sequencer. Proved machine repetition was hypnotic, not cold.", source: "Bussy, Kraftwerk: Man, Machine and Music (2004)" },
+  { id: "tr808", name: "Roland TR-808 Released", year: 1980, category: "electronic", lessons: ["4"], desc: "Analog drum machine. Commercial failure. Became the most important drum sound in hip-hop.", source: "Reid, 'History of Roland' in Sound on Sound (2004)" },
+  { id: "blue-monday", name: "New Order \u2014 Blue Monday", year: 1983, category: "electronic", lessons: ["0"], desc: "Best-selling 12-inch single ever. Programmed Oberheim DMX pattern as complete track.", source: "Reynolds, Energy Flash (1998)" },
+  { id: "sp1200", name: "E-mu SP-1200 Released", year: 1987, category: "electronic", lessons: ["7"], desc: "12-bit, 26kHz, 10 seconds max. Lo-fi by necessity. Defined hip-hop's golden age sound.", source: "Schloss, Making Beats (2004)" },
+  { id: "reese", name: "Kevin Saunderson \u2014 The Reese Bass", year: 1988, category: "electronic", lessons: ["2"], desc: "Two detuned saws on a Casio CZ-1. Became jungle/DnB's foundational bass sound.", source: "Attack Magazine, 'Reese Deconstructed' (2016)" },
+  { id: "detroit-techno", name: "Detroit Techno \u2014 Belleville Three", year: 1988, category: "electronic", lessons: ["0"], desc: "Atkins, May, Saunderson fused Kraftwerk with Parliament-Funkadelic. 'Strings of Life' (1987).", source: "Sicko, Techno Rebels (2010)" },
+  { id: "jungle", name: "London Jungle Scene", year: 1992, category: "electronic", lessons: ["1"], desc: "Pirate radio, sped-up breaks over reggae bass. Goldie, LTJ Bukem, Shy FX on Akai samplers.", source: "Reynolds, Energy Flash (1998)" },
+  { id: "terrorist", name: "Renegade \u2014 Terrorist", year: 1994, category: "electronic", lessons: ["1", "2"], desc: "Sampled Reese bass + chopped amen. Blueprint for jungle production.", source: "DJ Mag, 'Renegade's Terrorist' (2019)" },
+  { id: "memphis-rap", name: "Memphis Rap \u2014 Three 6 Mafia", year: 1995, category: "electronic", lessons: ["4"], desc: "DJ Paul & Juicy J. 808 kick as melodic bass. Mystic Stylez. Dark samples, heavy reverb.", source: "Miller, 'Memphis Rap' in Oxford Handbook of Hip-Hop (2022)" },
+  { id: "endtroducing", name: "DJ Shadow \u2014 Endtroducing", year: 1996, category: "electronic", lessons: ["7"], desc: "First album made entirely from samples. MPC60 + turntable.", source: "Schloss, Making Beats (2004)" },
+  { id: "photek", name: "Photek \u2014 Ni-Ten-Ichi-Ryu", year: 1997, category: "electronic", lessons: ["3"], desc: "Drum programming so intricate it seemed inhuman. Ghost notes, layered single shots.", source: "Pytlik, 'Photek: Solaris' in The Wire (1998)" },
+  { id: "new-forms", name: "Roni Size \u2014 New Forms (Mercury Prize)", year: 1997, category: "electronic", lessons: ["1", "3"], desc: "Live bass over programmed breaks. Brought DnB to mainstream. Mercury Prize winner.", source: "Belle-Fortune, All Crews (2004)" },
+  { id: "wormhole", name: "Ed Rush & Optical \u2014 Wormhole", year: 1998, category: "electronic", lessons: ["2"], desc: "First neurofunk record. Resampled bass processing, filter sweeps, surgical production.", source: "DJ Mag (2019)" },
+  { id: "toplap", name: "TOPLAP Manifesto", year: 2003, category: "electronic", lessons: ["5"], desc: "'Show us your screens.' Live coding as performance art.", source: "Collins et al., 'Live Coding in Laptop Performance' (2003)" },
+  { id: "dilla-donuts", name: "J Dilla \u2014 Donuts", year: 2006, category: "jazz", lessons: ["7"], desc: "31 tracks of chopped soul, produced on SP-303 from a hospital bed. Changed instrumental hip-hop.", source: "Charnas, Dilla Time (2022)" },
+  { id: "tidalcycles", name: "Alex McLean \u2014 TidalCycles", year: 2009, category: "electronic", lessons: ["5", "9c"], desc: "Pattern as the fundamental unit of musical thought. Haskell-based live coding.", source: "McLean, PhD thesis (2014)" },
+  { id: "phonk-revival", name: "Phonk Revival \u2014 DJ Smokey", year: 2013, category: "electronic", lessons: ["4"], desc: "Sampling Three 6 Mafia vocals over new production. Modern phonk begins.", source: "Billboard, 'How Phonk Went Global' (2022)" },
+  { id: "scary-garry", name: "Kaito Shoma \u2014 Scary Garry", year: 2016, category: "electronic", lessons: ["4"], desc: "First drift phonk track. Blown-out cowbell + distorted 808.", source: "Phonk Wiki" },
+  { id: "strudel", name: "Felix Roos \u2014 Strudel", year: 2022, category: "electronic", lessons: ["0", "9c"], desc: "TidalCycles ported to JavaScript. Live coding in the browser.", source: "Roos, 'Strudel' ICLC proceedings (2022)" },
+  { id: "bernhard", name: "Christoph Bernhard \u2014 Figurenlehre", year: 1657, category: "classical", lessons: ["9d"], desc: "Codified Baroque rhetorical figures in music: suspiratio, passus duriusculus, saltus duriusculus. Dissonance as expressive speech.", source: "Bartel, Musica Poetica (1997)" },
+  { id: "wc-handy", name: "W.C. Handy \u2014 The Memphis Blues", year: 1912, category: "jazz", lessons: ["9d"], desc: "First published blues composition. Formalized 12-bar blues structure with blue notes and call-and-response cadences.", source: "Handy, Father of the Blues (1941)" },
+  { id: "blanton-ellington", name: "Jimmy Blanton & Duke Ellington", year: 1939, category: "jazz", lessons: ["9e"], desc: "Blanton transformed bass from timekeeper to melodic voice. Walking bass as an independent contrapuntal line.", source: "Schuller, The Swing Era (1989)" },
+  { id: "clave", name: "Afro-Cuban Clave", year: 1940, category: "jazz", lessons: ["9e"], desc: "The 3-2 / 2-3 clave pattern: rhythmic DNA of Latin music. Tension-resolution encoded in a single rhythmic cell.", source: "Washburne, 'The Clave of Jazz' in Black Music Research Journal (1997)" },
+  { id: "george-russell", name: "George Russell \u2014 Lydian Chromatic Concept", year: 1953, category: "theory", lessons: ["8b"], desc: "Proposed the Lydian scale as the true parent scale of tonality. Influenced Miles Davis and modal jazz.", source: "Russell, The Lydian Chromatic Concept (1953)" },
+  { id: "charlie-parker", name: "Charlie Parker \u2014 Ko-Ko", year: 1945, category: "jazz", lessons: ["8c", "9b", "9f"], desc: "Parker's alto sax transformed melody. Chord tone targeting at blazing tempos, chromatic enclosures, motivic development across changes.", source: "Woideck, Charlie Parker: His Music and Life (1996)" },
+];
+
+const connections = [
+  ["pythagoras", "zhu-zaiyu"],
+  ["pythagoras", "rameau"],
+  ["zhu-zaiyu", "bach-wtc"],
+  ["fux", "bach-aof"],
+  ["palestrina", "fux"],
+  ["bach-aof", "beethoven-5th"],
+  ["bach-aof", "reich-phasing"],
+  ["dice-music", "eno-generative"],
+  ["stockhausen", "kraftwerk"],
+  ["kraftwerk", "detroit-techno"],
+  ["kraftwerk", "blue-monday"],
+  ["detroit-techno", "jungle"],
+  ["moog", "reese"],
+  ["reese", "terrorist"],
+  ["terrorist", "wormhole"],
+  ["amen-break", "jungle"],
+  ["amen-break", "endtroducing"],
+  ["jungle", "photek"],
+  ["jungle", "new-forms"],
+  ["tr808", "memphis-rap"],
+  ["memphis-rap", "phonk-revival"],
+  ["phonk-revival", "scary-garry"],
+  ["sp1200", "endtroducing"],
+  ["sp1200", "dilla-donuts"],
+  ["musique-concrete", "stockhausen"],
+  ["musique-concrete", "sp1200"],
+  ["tin-pan-alley", "bebop"],
+  ["bebop", "kind-of-blue"],
+  ["bebop", "autumn-leaves"],
+  ["kind-of-blue", "church-modes"],
+  ["reich-phasing", "toplap"],
+  ["eno-generative", "tidalcycles"],
+  ["toplap", "tidalcycles"],
+  ["tidalcycles", "strudel"],
+  ["riemann", "rameau"],
+  ["counterpoint", "palestrina"],
+  ["counterpoint", "fux"],
+  ["beethoven-5th", "bach-aof"],
+  ["palestrina", "bernhard"],
+  ["bernhard", "bach-aof"],
+  ["wc-handy", "tin-pan-alley"],
+  ["wc-handy", "bebop"],
+  ["blanton-ellington", "kind-of-blue"],
+  ["tin-pan-alley", "blanton-ellington"],
+  ["clave", "blanton-ellington"],
+  ["george-russell", "kind-of-blue"],
+  ["george-russell", "church-modes"],
+  ["charlie-parker", "bebop"],
+  ["charlie-parker", "kind-of-blue"],
+  ["charlie-parker", "autumn-leaves"],
+];
+
+// =========================================================================
+// HELPERS
+// =========================================================================
+const catColors = {
+    electronic: '#ff6b35',
+    theory: '#4fc3f7',
+    jazz: '#ab47bc',
+    classical: '#66bb6a'
+};
+
+const catColorsDim = {
+    electronic: '#ff6b3544',
+    theory: '#4fc3f744',
+    jazz: '#ab47bc44',
+    classical: '#66bb6a44'
+};
+
+const eventMap = {};
+events.forEach(e => eventMap[e.id] = e);
+
+// Lesson URL mapping
+const lessonUrls = {
+    '0': 'edm-0-first-noise.html',
+    '1': 'edm-1-the-break.html',
+    '2': 'edm-2-the-bass.html',
+    '3': 'edm-3-layers.html',
+    '4': 'edm-4-atmosphere.html',
+    '5': 'edm-5-movement.html',
+    '6': 'edm-6-the-drop.html',
+    '7': 'edm-7-chopping.html',
+    '8a': 'edm-8a-the-scale.html',
+    '8b': 'edm-8b-modes.html',
+    '8c': 'edm-8c-melody-over-changes.html',
+    '8d': 'edm-8d-intervals.html',
+    '8e': 'edm-8e-non-chord-tones.html',
+    '9a': 'edm-9a-diatonic-harmony.html',
+    '9b': 'edm-9b-ii-v-i.html',
+    '9c': 'edm-9c-the-monster.html',
+    '9d': 'edm-9d-cadences-form.html',
+    '9e': 'edm-9e-texture.html',
+    '9f': 'edm-9f-melodic-development.html',
+};
+
+// Get connections for an event
+function getConnections(id) {
+    const result = [];
+    connections.forEach(([a, b]) => {
+        if (a === id) result.push({ id: b, dir: 'to' });
+        if (b === id) result.push({ id: a, dir: 'from' });
+    });
+    return result;
+}
+
+// Format year display
+function fmtYear(y) {
+    if (y < 0) return Math.abs(y) + ' BC';
+    return '' + y;
+}
+
+// Active filters
+const activeFilters = new Set(['electronic', 'theory', 'jazz', 'classical']);
+
+// =========================================================================
+// ERA DEFINITIONS
+// =========================================================================
+const eras = [
+    { name: 'Ancient', start: -600, end: 500, color: '#4fc3f7' },
+    { name: 'Medieval', start: 500, end: 1400, color: '#ab47bc' },
+    { name: 'Renaissance', start: 1400, end: 1600, color: '#66bb6a' },
+    { name: 'Baroque', start: 1600, end: 1750, color: '#ff6b35' },
+    { name: 'Classical', start: 1750, end: 1820, color: '#4fc3f7' },
+    { name: 'Romantic', start: 1820, end: 1900, color: '#ab47bc' },
+    { name: 'Modern', start: 1900, end: 1970, color: '#66bb6a' },
+    { name: 'Digital', start: 1970, end: 2030, color: '#ff6b35' },
+];
+
+// =========================================================================
+// TOOLTIP
+// =========================================================================
+const tooltip = document.getElementById('tooltip');
+
+function showTooltip(evt, e) {
+    document.getElementById('tt-year').textContent = fmtYear(e.year);
+    document.getElementById('tt-year').style.color = catColors[e.category];
+    document.getElementById('tt-name').textContent = e.name;
+    document.getElementById('tt-desc').textContent = e.desc;
+    document.getElementById('tt-lessons').textContent = 'EDM.' + e.lessons.join(', EDM.');
+
+    tooltip.classList.add('visible');
+
+    const tx = evt.clientX + 16;
+    const ty = evt.clientY - 10;
+    const rect = tooltip.getBoundingClientRect();
+    const finalX = tx + rect.width > window.innerWidth ? evt.clientX - rect.width - 16 : tx;
+    const finalY = ty + rect.height > window.innerHeight ? window.innerHeight - rect.height - 10 : ty;
+    tooltip.style.left = finalX + 'px';
+    tooltip.style.top = finalY + 'px';
+}
+
+function hideTooltip() {
+    tooltip.classList.remove('visible');
+}
+
+// =========================================================================
+// DETAIL PANEL
+// =========================================================================
+const detailPanel = document.getElementById('detail-panel');
+
+function openDetail(e) {
+    document.getElementById('detail-year').textContent = fmtYear(e.year);
+    document.getElementById('detail-year').style.color = catColors[e.category];
+    document.getElementById('detail-name').textContent = e.name;
+    document.getElementById('detail-desc').textContent = e.desc;
+    document.getElementById('detail-source').textContent = e.source;
+
+    const lessonsEl = document.getElementById('detail-lessons');
+    lessonsEl.innerHTML = '';
+    e.lessons.forEach(l => {
+        const a = document.createElement('a');
+        a.className = 'lesson-badge';
+        a.textContent = 'EDM.' + l;
+        a.href = lessonUrls[l] || '#';
+        lessonsEl.appendChild(a);
+    });
+
+    const connEl = document.getElementById('detail-connections');
+    connEl.innerHTML = '';
+    const conns = getConnections(e.id);
+    conns.forEach(c => {
+        const ev = eventMap[c.id];
+        if (!ev) return;
+        const li = document.createElement('li');
+        if (c.dir === 'from') {
+            li.innerHTML = '<span style="color:' + catColors[ev.category] + '">' + ev.name + '</span> <span class="arrow">\u2192</span> ' + e.name;
+        } else {
+            li.innerHTML = e.name + ' <span class="arrow">\u2192</span> <span style="color:' + catColors[ev.category] + '">' + ev.name + '</span>';
+        }
+        li.onclick = () => {
+            openDetail(ev);
+            highlightNode(ev.id);
+        };
+        connEl.appendChild(li);
+    });
+
+    detailPanel.classList.add('open');
+}
+
+document.getElementById('detail-close').onclick = () => {
+    detailPanel.classList.remove('open');
+    clearHighlights();
+};
+
+// =========================================================================
+// TIMELINE VIEW
+// =========================================================================
+function buildTimeline() {
+    const svg = d3.select('#timeline-svg');
+    svg.selectAll('*').remove();
+
+    const container = document.getElementById('timeline-view');
+    const W = container.clientWidth;
+    const H = container.clientHeight;
+
+    svg.attr('width', W).attr('height', H);
+
+    const margin = { top: 80, bottom: 80, left: 60, right: 60 };
+    const innerW = Math.max(W * 3, 4000); // wide scrollable area
+    const innerH = H - margin.top - margin.bottom;
+
+    // Scale: year -> x
+    const xScale = d3.scaleLinear()
+        .domain([-600, 2030])
+        .range([0, innerW]);
+
+    // Create the zoomable group
+    const g = svg.append('g').attr('class', 'timeline-root');
+
+    // Zoom behavior
+    const zoom = d3.zoom()
+        .scaleExtent([0.3, 5])
+        .translateExtent([[-200, -H], [innerW + 200, H * 2]])
+        .on('zoom', (event) => {
+            g.attr('transform', event.transform);
+        });
+
+    timelineZoom = zoom;
+    svg.call(zoom);
+
+    // Initial transform to center on ~1950
+    const initialX = -xScale(1920) + W / 2;
+    svg.call(zoom.transform, d3.zoomIdentity.translate(initialX + margin.left, 0).scale(1));
+
+    const centerY = H / 2;
+
+    // Era bands
+    eras.forEach(era => {
+        g.append('rect')
+            .attr('class', 'era-band')
+            .attr('x', xScale(era.start))
+            .attr('y', margin.top - 20)
+            .attr('width', xScale(era.end) - xScale(era.start))
+            .attr('height', innerH + 40)
+            .attr('fill', era.color);
+
+        g.append('text')
+            .attr('class', 'era-label')
+            .attr('x', (xScale(era.start) + xScale(era.end)) / 2)
+            .attr('y', margin.top - 6)
+            .attr('text-anchor', 'middle')
+            .text(era.name);
+    });
+
+    // Year ticks
+    for (let y = -500; y <= 2025; y += 50) {
+        const x = xScale(y);
+        g.append('line')
+            .attr('class', 'year-tick')
+            .attr('x1', x).attr('x2', x)
+            .attr('y1', centerY - 8).attr('y2', centerY + 8);
+
+        if (y % 100 === 0) {
+            g.append('text')
+                .attr('class', 'year-label')
+                .attr('x', x)
+                .attr('y', centerY + 24)
+                .text(fmtYear(y));
+        }
+    }
+
+    // Axis line
+    g.append('line')
+        .attr('x1', xScale(-600)).attr('x2', xScale(2030))
+        .attr('y1', centerY).attr('y2', centerY)
+        .attr('stroke', '#ffffff').attr('stroke-width', 0.5).attr('opacity', 0.15);
+
+    // Compute vertical offsets to avoid overlap
+    const sorted = [...events].sort((a, b) => a.year - b.year);
+    const yOffsets = {};
+    const placed = [];
+
+    sorted.forEach(e => {
+        const x = xScale(e.year);
+        let bestY = -40;
+        let tries = 0;
+        let direction = -1; // start above
+
+        while (tries < 30) {
+            const candidateY = centerY + bestY;
+            const overlaps = placed.some(p => {
+                return Math.abs(p.x - x) < 80 && Math.abs(p.y - candidateY) < 28;
+            });
+            if (!overlaps) break;
+            bestY += direction * 28;
+            if (bestY < -(innerH / 2 - 20)) {
+                direction = 1;
+                bestY = 30;
+            }
+            tries++;
+        }
+
+        const finalY = centerY + bestY;
+        yOffsets[e.id] = finalY;
+        placed.push({ x, y: finalY });
+    });
+
+    // Connection lines
+    const connGroup = g.append('g').attr('class', 'tl-connections');
+
+    connections.forEach(([srcId, tgtId]) => {
+        const src = eventMap[srcId];
+        const tgt = eventMap[tgtId];
+        if (!src || !tgt) return;
+
+        const x1 = xScale(src.year);
+        const y1 = yOffsets[srcId];
+        const x2 = xScale(tgt.year);
+        const y2 = yOffsets[tgtId];
+
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2 - 20;
+
+        connGroup.append('path')
+            .attr('class', 'tl-connection')
+            .attr('d', `M${x1},${y1} Q${mx},${my} ${x2},${y2}`)
+            .attr('stroke', catColors[src.category])
+            .attr('data-src', srcId)
+            .attr('data-tgt', tgtId);
+    });
+
+    // Event nodes
+    const nodeGroup = g.append('g').attr('class', 'tl-nodes');
+
+    events.forEach(e => {
+        const x = xScale(e.year);
+        const y = yOffsets[e.id];
+
+        // Stem line from axis to node
+        g.append('line')
+            .attr('x1', x).attr('x2', x)
+            .attr('y1', centerY).attr('y2', y)
+            .attr('stroke', catColors[e.category])
+            .attr('stroke-width', 0.5)
+            .attr('opacity', 0.2)
+            .attr('class', 'tl-stem')
+            .attr('data-id', e.id);
+
+        const node = nodeGroup.append('g')
+            .attr('class', 'tl-node')
+            .attr('transform', `translate(${x},${y})`)
+            .attr('data-id', e.id)
+            .attr('data-cat', e.category);
+
+        const r = 4 + e.lessons.length * 1.5;
+
+        node.append('circle')
+            .attr('r', r)
+            .attr('fill', catColorsDim[e.category])
+            .attr('stroke', catColors[e.category])
+            .attr('stroke-width', 1.5)
+            .style('color', catColors[e.category]);
+
+        // Label
+        const labelY = y < centerY ? -r - 6 : r + 12;
+        node.append('text')
+            .attr('x', 0)
+            .attr('y', labelY)
+            .attr('text-anchor', 'middle')
+            .text(e.name.length > 28 ? e.name.slice(0, 26) + '\u2026' : e.name);
+
+        node.on('mouseenter', (evt) => showTooltip(evt, e))
+            .on('mousemove', (evt) => showTooltip(evt, e))
+            .on('mouseleave', hideTooltip)
+            .on('click', () => {
+                hideTooltip();
+                openDetail(e);
+                highlightNode(e.id);
+            });
+    });
+}
+
+// =========================================================================
+// NETWORK VIEW
+// =========================================================================
+let simulation;
+
+function buildNetwork() {
+    const svg = d3.select('#network-svg');
+    svg.selectAll('*').remove();
+
+    const container = document.getElementById('network-view');
+    const W = container.clientWidth;
+    const H = container.clientHeight;
+
+    svg.attr('width', W).attr('height', H);
+
+    // Prepare nodes and links
+    const nodes = events.map(e => ({
+        ...e,
+        radius: 6 + e.lessons.length * 3
+    }));
+
+    const nodeById = {};
+    nodes.forEach(n => nodeById[n.id] = n);
+
+    const links = connections
+        .filter(([s, t]) => nodeById[s] && nodeById[t])
+        .map(([s, t]) => ({ source: s, target: t }));
+
+    // Force simulation
+    simulation = d3.forceSimulation(nodes)
+        .force('link', d3.forceLink(links).id(d => d.id).distance(100).strength(0.4))
+        .force('charge', d3.forceManyBody().strength(-300))
+        .force('center', d3.forceCenter(W / 2, H / 2))
+        .force('collision', d3.forceCollide(d => d.radius + 12))
+        .force('x', d3.forceX(W / 2).strength(0.04))
+        .force('y', d3.forceY(H / 2).strength(0.04));
+
+    // Zoom
+    const g = svg.append('g');
+    const zoom = d3.zoom()
+        .scaleExtent([0.2, 4])
+        .on('zoom', (event) => g.attr('transform', event.transform));
+    svg.call(zoom);
+
+    // Links
+    const link = g.append('g')
+        .selectAll('line')
+        .data(links)
+        .join('line')
+        .attr('class', 'net-link')
+        .attr('data-src', d => d.source.id || d.source)
+        .attr('data-tgt', d => d.target.id || d.target);
+
+    // Nodes
+    const node = g.append('g')
+        .selectAll('g')
+        .data(nodes)
+        .join('g')
+        .attr('class', 'net-node')
+        .attr('data-id', d => d.id)
+        .attr('data-cat', d => d.category)
+        .call(d3.drag()
+            .on('start', (event, d) => {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x; d.fy = d.y;
+            })
+            .on('drag', (event, d) => {
+                d.fx = event.x; d.fy = event.y;
+            })
+            .on('end', (event, d) => {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null; d.fy = null;
+            })
+        );
+
+    node.append('circle')
+        .attr('r', d => d.radius)
+        .attr('fill', d => catColorsDim[d.category])
+        .attr('stroke', d => catColors[d.category])
+        .attr('stroke-width', 2)
+        .style('color', d => catColors[d.category]);
+
+    node.append('text')
+        .attr('y', d => d.radius + 14)
+        .text(d => d.name.length > 22 ? d.name.slice(0, 20) + '\u2026' : d.name);
+
+    // Small year label
+    node.append('text')
+        .attr('y', d => -d.radius - 6)
+        .attr('font-size', '7px')
+        .attr('fill', '#5a584f')
+        .text(d => fmtYear(d.year));
+
+    // Interactions
+    node.on('mouseenter', (evt, d) => showTooltip(evt, d))
+        .on('mousemove', (evt, d) => showTooltip(evt, d))
+        .on('mouseleave', hideTooltip)
+        .on('click', (evt, d) => {
+            hideTooltip();
+            openDetail(d);
+            highlightNode(d.id);
+        });
+
+    // Tick
+    simulation.on('tick', () => {
+        link
+            .attr('x1', d => d.source.x)
+            .attr('y1', d => d.source.y)
+            .attr('x2', d => d.target.x)
+            .attr('y2', d => d.target.y);
+
+        node.attr('transform', d => `translate(${d.x},${d.y})`);
+    });
+}
+
+// =========================================================================
+// HIGHLIGHT / FILTER
+// =========================================================================
+function highlightNode(id) {
+    const conns = getConnections(id);
+    const connIds = new Set(conns.map(c => c.id));
+    connIds.add(id);
+
+    // Timeline
+    d3.selectAll('.tl-connection')
+        .classed('highlight', function() {
+            const s = this.getAttribute('data-src');
+            const t = this.getAttribute('data-tgt');
+            return s === id || t === id;
+        });
+
+    // Network
+    d3.selectAll('.net-node')
+        .classed('dimmed', function() {
+            return !connIds.has(this.getAttribute('data-id'));
+        });
+
+    d3.selectAll('.net-link')
+        .classed('highlight', function() {
+            const s = this.getAttribute('data-src');
+            const t = this.getAttribute('data-tgt');
+            return s === id || t === id;
+        })
+        .each(function() {
+            const s = this.getAttribute('data-src');
+            const t = this.getAttribute('data-tgt');
+            if (s !== id && t !== id) {
+                d3.select(this).style('opacity', 0.03);
+            }
+        });
+}
+
+function clearHighlights() {
+    d3.selectAll('.tl-connection').classed('highlight', false);
+    d3.selectAll('.net-node').classed('dimmed', false);
+    d3.selectAll('.net-link').classed('highlight', false).style('opacity', null);
+}
+
+function applyFilters() {
+    // Timeline nodes
+    d3.selectAll('.tl-node').style('display', function() {
+        return activeFilters.has(this.getAttribute('data-cat')) ? null : 'none';
+    });
+    d3.selectAll('.tl-stem').style('display', function() {
+        const id = this.getAttribute('data-id');
+        const ev = eventMap[id];
+        return ev && activeFilters.has(ev.category) ? null : 'none';
+    });
+    d3.selectAll('.tl-connection').style('display', function() {
+        const s = eventMap[this.getAttribute('data-src')];
+        const t = eventMap[this.getAttribute('data-tgt')];
+        return (s && activeFilters.has(s.category)) && (t && activeFilters.has(t.category)) ? null : 'none';
+    });
+
+    // Network nodes
+    d3.selectAll('.net-node').style('display', function() {
+        return activeFilters.has(this.getAttribute('data-cat')) ? null : 'none';
+    });
+    d3.selectAll('.net-link').style('display', function() {
+        const s = this.getAttribute('data-src');
+        const t = this.getAttribute('data-tgt');
+        const se = eventMap[s];
+        const te = eventMap[t];
+        return (se && activeFilters.has(se.category)) && (te && activeFilters.has(te.category)) ? null : 'none';
+    });
+}
+
+// =========================================================================
+// VIEW TOGGLE
+// =========================================================================
+let currentView = 'timeline';
+let networkBuilt = false;
+let timelineZoom = null;
+
+function scrollTimeline(direction) {
+    if (currentView !== 'timeline') return;
+    const svg = d3.select('#timeline-svg');
+    const currentTransform = d3.zoomTransform(svg.node());
+    const newX = currentTransform.x + (direction * -300);
+    svg.transition().duration(500).call(
+        timelineZoom.transform,
+        d3.zoomIdentity.translate(newX, currentTransform.y).scale(currentTransform.k)
+    );
+}
+
+document.querySelectorAll('.view-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const view = btn.dataset.view;
+        if (view === currentView) return;
+        currentView = view;
+
+        document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        if (view === 'timeline') {
+            document.getElementById('timeline-view').classList.remove('hidden');
+            document.getElementById('network-view').classList.add('hidden');
+        } else {
+            document.getElementById('network-view').classList.remove('hidden');
+            document.getElementById('timeline-view').classList.add('hidden');
+            if (!networkBuilt) {
+                buildNetwork();
+                networkBuilt = true;
+                applyFilters();
+            }
+        }
+
+        detailPanel.classList.remove('open');
+        clearHighlights();
+    });
+});
+
+// =========================================================================
+// FILTER CHIPS
+// =========================================================================
+document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+        const cat = chip.dataset.cat;
+        if (activeFilters.has(cat)) {
+            activeFilters.delete(cat);
+            chip.classList.add('off');
+        } else {
+            activeFilters.add(cat);
+            chip.classList.remove('off');
+        }
+        applyFilters();
+    });
+});
+
+// =========================================================================
+// INIT
+// =========================================================================
+buildTimeline();
+
+window.addEventListener('resize', () => {
+    buildTimeline();
+    if (networkBuilt) {
+        networkBuilt = false;
+        if (currentView === 'network') {
+            buildNetwork();
+            networkBuilt = true;
+        }
+    }
+    applyFilters();
+});
+</script>
+</body></html>
