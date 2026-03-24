@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EDM.2 — The Bass</title>
+<title>EDM.2: The Bass</title>
 <style>
 :root {
     --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
@@ -217,6 +217,17 @@ details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #11111
 details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
 details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
 
+/* --- Harmonic toggle buttons --- */
+.harmonic-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s;
+}
+.harmonic-btn.active {
+    border-color: var(--cool); color: var(--cool); background: var(--cool-dim);
+}
+
 /* --- Punchline / capstone highlight --- */
 .punchline {
     background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
@@ -275,11 +286,11 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 <!-- ============ HERO ============ -->
 <section id="hero">
 <h1>The <span class="accent">Bass</span></h1>
-<div class="subtitle">EDM.2 &mdash; sub bass, reese, and filtering</div>
+<div class="subtitle">EDM.2: sub bass, reese, and filtering</div>
 
 <p>DnB has two load-bearing walls: drums and bass. You built the drums. Now the other half.</p>
 
-<p>Bass in DnB lives below 200Hz. It&rsquo;s physical. You feel it in your chest before you hear it in your ears. This lesson starts with a single low note and ends with a filtered reese sitting under your EDM.1 breakbeat.</p>
+<p>Bass in DnB lives below 200Hz. It&rsquo;s physical. You feel it in your chest before you hear it in your ears. You&rsquo;ll start with a single low note and end with a filtered reese sitting under your EDM.1 breakbeat.</p>
 
 <div class="concept warm">
     <span class="c-label">what you already know</span>
@@ -307,7 +318,7 @@ note("c1").s("sine")
     </strudel-editor>
 </div>
 
-<p>If your speakers are small, you might barely hear it. That&rsquo;s normal. C1 is 32.7Hz. Most laptop speakers roll off around 80Hz. Headphones or a subwoofer will make this lesson significantly more educational.</p>
+<p>If your speakers are small, you might barely hear it. That&rsquo;s normal. C1 is 32.7Hz. Most laptop speakers roll off around 80Hz. Headphones or a subwoofer help.</p>
 
 <div class="try-this">
     <span class="label">tweak it</span>
@@ -362,7 +373,7 @@ note("c1 ~ eb1 ~").s("sine")
 
 <div class="concept">
     <span class="c-label">sub bass</span>
-    <p>A sine wave below ~100Hz. Pure fundamental, no harmonics. Felt more than heard. The foundation that everything else sits on top of. In a club, this is what makes your ribcage vibrate.</p>
+    <p>A sine wave below ~100Hz. Pure fundamental, no harmonics. Felt more than heard. Everything else sits on top of it. In a club, this is what makes your ribcage vibrate.</p>
 </div>
 </section>
 
@@ -390,6 +401,7 @@ note("c2").s("sine")
     <!--
 note("c2").s("sawtooth")
   .sustain(1).release(0.1)
+  ._spiral()
     -->
     </strudel-editor>
 </div>
@@ -417,7 +429,7 @@ note("c2").s("square")
 </div>
 
 <details class="rabbit-hole">
-    <summary>rabbit hole &mdash; why waveforms sound different</summary>
+    <summary>rabbit hole: why waveforms sound different</summary>
     <div class="rh-body">
         <h4>Harmonics</h4>
         <p>A sine wave is a single frequency. A sawtooth contains every harmonic: the fundamental plus 2x, 3x, 4x, 5x&hellip; all stacked up, each quieter than the last. A square wave has only the odd harmonics (1x, 3x, 5x, 7x). That&rsquo;s why it sounds hollow.</p>
@@ -513,6 +525,163 @@ note("c2").s("square")
         </script>
     </div>
 </details>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: what harmonics actually are</summary>
+    <div class="rh-body">
+        <h4>The fundamental</h4>
+        <p>A sine wave is a single frequency. Play C2 as a sine and that&rsquo;s the <strong>fundamental</strong>: 65.4Hz, one frequency, one pitch. Nothing else in the signal. Pure tone.</p>
+
+        <h4>Overtones</h4>
+        <p>Every acoustic sound contains the fundamental plus higher frequencies at integer multiples. These are <strong>harmonics</strong>. The 2nd harmonic is 2&times; the fundamental (one octave above). The 3rd is 3&times; (an octave plus a fifth). The 4th is 4&times; (two octaves). And so on, stacking upward forever.</p>
+
+        <p>A plucked guitar string vibrates at C2 (65.4Hz), but also at 130.8Hz, 196.2Hz, 261.6Hz, and hundreds more simultaneously. The relative loudness of each harmonic is what makes a guitar sound like a guitar and not a clarinet.</p>
+
+        <h4>Build it yourself</h4>
+        <p>Toggle harmonics on and off. The canvas draws each active harmonic as a faint line and the composite (sum of all active) as a bright line. Watch how the composite shape changes as you stack harmonics.</p>
+
+        <div style="margin-bottom: 0.8rem;">
+            <div id="harmonics-controls" style="display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.6rem;">
+                <button class="harmonic-btn active" data-h="1" onclick="toggleHarmonic(1, this)">1st (fund.)</button>
+                <button class="harmonic-btn" data-h="2" onclick="toggleHarmonic(2, this)">+2nd</button>
+                <button class="harmonic-btn" data-h="3" onclick="toggleHarmonic(3, this)">+3rd</button>
+                <button class="harmonic-btn" data-h="4" onclick="toggleHarmonic(4, this)">+4th</button>
+                <button class="harmonic-btn" data-h="5" onclick="toggleHarmonic(5, this)">+5th</button>
+                <button class="harmonic-btn" data-h="6" onclick="toggleHarmonic(6, this)">+6th</button>
+                <button class="harmonic-btn" data-h="7" onclick="toggleHarmonic(7, this)">+7th</button>
+                <button class="harmonic-btn" data-h="8" onclick="toggleHarmonic(8, this)">+8th</button>
+                <button class="harmonic-btn" style="border-color: var(--accent); color: var(--accent);" onclick="resetHarmonics()">reset</button>
+            </div>
+            <div style="font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.05em; margin-bottom: 0.4rem;">
+                active: <span id="harmonics-label">1st</span>
+            </div>
+            <canvas id="harmonics-canvas" width="800" height="300" style="width: 100%; background: var(--surface); border-radius: 4px;"></canvas>
+        </div>
+
+        <p>Add only odd harmonics (1, 3, 5, 7) and the composite approaches a <strong>square wave</strong>. Add all of them (1, 2, 3, 4, 5, 6, 7, 8) and it approaches a <strong>sawtooth</strong>. The waveform shape IS the harmonic content. They&rsquo;re two descriptions of the same thing.</p>
+
+        <script>
+        (function() {
+            const canvas = document.getElementById('harmonics-canvas');
+            const ctx = canvas.getContext('2d');
+            const W = 800, H = 300;
+            const activeHarmonics = new Set([1]);
+
+            const accentColor = '#ff6b35';
+            const coolColor = '#4fc3f7';
+            const greenColor = '#66bb6a';
+            const dimAlpha = '44';
+
+            function drawHarmonics() {
+                ctx.clearRect(0, 0, W, H);
+
+                // zero line
+                ctx.strokeStyle = '#5a584f';
+                ctx.lineWidth = 0.5;
+                ctx.beginPath();
+                ctx.moveTo(0, H / 2);
+                ctx.lineTo(W, H / 2);
+                ctx.stroke();
+
+                const cycles = 2;
+                const amp = H * 0.35;
+
+                // Draw individual harmonics as faint lines
+                activeHarmonics.forEach(function(n) {
+                    ctx.strokeStyle = n === 1 ? accentColor + '66' : coolColor + dimAlpha;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    for (var x = 0; x < W; x++) {
+                        var t = (x / W) * cycles * Math.PI * 2;
+                        var y = (1 / n) * Math.sin(n * t);
+                        var py = H / 2 - y * amp;
+                        if (x === 0) ctx.moveTo(x, py);
+                        else ctx.lineTo(x, py);
+                    }
+                    ctx.stroke();
+                });
+
+                // Draw composite wave (sum) as bright line
+                ctx.strokeStyle = activeHarmonics.size === 1 && activeHarmonics.has(1) ? accentColor : greenColor;
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                for (var x = 0; x < W; x++) {
+                    var t = (x / W) * cycles * Math.PI * 2;
+                    var y = 0;
+                    activeHarmonics.forEach(function(n) {
+                        y += (1 / n) * Math.sin(n * t);
+                    });
+                    var py = H / 2 - y * amp;
+                    if (x === 0) ctx.moveTo(x, py);
+                    else ctx.lineTo(x, py);
+                }
+                ctx.stroke();
+            }
+
+            function updateLabel() {
+                var nums = Array.from(activeHarmonics).sort(function(a, b) { return a - b; });
+                var suffixes = { 1: '1st', 2: '2nd', 3: '3rd', 4: '4th', 5: '5th', 6: '6th', 7: '7th', 8: '8th' };
+                document.getElementById('harmonics-label').textContent = nums.map(function(n) { return suffixes[n]; }).join(', ');
+            }
+
+            window.toggleHarmonic = function(n, btn) {
+                if (n === 1) {
+                    // fundamental always stays on
+                    if (!activeHarmonics.has(1)) {
+                        activeHarmonics.add(1);
+                        btn.classList.add('active');
+                    }
+                    return;
+                }
+                if (activeHarmonics.has(n)) {
+                    activeHarmonics.delete(n);
+                    btn.classList.remove('active');
+                } else {
+                    activeHarmonics.add(n);
+                    btn.classList.add('active');
+                }
+                updateLabel();
+                drawHarmonics();
+            };
+
+            window.resetHarmonics = function() {
+                activeHarmonics.clear();
+                activeHarmonics.add(1);
+                document.querySelectorAll('#harmonics-controls .harmonic-btn[data-h]').forEach(function(b) {
+                    b.classList.toggle('active', b.getAttribute('data-h') === '1');
+                });
+                updateLabel();
+                drawHarmonics();
+            };
+
+            drawHarmonics();
+        })();
+        </script>
+
+        <h4>Why waveforms sound different</h4>
+        <p>A sine has no harmonics. Pure fundamental. A sawtooth has all harmonics (1, 2, 3, 4, 5&hellip;), each at 1/n amplitude. Buzzy and bright. A square has only odd harmonics (1, 3, 5, 7&hellip;), which gives it that hollow, clarinet-like character. A triangle also has only odd harmonics, but they fall off as 1/n&sup2; instead of 1/n, so they&rsquo;re much quieter. Softer sound.</p>
+
+        <p>Filtering (<code>.lpf()</code>) removes upper harmonics. That&rsquo;s why it makes a sawtooth darker: you&rsquo;re peeling away the high-frequency content that made it buzzy. Push the cutoff low enough and any waveform starts to sound like a sine, because you&rsquo;ve removed everything except the fundamental.</p>
+
+        <h4>The overtone series</h4>
+        <table>
+            <thead><tr><th>harmonic</th><th>multiple</th><th>interval</th><th>note (fund. = C2)</th></tr></thead>
+            <tbody>
+            <tr><td>1st (fund.)</td><td>1&times;</td><td>unison</td><td>C2</td></tr>
+            <tr><td>2nd</td><td>2&times;</td><td>octave</td><td>C3</td></tr>
+            <tr><td>3rd</td><td>3&times;</td><td>octave + fifth</td><td>G3</td></tr>
+            <tr><td>4th</td><td>4&times;</td><td>2 octaves</td><td>C4</td></tr>
+            <tr><td>5th</td><td>5&times;</td><td>2 oct. + major 3rd</td><td>E4</td></tr>
+            <tr><td>6th</td><td>6&times;</td><td>2 oct. + fifth</td><td>G4</td></tr>
+            <tr><td>7th</td><td>7&times;</td><td>2 oct. + minor 7th</td><td>B&flat;4 (approx)</td></tr>
+            <tr><td>8th</td><td>8&times;</td><td>3 octaves</td><td>C5</td></tr>
+            </tbody>
+        </table>
+
+        <h4>Connection to music</h4>
+        <p>Harmonics 4, 5, and 6 are C, E, and G. That&rsquo;s a major triad, built into the physics of a vibrating string. Some argue this is why major chords sound &ldquo;natural&rdquo; or consonant: the intervals mirror the overtone series that every acoustic sound already contains. The relationship between harmonics and consonance is one of the oldest questions in music theory. No settled answer, but the pattern is hard to ignore.</p>
+    </div>
+</details>
 </section>
 
 <!-- ============ SECTION 2: THE REESE ============ -->
@@ -550,7 +719,7 @@ stack(
     </strudel-editor>
 </div>
 
-<p>That slow, churning movement. The two frequencies are close enough to fight each other. The result is a pulsing, phasing texture. More alive than a single saw.</p>
+<p>That slow, churning movement. The two frequencies are close enough to fight each other, producing a pulsing, phasing texture. More alive than a single saw.</p>
 
 <div class="try-this">
     <span class="label">tweak it</span>
@@ -563,7 +732,7 @@ stack(
 </div>
 
 <details class="rabbit-hole">
-    <summary>rabbit hole &mdash; why detuning creates movement</summary>
+    <summary>rabbit hole: why detuning creates movement</summary>
     <div class="rh-body">
         <h4>Beating frequencies</h4>
         <p>When two tones are close in pitch, their peaks align and misalign at a regular rate. When peaks align: louder. When they oppose: quieter. This cycling between loud and quiet is called <strong>beating</strong>.</p>
@@ -584,7 +753,7 @@ stack(
         <p>In the strudel editor above, <code>.add(note(0.15))</code> adds 0.15 semitones to the pitch. At C2 (65.4Hz), that&rsquo;s roughly a 0.6Hz difference: a slow, deep throb. The exact Hz depends on the base frequency, which is why the same detune amount sounds different in different octaves.</p>
 
         <h4>Why sawtooth specifically?</h4>
-        <p>Sawtooths have the most harmonics of any basic wave shape. When two of them beat against each other, the beating happens at every harmonic simultaneously. The fundamental beats, the second harmonic beats, the third, and so on. The result is thick, complex movement across the whole spectrum. Two sines beating just gives you a simple volume pulse. Two saws give you the reese.</p>
+        <p>Sawtooths have the most harmonics of any basic wave shape. When two of them beat against each other, the beating happens at every harmonic simultaneously. The fundamental beats, the second harmonic beats, the third, and so on. Thick, complex movement across the whole spectrum. Two sines beating just gives you a simple volume pulse. Two saws give you the reese.</p>
     </div>
 </details>
 
@@ -646,7 +815,7 @@ stack(
 
 <h3>Resonance: boost the cutoff point</h3>
 
-<p><code>.lpq()</code> adds resonance at the cutoff frequency. A boost right at the edge, from gentle warmth to nasal honk.</p>
+<p><code>.lpq()</code> adds resonance at the cutoff frequency. A boost right at the edge. Gentle warmth at low values, nasal honk at high ones.</p>
 
 <div class="strudel-block">
     <div class="strudel-label"><span>resonant filter</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
@@ -673,9 +842,91 @@ stack(
     <p>Push <code>.lpq()</code> up to <code>15</code> or <code>20</code>. It starts to ring and whistle. That&rsquo;s self-oscillation territory: the filter feeding back on itself. Useful in acid techno, dangerous in DnB.</p>
 </div>
 
+<div style="margin: 1.5rem 0;">
+    <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+        <button class="harmonic-btn active" onclick="drawFilter(this, 1)">Q = 1</button>
+        <button class="harmonic-btn" onclick="drawFilter(this, 3)">Q = 3</button>
+        <button class="harmonic-btn" onclick="drawFilter(this, 8)">Q = 8</button>
+        <button class="harmonic-btn" onclick="drawFilter(this, 20)">Q = 20</button>
+    </div>
+    <canvas id="filter-canvas" width="600" height="180" style="width:100%; background: var(--surface); border-radius: 4px;"></canvas>
+    <p style="font-size: 0.8rem; color: var(--text-faint); margin-top: 0.3rem;">Orange: lowpass response. The bump at cutoff is the resonance peak. Higher Q = sharper peak.</p>
+</div>
+<script>
+(function() {
+    const canvas = document.getElementById('filter-canvas');
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    const cutoffX = w * 0.4;
+
+    window.drawFilter = function(btn, q) {
+        if (btn) {
+            btn.parentElement.querySelectorAll('.harmonic-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        ctx.clearRect(0, 0, w, h);
+
+        // Grid
+        ctx.strokeStyle = '#1e1e24';
+        ctx.lineWidth = 1;
+        for (let i = 1; i < 4; i++) {
+            ctx.beginPath(); ctx.moveTo(0, h*i/4); ctx.lineTo(w, h*i/4); ctx.stroke();
+        }
+
+        // Cutoff line
+        ctx.strokeStyle = '#5a584f';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.moveTo(cutoffX, 0); ctx.lineTo(cutoffX, h); ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Labels
+        ctx.font = '9px monospace';
+        ctx.fillStyle = '#5a584f';
+        ctx.fillText('20 Hz', 5, h - 5);
+        ctx.fillText('cutoff', cutoffX - 15, h - 5);
+        ctx.fillText('20 kHz', w - 45, h - 5);
+        ctx.fillText('loud', 5, 15);
+        ctx.fillText('quiet', 5, h - 15);
+
+        // Lowpass curve
+        ctx.beginPath();
+        ctx.strokeStyle = '#ff6b35';
+        ctx.lineWidth = 2.5;
+        const margin = h * 0.1;
+        const usable = h * 0.7;
+        for (let x = 0; x < w; x++) {
+            const f = x / w;
+            const fc = cutoffX / w;
+            let gain;
+            if (f <= fc) {
+                const nearness = 1 - (fc - f) / fc;
+                const peak = q * 0.12 * Math.pow(nearness, q * 0.8);
+                gain = 1 + peak;
+            } else {
+                const past = (f - fc) / (1 - fc);
+                const rolloff = 1 / (1 + Math.pow(past * 8, 2));
+                const peak = q * 0.12 * Math.exp(-past * q * 0.5);
+                gain = rolloff + peak * rolloff;
+            }
+            const maxGain = 1 + q * 0.12;
+            const y = h - margin - (gain / maxGain) * usable;
+            if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+
+        // Fill under
+        ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath();
+        ctx.fillStyle = 'rgba(255, 107, 53, 0.06)';
+        ctx.fill();
+    };
+
+    drawFilter(null, 1);
+})();
+</script>
+
 <h3>Moving the cutoff: filter sweeps</h3>
 
-<p>A static filter is fine. A moving filter is alive. Use a signal to sweep the cutoff.</p>
+<p>A static filter is fine. A moving filter is alive. Use a signal to sweep the cutoff over time.</p>
 
 <div class="strudel-block">
     <div class="strudel-label"><span>filter sweep</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
@@ -704,8 +955,35 @@ stack(
     <p><code>.lpf(freq)</code> passes frequencies below <code>freq</code> and cuts the rest. <code>.lpq(q)</code> adds resonance, a volume boost at the cutoff frequency. Low cutoff = dark and subby. High cutoff = bright and present. Move the cutoff over time and you get a filter sweep.</p>
 </div>
 
+<h3>Bandpass</h3>
+
+<p>Lowpass removes highs. Highpass removes lows. A bandpass does both &mdash; cuts the highs AND the lows, keeping only a band in the middle:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>bandpass &mdash; keep only the middle</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-bp">
+    <!--
+note("c2").s("sawtooth")
+  .sustain(1).release(0.1)
+  .bpf(400).bpq(5)
+    -->
+    </strudel-editor>
+</div>
+
+<p><code>.bpf()</code> sets the center frequency. <code>.bpq()</code> sets how narrow the band is. High Q = narrow, nasal. Low Q = wide, subtle. The bandpass focuses the sound on one frequency region.</p>
+
+<div class="concept">
+    <span class="c-label">filter types</span>
+    <p>Three filters, three jobs. <code>.lpf()</code> = lowpass (cut highs, keep lows). <code>.hpf()</code> = highpass (cut lows, keep highs). <code>.bpf()</code> = bandpass (cut both, keep a band in the middle). Each takes a frequency. Each has a Q parameter (<code>.lpq()</code>, <code>.hpq()</code>, <code>.bpq()</code>).</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Sweep the bandpass: <code>.bpf(sine.range(200, 2000).slow(4))</code>. The band moves through the spectrum. Try <code>.bpq(20)</code> for extreme narrow &mdash; the sawtooth becomes a whistle.</p>
+</div>
+
 <details class="rabbit-hole">
-    <summary>rabbit hole &mdash; filter types and frequency response</summary>
+    <summary>rabbit hole: filter types and frequency response</summary>
     <div class="rh-body">
         <h4>Lowpass vs. highpass</h4>
         <p>Two sides of the same idea. A lowpass lets the low end through and cuts the top. A highpass does the opposite: cuts the low end and lets the top through.</p>
@@ -772,7 +1050,7 @@ stack(
 <section id="capstone">
 <h2><span class="num">04</span>Drums + Bass</h2>
 
-<p>The two pillars. Your EDM.1 breakbeat on top, the filtered reese underneath. This is the skeleton of every DnB track.</p>
+<p>Your EDM.1 breakbeat on top, the filtered reese underneath. The skeleton of every DnB track.</p>
 
 <div class="punchline">
     <p><strong>Everything combined.</strong> The DnB breakbeat from EDM.1 (kick, snare, hats) stacked with a filtered reese bass. Two detuned saws, lowpassed, moving under programmed drums at 170bpm.</p>
@@ -873,6 +1151,38 @@ stack(
         <span class="c-label">reese recipe</span>
         <p>Two <code>sawtooth</code> oscillators. Detune the second by <code>.add(note(0.1))</code> to <code>.add(note(0.3))</code>. Lowpass both at 400&ndash;1200Hz. Add <code>.lpq(3)</code> for presence. Done.</p>
     </div>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td>Reese (Kevin Saunderson)</td><td>Just Want Another Chance (1988)</td><td>(techno) the literal origin of the Reese bass</td></tr>
+        <tr><td>Renegade (Ray Keith)</td><td>Terrorist (1994)</td><td>(jungle) sampled Reese + amen = instant jungle</td></tr>
+        <tr><td>Ed Rush &amp; Optical</td><td>Wormhole (1998)</td><td>(neurofunk) first neurofunk, filter sweeps + resampled bass</td></tr>
+        <tr><td>Goldie</td><td>Inner City Life (1995)</td><td>(DnB) sub-bass carrying emotional weight</td></tr>
+        <tr><td>Wendy Carlos</td><td>Switched-On Bach (1968)</td><td>(electronic) first Moog album, proved synthesis could carry a composition</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The synthesizer turned sound into something you could sculpt. The bass that emerged changed how low-end works in all electronic music.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Bob Moog and voltage control (1964)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Robert Moog demonstrated the first practical voltage-controlled synthesizer at the Audio Engineering Society convention in 1964. His key insight: use voltage to control oscillator frequency, filter cutoff, and amplifier level. One control signal could shape all three. That&rsquo;s the signal chain in every synth since &mdash; oscillator &rarr; filter &rarr; amplifier &mdash; and the chain you&rsquo;re using with <code>.lpf()</code> and ADSR in this lesson.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Kevin Saunderson&rsquo;s Casio CZ-1 (1988)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Saunderson recorded &ldquo;Just Want Another Chance&rdquo; as Reese. The bassline &mdash; two detuned sawtooth oscillators on a Casio CZ-1 &mdash; phased against each other to create a growling, living texture. He didn&rsquo;t intend it as a bass revolution. UK producers sampled it directly. Ray Keith&rsquo;s &ldquo;Terrorist&rdquo; (1994) lifted the bassline wholesale. The &ldquo;Reese bass&rdquo; became jungle&rsquo;s default low-end weapon.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Neurofunk and bass design (1998&ndash;2005)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Ed Rush &amp; Optical&rsquo;s <em>Wormhole</em> (1998) applied studio processing &mdash; resampling, heavy filtering, distortion chains &mdash; to the Reese template. The bass became an instrument to be designed, not just played. Noisia (Netherlands) pushed this further with surgical mixing and layered sub/mid/high bass splits. Modern bass music production descends from this lineage.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Pinch &amp; Trocco, <em>Analog Days</em> (2002); Attack Magazine, &ldquo;Reese Deconstructed&rdquo; (2016); DJ Mag, &ldquo;Renegade&rsquo;s Terrorist&rdquo; (2019).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
     </div>
 </details>
 </section>
