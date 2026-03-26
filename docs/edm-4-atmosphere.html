@@ -619,24 +619,10 @@ s("~ cb ~ cb ~ cb cb ~").gain(0.5)
 
 <h3>Two notes</h3>
 
-<p>C alone:</p>
+<p>C and G together. Comma inside brackets means &ldquo;play at the same time&rdquo;:</p>
 
 <div class="strudel-block">
-    <div class="strudel-label"><span>one note</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-3-one">
-    <!--
-setcpm(35)
-note("c3").s("sawtooth")
-  .lpf(800).attack(0.2).sustain(0.6).release(0.5)
-  .room(0.5).size(0.8).gain(0.3)
-    -->
-    </strudel-editor>
-</div>
-
-<p>Now C and G together. Two notes, comma-separated inside brackets:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>c + g &mdash; wide, stable</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <div class="strudel-label"><span>c + g</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
     <strudel-editor id="ed-3-cg">
     <!--
 setcpm(35)
@@ -647,12 +633,10 @@ note("[c3,g3]").s("sawtooth")
     </strudel-editor>
 </div>
 
-<p>Wide. Solid. The two notes are far apart and they agree with each other.</p>
-
-<p>C and E-flat. Closer together:</p>
+<p>Now C and E-flat:</p>
 
 <div class="strudel-block">
-    <div class="strudel-label"><span>c + eb &mdash; close, dark</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <div class="strudel-label"><span>c + eb</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
     <strudel-editor id="ed-3-ceb">
     <!--
 setcpm(35)
@@ -663,12 +647,10 @@ note("[c3,eb3]").s("sawtooth")
     </strudel-editor>
 </div>
 
-<p>Darker. Heavier. The notes are close together and there&rsquo;s a weight between them.</p>
-
-<p>C and E instead of E-flat. One note different:</p>
+<p>C and E. One note different from the last one:</p>
 
 <div class="strudel-block">
-    <div class="strudel-label"><span>c + e &mdash; close, bright</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <div class="strudel-label"><span>c + e</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
     <strudel-editor id="ed-3-ce">
     <!--
 setcpm(35)
@@ -679,16 +661,59 @@ note("[c3,e3]").s("sawtooth")
     </strudel-editor>
 </div>
 
-<p>Brighter. Same closeness, different character. Eb made it dark. E makes it bright. One note is the difference.</p>
+<p>Three pairs. Three different moods. The notes are doing something to each other. Which pair felt heaviest? Which felt like it wanted to go somewhere?</p>
 
 <div class="try-this">
     <span class="label">tweak it</span>
-    <p>Try other pairs: <code>[c3,f3]</code>, <code>[c3,ab3]</code>, <code>[c3,b3]</code>. Each pairing has its own mood. Some feel stable. Some feel tense. The relationship between two notes is where mood starts.</p>
+    <p>Try <code>[c3,f3]</code>, <code>[c3,ab3]</code>, <code>[c3,b3]</code>. Some pairs sit still. Some pull.</p>
+</div>
+
+<h3>One holds, one moves</h3>
+
+<p>Hold C in the bass. Let another voice move over it:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>drone + melody</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-drone">
+    <!--
+setcpm(35)
+stack(
+  note("c2").s("sine").sustain(0.8).gain(0.6),
+  note("eb3 g3 f3 eb3").s("sawtooth")
+    .lpf(1200).decay(0.1).sustain(0.2).gain(0.35)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The C holds still. The top voice moves: Eb, G, F, Eb. Every note in the melody sounds different because of the C underneath it. The held note changes the meaning of the moving one.</p>
+
+<p>Change the anchor. Same melody, different bass note:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>different anchor, same melody</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-drone2">
+    <!--
+setcpm(35)
+stack(
+  note("ab1").s("sine").sustain(0.8).gain(0.6),
+  note("eb3 g3 f3 eb3").s("sawtooth")
+    .lpf(1200).decay(0.1).sustain(0.2).gain(0.35)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Same four notes on top. Completely different feel. The anchor decides the mood. The melody is the same &mdash; what&rsquo;s underneath it changed everything.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>note("g1")</code> as the anchor. Or <code>note("bb1")</code>. The melody doesn&rsquo;t change. Your experience of it does.</p>
 </div>
 
 <h3>Three notes</h3>
 
-<p>Stack all three &mdash; C, E-flat, and G. The two pairs you just heard, combined:</p>
+<p>Stack all three from the pairs &mdash; C, Eb, G. Together at once:</p>
 
 <div class="strudel-block">
     <div class="strudel-label"><span>c minor chord</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
@@ -715,6 +740,28 @@ note("[c3,eb3,g3]").s("sawtooth")
     <span class="c-label">pad</span>
     <p>A sustained chord sound. Slow attack, long sustain, reverb. It fills background, sets mood. In the mini-notation, commas inside brackets mean &ldquo;play simultaneously&rdquo;: <code>[c3,eb3,g3]</code>.</p>
 </div>
+
+<h3>A voice over a chord</h3>
+
+<p>The chord holds. A melody moves on top:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>chord + melody</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-chordmel">
+    <!--
+setcpm(35)
+stack(
+  note("[c3,eb3,g3]").s("sawtooth")
+    .lpf(800).attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8).gain(0.25),
+  note("g4 eb4 c4 eb4").s("sawtooth")
+    .lpf(1500).decay(0.08).sustain(0).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Same idea as the drone, but now the anchor is a full chord instead of a single note. The melody has more context. More to agree or disagree with. This is where we&rsquo;re heading &mdash; Phase 2 builds this properly.</p>
 
 <h3>The progression</h3>
 
