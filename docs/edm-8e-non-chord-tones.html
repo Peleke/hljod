@@ -426,7 +426,7 @@ stack(
     <!--
 setcpm(35)
 stack(
-  note("g1").s("sine").sustain(0.8).gain(0.7),
+  note("g2").s("sine").sustain(0.8).gain(0.7),
   note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
     .s("sawtooth").lpf(800).attack(0.2).sustain(0.6).release(0.5)
     .room(0.5).size(0.8).gain(0.25)
@@ -534,7 +534,7 @@ stack(
     <span class="ex-label">compose</span>
     <ol>
         <li>Add a suspension: in bar 4, hold the f4 from bar 3 before resolving to d4. Try <code>[g3 ~ f4 d4 b3 ~ g3 ~]</code> for bar 4&mdash;the f4 clashes against G major and resolves down.</li>
-        <li>Replace the tonic pedal (<code>note("c2")</code>) with a dominant pedal (<code>note("g1")</code>). Hear how the tension changes&mdash;the bass pulls toward resolution instead of anchoring.</li>
+        <li>Replace the tonic pedal (<code>note("c2")</code>) with a dominant pedal (<code>note("g2")</code>). Hear how the tension changes&mdash;the bass pulls toward resolution instead of anchoring.</li>
         <li>Write a melody using only neighbor tones on each chord&rsquo;s 5th. Bar 1: <code>[g4 ab4 g4 ~ g4 f4 g4 ~]</code>. Bar 2: <code>[eb4 f4 eb4 ~ eb4 d4 eb4 ~]</code>. Nothing but decoration.</li>
         <li>Share it. The track has drums, bass drone, pad, and a melody built from the tension vocabulary.</li>
     </ol>
@@ -554,7 +554,7 @@ stack(
         <tr><td>suspension (9-8)</td><td>hold 9th from prev chord, resolve down</td><td>same mechanism, higher interval</td></tr>
         <tr><td>retardation</td><td>like suspension, but resolves up</td><td>held note &rarr; step up</td></tr>
         <tr><td>pedal point (tonic)</td><td>hold root under changing harmony</td><td><code>note("c2").s("sine")</code></td></tr>
-        <tr><td>pedal point (dominant)</td><td>hold 5th under changing harmony</td><td><code>note("g1").s("sine")</code></td></tr>
+        <tr><td>pedal point (dominant)</td><td>hold 5th under changing harmony</td><td><code>note("g2").s("sine")</code></td></tr>
         <tr><td>appoggiatura</td><td>leap to dissonance, resolve by step</td><td>leap to f4 &rarr; step to eb4</td></tr>
         <tr><td>anticipation</td><td>arrive at next chord&rsquo;s note early</td><td>c4 before Bb chord</td></tr>
         <tr><td>escape tone</td><td>step to dissonance, leap away</td><td>step in, leap out opposite</td></tr>

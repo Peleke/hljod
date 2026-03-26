@@ -696,7 +696,7 @@ stack(
     <!--
 setcpm(35)
 stack(
-  note("ab1").s("sine").sustain(0.8).gain(0.6),
+  note("ab2").s("sine").sustain(0.8).gain(0.6),
   note("eb3 g3 f3 eb3").s("sawtooth")
     .lpf(1200).decay(0.1).sustain(0.2).gain(0.35)
 )
@@ -708,7 +708,7 @@ stack(
 
 <div class="try-this">
     <span class="label">tweak it</span>
-    <p>Try <code>note("g1")</code> as the anchor. Or <code>note("bb1")</code>. The melody doesn&rsquo;t change. Your experience of it does.</p>
+    <p>Try <code>note("g2")</code> as the anchor. Or <code>note("bb2")</code>. The melody doesn&rsquo;t change. Your experience of it does.</p>
 </div>
 
 <h3>Three notes</h3>
@@ -801,7 +801,7 @@ note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
 setcpm(35)
 stack(
   // 808 bass
-  note("<[c2 ~ c2 ~ ~ ~ eb2 ~] [ab1 ~ ab1 ~ ~ ~ c2 ~] [bb1 ~ bb1 ~ ~ ~ d2 ~] [g1 ~ g1 ~ ~ ~ b1 ~]>")
+  note("<[c2 ~ c2 ~ ~ ~ eb2 ~] [ab2 ~ ab2 ~ ~ ~ c2 ~] [bb2 ~ bb2 ~ ~ ~ d2 ~] [g2 ~ g2 ~ ~ ~ b2 ~]>")
     .s("sine").decay(0.3).sustain(0.2).release(0.1)
     .distort(0.3).gain(0.8),
   // pad
@@ -820,7 +820,7 @@ stack(
 
 <div class="try-this">
     <span class="label">tweak it</span>
-    <p>Simplify the bass: try <code>note("&lt;c2 ab1 bb1 g1&gt;")</code> for straight roots, one per bar. Or add a fifth to the Cm bar: <code>[c2 ~ g2 ~ c2 ~ eb2 ~]</code>. The fifth reinforces the chord from below.</p>
+    <p>Simplify the bass: try <code>note("&lt;c2 ab2 bb2 g2&gt;")</code> for straight roots, one per bar. Or add a fifth to the Cm bar: <code>[c2 ~ g2 ~ c2 ~ eb2 ~]</code>. The fifth reinforces the chord from below.</p>
 </div>
 
 <h3>Beyond roots</h3>
@@ -845,7 +845,7 @@ stack(
 setcpm(35)
 stack(
   // bass: root + fifth
-  note("<[c2 ~ g2 ~ c2 ~ g2 ~] [ab1 ~ eb2 ~ ab1 ~ eb2 ~] [bb1 ~ f2 ~ bb1 ~ f2 ~] [g1 ~ d2 ~ g1 ~ d2 ~]>")
+  note("<[c2 ~ g2 ~ c2 ~ g2 ~] [ab2 ~ eb2 ~ ab2 ~ eb2 ~] [bb2 ~ f2 ~ bb2 ~ f2 ~] [g2 ~ d2 ~ g2 ~ d2 ~]>")
     .s("sine").decay(0.3).sustain(0.2).release(0.1)
     .distort(0.3).gain(0.8),
   // pad
@@ -886,7 +886,7 @@ stack(
 setcpm(35)
 stack(
   // bass: root, fifth, approach into next root
-  note("<[c2 ~ g2 ~ c2 ~ eb2 g1] [ab1 ~ eb2 ~ ab1 ~ c2 a1] [bb1 ~ f2 ~ bb1 ~ d2 fs1] [g1 ~ d2 ~ g1 ~ b1 b0]>")
+  note("<[c2 ~ g2 ~ c2 ~ eb2 g2] [ab2 ~ eb2 ~ ab2 ~ c2 a2] [bb2 ~ f2 ~ bb2 ~ d2 fs2] [g2 ~ d2 ~ g2 ~ b2 b1]>")
     .s("sine").decay(0.3).sustain(0.2).release(0.1)
     .distort(0.3).gain(0.8),
   // pad
@@ -910,7 +910,7 @@ stack(
 
 <div class="try-this">
     <span class="label">tweak it</span>
-    <p>Change the approach notes to come from ABOVE instead of below: try <code>a1</code> before <code>ab1</code> (one note above, sliding down). Different tension. Or try TWO approach notes: <code>[bb1 ~ f2 ~ bb1 d2 c2 a1]</code> &mdash; the bass walks down into the next root.</p>
+    <p>Change the approach notes to come from ABOVE instead of below: try <code>a2</code> before <code>ab2</code> (one note above, sliding down). Different tension. Or try TWO approach notes: <code>[bb2 ~ f2 ~ bb2 d2 c2 a2]</code> &mdash; the bass walks down into the next root.</p>
 </div>
 
 <details class="rabbit-hole">
@@ -966,7 +966,7 @@ stack(
     .delay(0.2).delaytime(0.125).delayfeedback(0.3)
     .pan(0.6),
   // 808 bass
-  note("<[c2 ~ c2 ~ ~ ~ eb2 ~] [ab1 ~ ab1 ~ ~ ~ c2 ~] [bb1 ~ bb1 ~ ~ ~ d2 ~] [g1 ~ g1 ~ ~ ~ b1 ~]>")
+  note("<[c2 ~ c2 ~ ~ ~ eb2 ~] [ab2 ~ ab2 ~ ~ ~ c2 ~] [bb2 ~ bb2 ~ ~ ~ d2 ~] [g2 ~ g2 ~ ~ ~ b2 ~]>")
     .s("sine").decay(0.3).sustain(0.2).release(0.1)
     .distort(0.3).gain(0.8),
   // dark pad
@@ -984,7 +984,7 @@ stack(
 <div class="exercises">
     <span class="ex-label">compose</span>
     <ol>
-        <li>Swap the progression: try <code>note("&lt;[c3,eb3,g3] [f3,ab3,c4] [ab2,c3,eb3] [bb2,d3,f3]&gt;")</code> for i&ndash;iv&ndash;VI&ndash;VII. Update the 808 roots to match: <code>&lt;[c2 ~ c2 ~ eb2 ~ c2 ~] [f1 ~ f1 ~ ab1 ~ f1 ~] [ab1 ~ ab1 ~ c2 ~ ab1 ~] [bb1 ~ bb1 ~ d2 ~ bb1 ~]&gt;</code>.</li>
+        <li>Swap the progression: try <code>note("&lt;[c3,eb3,g3] [f3,ab3,c4] [ab2,c3,eb3] [bb2,d3,f3]&gt;")</code> for i&ndash;iv&ndash;VI&ndash;VII. Update the 808 roots to match: <code>&lt;[c2 ~ c2 ~ eb2 ~ c2 ~] [f2 ~ f2 ~ ab2 ~ f2 ~] [ab2 ~ ab2 ~ c2 ~ ab2 ~] [bb2 ~ bb2 ~ d2 ~ bb2 ~]&gt;</code>.</li>
         <li>Add ghost snares from EDM.3: <code>s("sd(3,16)").gain(0.2).pan(0.4)</code>.</li>
         <li>Layer a melodic stab:<br><code style="font-size:0.8em;">note("~ &lt;eb4 g4&gt; ~ &lt;c4 eb4&gt;").s("square")<br>&nbsp;&nbsp;.lpf(2000).decay(0.06).sustain(0)<br>&nbsp;&nbsp;.gain(0.3).pan(0.65)<br>&nbsp;&nbsp;.delay(0.15).delaytime(0.125).delayfeedback(0.2)</code></li>
         <li>Hit <em>share</em>. Phonk track, coded.</li>
