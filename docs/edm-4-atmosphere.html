@@ -615,7 +615,80 @@ s("~ cb ~ cb ~ cb cb ~").gain(0.5)
 <section id="chord">
 <h2><span class="num">03</span>The Chord</h2>
 
-<p>Everything so far is single notes and drum hits. A chord is three or more notes at once. Stack C, E-flat, and G:</p>
+<p>Everything so far is one note at a time. What happens when you play two?</p>
+
+<h3>Two notes</h3>
+
+<p>C alone:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>one note</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-one">
+    <!--
+setcpm(35)
+note("c3").s("sawtooth")
+  .lpf(800).attack(0.2).sustain(0.6).release(0.5)
+  .room(0.5).size(0.8).gain(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Now C and G together. Two notes, comma-separated inside brackets:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>c + g &mdash; wide, stable</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-cg">
+    <!--
+setcpm(35)
+note("[c3,g3]").s("sawtooth")
+  .lpf(800).attack(0.2).sustain(0.6).release(0.5)
+  .room(0.5).size(0.8).gain(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Wide. Solid. The two notes are far apart and they agree with each other.</p>
+
+<p>C and E-flat. Closer together:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>c + eb &mdash; close, dark</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-ceb">
+    <!--
+setcpm(35)
+note("[c3,eb3]").s("sawtooth")
+  .lpf(800).attack(0.2).sustain(0.6).release(0.5)
+  .room(0.5).size(0.8).gain(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Darker. Heavier. The notes are close together and there&rsquo;s a weight between them.</p>
+
+<p>C and E instead of E-flat. One note different:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>c + e &mdash; close, bright</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-ce">
+    <!--
+setcpm(35)
+note("[c3,e3]").s("sawtooth")
+  .lpf(800).attack(0.2).sustain(0.6).release(0.5)
+  .room(0.5).size(0.8).gain(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Brighter. Same closeness, different character. Eb made it dark. E makes it bright. One note is the difference.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try other pairs: <code>[c3,f3]</code>, <code>[c3,ab3]</code>, <code>[c3,b3]</code>. Each pairing has its own mood. Some feel stable. Some feel tense. The relationship between two notes is where mood starts.</p>
+</div>
+
+<h3>Three notes</h3>
+
+<p>Stack all three &mdash; C, E-flat, and G. The two pairs you just heard, combined:</p>
 
 <div class="strudel-block">
     <div class="strudel-label"><span>c minor chord</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
@@ -631,11 +704,11 @@ note("[c3,eb3,g3]").s("sawtooth")
     </strudel-editor>
 </div>
 
-<p>Dark. The sawtooth adds texture, the lowpass filter shaves the harshness, and the reverb places it in a room. Three notes, one mood.</p>
+<p>Dark. C and Eb give it weight. C and G give it width. Three notes, one mood. That&rsquo;s a chord.</p>
 
 <div class="concept">
     <span class="c-label">chord / triad</span>
-    <p>Three or more notes sounding at once. A triad has three: root, third, fifth. C minor&thinsp;=&thinsp;C (root), Eb (minor third), G (fifth). The minor third (three semitones above the root instead of four) is what makes it dark.</p>
+    <p>Three or more notes sounding at once. A triad has three: root, third, fifth. C minor&thinsp;=&thinsp;C (root), Eb (third), G (fifth). The Eb is what makes it dark. Swap it for E natural and the same chord turns bright &mdash; that&rsquo;s C major.</p>
 </div>
 
 <div class="concept">
