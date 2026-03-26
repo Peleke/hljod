@@ -21,7 +21,7 @@
 
 ## The Idea
 
-Most music theory resources hand you definitions and expect understanding. You memorize intervals, read about chord progressions, stare at notation — and still can't *hear* why a dominant 7th wants to resolve.
+Most music theory resources hand you definitions and expect understanding. You memorize intervals, read about chord progressions, stare at notation, and still can't *hear* why a dominant 7th wants to resolve.
 
 **hljóð** flips it. You hear first, name after. Every concept starts as sound. You press play, something happens in your ears, you change a number, it changes, and *then* the page tells you what you just did. The theory arrives after the experience, not before it.
 
