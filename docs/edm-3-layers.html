@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.3: Layers</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+/* Reduce internal padding/space in the strudel component */
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#polyrhythm">Polyrhythm</a>
+    <a href="#ghosts">Ghosts</a>
+    <a href="#width">Width</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">Layers</span></h1>
+<div class="subtitle">EDM.3: polyrhythm, ghost notes, and stereo width</div>
+
+<p>Your EDM.2 capstone has six layers. Sounds like a track. But it&rsquo;s flat: no ghosts, no width, no cross-rhythm. This lesson adds what turns a pattern into a groove.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm()</code>,
+    mini-notation (<code>[] * ~ () &lt;&gt;</code>), <code>.gain()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>, <code>.add(note())</code>,
+    <code>sine.range()</code>, <code>.slow()</code>,
+    and the drums + filtered reese from EDM.1&ndash;2.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: POLYRHYTHM ============ -->
+<section id="polyrhythm">
+<h2><span class="num">00</span>Three Against Four</h2>
+
+<p>Four kicks, evenly spaced. One per beat:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>four in a cycle</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(42.5)
+s("bd bd bd bd")
+    -->
+    </strudel-editor>
+</div>
+
+<p>Now three claps in the same amount of time:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>three in a cycle</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+setcpm(42.5)
+s("cp cp cp")
+    -->
+    </strudel-editor>
+</div>
+
+<p>Stack them:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>3 against 4</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0c">
+    <!--
+setcpm(42.5)
+stack(
+  s("bd bd bd bd"),
+  s("cp cp cp").gain(0.7)
+).color("cyan")._spiral()
+    -->
+    </strudel-editor>
+</div>
+
+<p>The kick divides the cycle into four. The clap divides it into three. They line up on beat 1 and pull apart everywhere else. That tension is the groove.</p>
+
+<div class="concept">
+    <span class="c-label">polyrhythm</span>
+    <p>Two or more patterns with different subdivisions running over the same time span. Three against four. Five against eight. They share a downbeat but disagree on everything between.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Replace the clap with <code>s("cp cp cp cp cp")</code>. Five against four. Try <code>s("cp cp cp cp cp cp cp")</code> for seven against four. More hits, more tension.</p>
+</div>
+
+<h3>Euclidean layers</h3>
+
+<p>Euclidean patterns generate polyrhythm. Stack two with different hit counts over the same grid:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>3 kicks + 5 claps in 8 slots</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0d">
+    <!--
+setcpm(42.5)
+stack(
+  s("bd(3,8)"),
+  s("cp(5,8)").gain(0.6)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Three kicks. Five claps. Eight slots. Two grids interlocking. Change the numbers and the whole groove shifts.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>s("bd(5,16)")</code> against <code>s("cp(7,16)").gain(0.6)</code>. Sixteen slots, more room. Add a third layer: <code>s("hh(11,16)").gain(0.3)</code>.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: cross-rhythm and West African drumming</summary>
+    <div class="rh-body">
+        <h4>Cross-rhythm</h4>
+        <p>A cross-rhythm is a polyrhythm where the two subdivisions are coprime (no common factor except 1). Three against four is a cross-rhythm because 3 and 4 share no factors. Six against four is not, because both are divisible by 2.</p>
+        <p>The most common cross-rhythm is 3:2. Two beats in one hand, three in the other. It shows up everywhere: West African bell patterns, Afro-Cuban clave, jazz ride cymbal.</p>
+
+        <h4>Where beats align</h4>
+        <svg viewBox="0 0 400 85" style="width: 100%; background: var(--surface); border-radius: 4px; margin: 0.5rem 0 1rem;">
+            <text x="12" y="28" fill="#ff6b35" font-family="SF Mono, monospace" font-size="9" font-weight="600">4</text>
+            <text x="12" y="58" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="9" font-weight="600">3</text>
+            <line x1="30" y1="24" x2="380" y2="24" stroke="#1e1e24" stroke-width="1"/>
+            <line x1="30" y1="54" x2="380" y2="54" stroke="#1e1e24" stroke-width="1"/>
+            <!-- 4 beats at 0/4, 1/4, 2/4, 3/4 of 350px span -->
+            <circle cx="30" cy="24" r="5" fill="#ff6b35"/>
+            <circle cx="117.5" cy="24" r="5" fill="#ff6b35"/>
+            <circle cx="205" cy="24" r="5" fill="#ff6b35"/>
+            <circle cx="292.5" cy="24" r="5" fill="#ff6b35"/>
+            <!-- 3 beats at 0/3, 1/3, 2/3 -->
+            <circle cx="30" cy="54" r="5" fill="#4fc3f7"/>
+            <circle cx="146.7" cy="54" r="5" fill="#4fc3f7"/>
+            <circle cx="263.3" cy="54" r="5" fill="#4fc3f7"/>
+            <!-- alignment line at beat 1 -->
+            <line x1="30" y1="14" x2="30" y2="64" stroke="#66bb6a" stroke-width="1.5" stroke-dasharray="3"/>
+            <text x="30" y="78" fill="#66bb6a" font-family="SF Mono, monospace" font-size="7" text-anchor="middle">align</text>
+            <!-- cycle end -->
+            <line x1="380" y1="14" x2="380" y2="64" stroke="#5a584f" stroke-width="1" stroke-dasharray="3"/>
+            <text x="380" y="78" fill="#5a584f" font-family="SF Mono, monospace" font-size="7" text-anchor="middle">cycle</text>
+        </svg>
+        <p>The 4-beat grid (orange) and 3-beat grid (blue) only coincide at the start of each cycle. Every other hit lands in a gap. That&rsquo;s where the rhythmic interest lives.</p>
+
+        <h4>West African drumming</h4>
+        <p>West African music is built on polyrhythm. The master drummer plays a timeline pattern while other drums play interlocking parts with different subdivisions. Each player hears a different &ldquo;beat 1.&rdquo;</p>
+        <p>The bell pattern in Ewe music (Ghana) is a 12-pulse timeline where different drums divide those 12 pulses into groups of 2, 3, and 4 simultaneously. Three against four against six. That&rsquo;s what you built with <code>stack()</code> and euclidean patterns.</p>
+
+        <h4>Three layers</h4>
+        <div class="strudel-block">
+            <div class="strudel-label"><span>4:3:5 polyrhythm</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-poly">
+            <!--
+setcpm(42.5)
+stack(
+  s("bd bd bd bd"),
+  s("cp cp cp").gain(0.6),
+  s("hh hh hh hh hh").gain(0.4)
+)
+            -->
+            </strudel-editor>
+        </div>
+
+        <p style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0;">For more on West African polyrhythm: Novotney, &ldquo;The 3:2 Relationship as the Foundation of Timelines in West African Musics&rdquo; (1998).</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 1: GHOST NOTES ============ -->
+<section id="ghosts">
+<h2><span class="num">01</span>Ghost Notes</h2>
+
+<p>The breakbeat from EDM.1. Kick, snare, hats. Clean and functional:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>the basic break</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(42.5)
+stack(
+  s("bd ~ ~ ~ ~ ~ [~ bd] ~"),
+  s("~ ~ ~ ~ sd ~ ~ ~"),
+  s("hh*16").gain(0.5)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Now add a quiet euclidean snare underneath:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>+ ghost snares</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(42.5)
+stack(
+  s("bd ~ ~ ~ ~ ~ [~ bd] ~"),
+  s("~ ~ ~ ~ sd ~ ~ ~"),
+  s("sd(3,16)").gain(0.2),
+  s("hh*16").gain(0.5)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The main snare still cracks on beat 3. The ghosts fill in around it, quiet enough to stay behind but loud enough to add motion. The beat stopped being a grid. Started being a groove.</p>
+
+<div class="concept">
+    <span class="c-label">ghost notes</span>
+    <p>Quiet hits between the main beats. Drummers play them naturally. Programmed beats usually miss them. Notice the difference: a pattern that ticks vs. one that breathes.</p>
+</div>
+
+<h3>Ghost kicks</h3>
+
+<p>Same idea, different drum. A euclidean kick layer at low volume:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>+ ghost kicks</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1c">
+    <!--
+setcpm(42.5)
+stack(
+  s("bd ~ ~ ~ ~ ~ [~ bd] ~"),
+  s("bd(5,16)").gain(0.25),
+  s("~ ~ ~ ~ sd ~ ~ ~"),
+  s("sd(3,16)").gain(0.2),
+  s("hh*16").gain(0.5)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The ghost kick shuffles underneath the main pattern. It fills spaces without fighting the downbeat.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Change <code>(5,16)</code> to <code>(3,16)</code> for sparser ghosts. Try <code>(7,16)</code> for busier. Adjust <code>.gain()</code> between <code>0.15</code> and <code>0.3</code>. Too loud and they compete. Too quiet and they vanish.</p>
+</div>
+
+<h3>Hat dynamics</h3>
+
+<p>Hi-hats at one volume sound robotic. Pattern the velocity and mix in an open hat at the end of the bar:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>dynamic hats + open hat tail</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1d">
+    <!--
+setcpm(42.5)
+stack(
+  s("bd ~ ~ ~ ~ ~ [~ bd] ~"),
+  s("~ ~ ~ ~ sd ~ ~ ~"),
+  s("hh*16").gain("0.3 0.5 0.3 0.7 0.3 0.5 0.3 0.9"),
+  s("~ ~ ~ ~ ~ ~ ~ oh").gain(0.5)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The gain pattern creates accents. Quiet, medium, quiet, loud. Your ear locks onto the accents, not the individual ticks.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.gain("0.2 0.6 0.3 1")</code> for harder accents. Or <code>s("[hh hh hh oh]*4")</code> to put an open hat every fourth hit. Different rhythmic feel, same number of sounds.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 2: WIDTH ============ -->
+<section id="width">
+<h2><span class="num">02</span>Width</h2>
+
+<p>Everything so far plays dead center. A single point between your ears.</p>
+
+<p><code>.pan()</code> places a sound in the stereo field. <code>0</code> is full left. <code>1</code> is full right. <code>0.5</code> is center. Listen to the hats in this version:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>mono hats (centered)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+setcpm(42.5)
+stack(
+  s("bd ~ ~ ~ ~ ~ [~ bd] ~"),
+  s("~ ~ ~ ~ sd ~ ~ ~"),
+  s("hh*16").gain("0.3 0.5 0.3 0.8")
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Now the same beat with two hat lines panned apart:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>stereo hats (panned L + R)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+setcpm(42.5)
+stack(
+  s("bd ~ ~ ~ ~ ~ [~ bd] ~"),
+  s("~ ~ ~ ~ sd ~ ~ ~"),
+  s("hh*16").gain("0.3 0.5 0.3 0.8").pan(0.3),
+  s("hh*16").gain("0.2 0.4 0.2 0.6").pan(0.7)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Wider. Each hat has its own space. The kick and snare stay centered. Use headphones for the clearest difference.</p>
+
+<div class="concept">
+    <span class="c-label">stereo field</span>
+    <p><code>.pan(0)</code> = left ear. <code>.pan(1)</code> = right ear. <code>.pan(0.5)</code> = center. Heavy sounds (kick, snare, bass) stay centered. Light textures (hats, percussion) spread to the sides.</p>
+</div>
+
+<h3>Moving pan</h3>
+
+<p>Static pan is placement. Moving pan is motion:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>hats sweeping L to R</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2c">
+    <!--
+setcpm(42.5)
+stack(
+  s("bd ~ ~ ~ ~ ~ [~ bd] ~"),
+  s("~ ~ ~ ~ sd ~ ~ ~"),
+  s("hh*8").gain(0.5).pan(sine.slow(2))
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p><code>.pan(sine.slow(2))</code>: the hats sweep left to right over 2 cycles. Notice the movement is spatial now, not just rhythmic.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.pan(sine.slow(8))</code> for a slower sweep. Or <code>.pan(perlin.range(0.2, 0.8))</code> for random wandering that avoids the extremes. <code>perlin</code> is a smooth noise signal.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: why bass stays centered</summary>
+    <div class="rh-body">
+        <h4>Physics</h4>
+        <p>Low frequencies have long wavelengths. A 50Hz wave is about 7 meters long. Your head is about 0.2 meters wide. Your ears can&rsquo;t tell which direction a 50Hz sound comes from because the wave wraps around your skull before the ears register a difference. Low-frequency panning is wasted information.</p>
+
+        <h4>Club systems</h4>
+        <p>Most club sound systems run the sub in mono. Everything below ~120Hz gets summed to a single channel. If your bass is panned hard left, half its energy disappears on summing. Center bass = full power on every system.</p>
+
+        <h4>The rule</h4>
+        <p>Kick, snare, and bass: center. Always. Hats, rides, percussion: spread them. Effects (delay tails, reverb, pads): go wide. The low end anchors. The top end decorates.</p>
+        <p>That&rsquo;s why none of the bass patterns in EDM.2 use <code>.pan()</code>. The reese stays at 0.5 (the default). The stereo width comes from everything else.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 3: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">03</span>The Arrangement</h2>
+
+<div class="punchline">
+    <p><strong>Everything combined.</strong> Kick, snare, ghost snares, stereo hats, open hat, an alternating reese, and a melodic stab. Ten layers. One track.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: layers</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(42.5)
+stack(
+  // kick
+  s("bd ~ ~ ~ ~ ~ [~ bd] ~").gain(0.9),
+  // snare
+  s("~ ~ ~ ~ sd ~ ~ ~").gain(0.85),
+  // ghost snares
+  s("sd(3,16)").gain(0.2).pan(0.4),
+  // hats L
+  s("hh*16").gain("0.3 0.5 0.3 0.8").pan(0.3),
+  // hats R
+  s("hh*16").gain("0.2 0.4 0.2 0.6").pan(0.7),
+  // open hat
+  s("~ ~ ~ ~ ~ ~ ~ oh").gain(0.4),
+  // reese saw 1
+  note("<[c2 ~ eb2 ~] [c2 c2 f2 ~]>").s("sawtooth")
+    .sustain(0.8).release(0.1)
+    .lpf(sine.range(300, 1200).slow(8)).lpq(3)
+    .gain(0.6),
+  // reese saw 2 (detuned)
+  note("<[c2 ~ eb2 ~] [c2 c2 f2 ~]>").s("sawtooth")
+    .sustain(0.8).release(0.1)
+    .add(note(0.15))
+    .lpf(sine.range(300, 1200).slow(8)).lpq(3)
+    .gain(0.6),
+  // stab
+  note("~ <eb4 f4> ~ <c4 eb4>").s("square")
+    .lpf(2000).decay(0.06).sustain(0)
+    .gain(0.3).pan(0.6)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Rewrite the stab melody. Try <code>note("~ &lt;g4 ab4&gt; ~ &lt;eb4 f4&gt;")</code> for higher, brighter notes. Or <code>note("&lt;[~ eb4 ~ c4] [~ f4 ~ eb4]&gt;")</code> for two hits per cycle.</li>
+        <li>Add a euclidean ride: <code>s("ride(3,8)").gain(0.25).pan(0.6)</code>. The ride cross-rhythm weaves through the hats.</li>
+        <li>Change the bass pattern: try <code>"&lt;[c2 ~ eb2 ~] [c2 ~ g1 ~] [c2 c2 f2 ~] [eb2 ~ c2 ~]&gt;"</code> for a 4-cycle phrase instead of 2.</li>
+        <li>When it grooves, hit <em>share</em>. That&rsquo;s a full DnB arrangement you coded.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>.pan()</td><td>stereo position (0=left, 0.5=center, 1=right)</td><td><code>.pan(0.3)</code></td></tr>
+        <tr><td>.pan(signal)</td><td>automated stereo movement</td><td><code>.pan(sine.slow(2))</code></td></tr>
+        <tr><td>perlin</td><td>smooth random noise signal</td><td><code>perlin.range(0.2, 0.8)</code></td></tr>
+        <tr><td>ghost layer</td><td>quiet euclidean pattern under a main hit</td><td><code>s("sd(3,16)").gain(0.2)</code></td></tr>
+        </tbody>
+    </table>
+    <div class="concept" style="margin: 1rem 0 0; border-radius: 6px;">
+        <span class="c-label">arrangement checklist</span>
+        <p>Kick and snare: centered, loud. Ghost layers: euclidean, quiet. Hats: panned, dynamic gain. Bass: centered, filtered. Everything in a <code>stack()</code>.</p>
+    </div>
+    <p class="earned-next">Next: <em>Atmosphere</em>. Genre shift to phonk. The 808, dark chords, reverb, and space.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td>Photek</td><td>Ni-Ten-Ichi-Ryu (1997)</td><td>(DnB) drum programming so intricate it seemed inhuman</td></tr>
+        <tr><td>Goldie</td><td>Timeless (1995)</td><td>(DnB) 21 minutes of impossibly layered production</td></tr>
+        <tr><td>Noisia</td><td>Stigma (2007)</td><td>(neurofunk) polyrhythmic interplay reframes the groove</td></tr>
+        <tr><td>Ewe Drum Ensemble</td><td>Agbadza (traditional)</td><td>(DnB) master drum + bell + rattle: the original polyrhythmic stack</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Polyrhythm isn&rsquo;t a technique. It&rsquo;s a worldview &mdash; the idea that multiple independent rhythmic voices can coexist without a single &ldquo;correct&rdquo; beat.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">West African drumming</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The Ewe people of Ghana use a bell pattern (the &ldquo;standard pattern&rdquo;) as a timeline against which multiple drums play independent, interlocking parts. Each player hears a different &ldquo;beat 1.&rdquo; The master drummer (atsimevu) controls the ensemble but doesn&rsquo;t dictate individual parts. The music is the relationship between the layers, not any single layer. Ethnomusicologist A.M. Jones documented these structures in <em>Studies in African Music</em> (1959), one of the first Western academic accounts of polyrhythmic practice.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Afro-Cuban clave</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The clave pattern (3+2 or 2+3) arrived in Cuba via the slave trade. It became the organizational principle of son, rumba, salsa, and eventually Latin jazz. The clave isn&rsquo;t the rhythm &mdash; it&rsquo;s the invisible grid that all other parts reference. Strudel&rsquo;s euclidean patterns <code>(3,8)</code> and <code>(5,8)</code> generate the same kinds of maximally-even distributions that underlie clave-based music.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Photek and programmed polyrhythm (1997)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Rupert Parkes (Photek) used an E-mu sampler to program drum patterns with the precision of West African ensemble music but the timbral palette of electronic production. &ldquo;Ni-Ten-Ichi-Ryu&rdquo; layered single-shot drums from multiple sources with ghost notes so quiet they were almost subliminal. He cited Coltrane&rsquo;s drummer Elvin Jones as an influence &mdash; jazz polyrhythm translated through a sampler.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Jones, <em>Studies in African Music</em> (1959); Washburne, &ldquo;The Clave of Jazz&rdquo; (1997); Pytlik, &ldquo;Photek: Solaris&rdquo; (1998).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(8, 0.05, 1.4)
+            .color(0.7, 0.35, 1.0)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.4)
+            .modulateScale(
+                h.osc(5, 0.1).rotate(0.4),
+                () => 0.12 + window._audioData.fft[1] * 0.5
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.35)
+            .saturate(() => 1.1 + window._audioData.fft[2] * 2.2)
+            .kaleid(() => 3 + Math.floor(window._audioData.fft[3] * 3))
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    // Try known StrudelMirror / CodeMirror accessors
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    // Fallback: read from attribute or inner HTML comment
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    // Stop all others
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        // Fallback: open in new tab
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>

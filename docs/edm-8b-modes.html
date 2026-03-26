@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.8b: Modes</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#modes">The Modes</a>
+    <a href="#relative">Relative Keys</a>
+    <a href="#pentatonic">Pentatonic + Blues</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">Modes</span></h1>
+<div class="subtitle">EDM.8b: same notes, different home, different mood</div>
+
+<p>You know major and minor. Two scales, two moods. But there are seven notes in a major scale, and you can start on any of them. Each starting point gives you a different pattern of whole and half steps. Seven starting points, seven patterns, seven moods. Those are modes.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>n()</code>, <code>stack()</code>, <code>cat()</code>, <code>setcpm(35)</code>,
+    mini-notation, <code>.scale()</code>,
+    <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>,
+    <code>.every()</code>, <code>.sometimes()</code>, <code>.jux()</code>, <code>.off()</code>,
+    and the phonk palette from EDM.4&ndash;7.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: THE MODES ============ -->
+<section id="modes">
+<h2><span class="num">00</span>The Modes</h2>
+
+<p>C major has seven notes: C D E F G A B. Play them starting on C:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>C ionian (major)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+n("0 1 2 3 4 5 6 7").scale("C:major")
+  .s("sawtooth").lpf(1200)
+  .decay(0.15).sustain(0.3).gain(0.4)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Bright. Resolved. Home is C. Now the same seven notes, but start on D:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>D dorian</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+n("0 1 2 3 4 5 6 7").scale("D:dorian")
+  .s("sawtooth").lpf(1200)
+  .decay(0.15).sustain(0.3).gain(0.4)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Minor, but warmer than you expect. The same white keys on a piano, but D feels like home now. Different gravity.</p>
+
+<p>Same melody through four modes. Listen to how the mood shifts while the shape stays the same:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>one melody, four modes</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0c">
+    <!--
+setcpm(25)
+cat(
+  n("0 2 4 7 4 2 0 ~").scale("C:major").s("sawtooth").lpf(1200).decay(0.1).sustain(0.3).gain(0.4),
+  n("0 2 4 7 4 2 0 ~").scale("C:dorian").s("sawtooth").lpf(1200).decay(0.1).sustain(0.3).gain(0.4),
+  n("0 2 4 7 4 2 0 ~").scale("C:mixolydian").s("sawtooth").lpf(1200).decay(0.1).sustain(0.3).gain(0.4),
+  n("0 2 4 7 4 2 0 ~").scale("C:phrygian").s("sawtooth").lpf(1200).decay(0.1).sustain(0.3).gain(0.4)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Four cycles. Major sounds bright. Dorian sounds minor but with a lifted 6th&mdash;warm. Mixolydian sounds bluesy, like rock. Phrygian sounds dark, almost Spanish. Same melodic shape. Different intervals underneath.</p>
+
+<div class="concept">
+    <span class="c-label">mode</span>
+    <p>A scale built by starting on a different degree of the parent scale. Each mode has a unique pattern of whole and half steps. Same notes, different gravity = different mood. The starting note becomes the new &ldquo;home.&rdquo;</p>
+</div>
+
+<p>The seven modes of the major scale:</p>
+
+<table style="width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 1.5rem 0;">
+    <thead><tr>
+        <th style="font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);">degree</th>
+        <th style="font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);">mode</th>
+        <th style="font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);">character</th>
+        <th style="font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase; text-align: left; padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);">strudel</th>
+    </tr></thead>
+    <tbody>
+    <tr><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600;">1st</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;">Ionian</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;">bright, happy&mdash;the major scale</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;"><code>"C:major"</code></td></tr>
+    <tr><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row); font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600;">2nd</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row);">Dorian</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row);">minor but warm, jazzy</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row);"><code>"D:dorian"</code></td></tr>
+    <tr><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600;">3rd</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;">Phrygian</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;">dark, Spanish, exotic</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;"><code>"E:phrygian"</code></td></tr>
+    <tr><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row); font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600;">4th</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row);">Lydian</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row);">dreamy, bright, floating</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row);"><code>"F:lydian"</code></td></tr>
+    <tr><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600;">5th</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;">Mixolydian</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;">bluesy, rock, dominant</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;"><code>"G:mixolydian"</code></td></tr>
+    <tr><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row); font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600;">6th</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row);">Aeolian</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row);">natural minor, sad, serious</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; background: var(--table-row);"><code>"A:minor"</code></td></tr>
+    <tr><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600;">7th</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;">Locrian</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;">unstable, dark, diminished</td><td style="padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115;"><code>"B:locrian"</code></td></tr>
+    </tbody>
+</table>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Play each mode over a drone. The drone anchors the root so you hear the mode&rsquo;s character clearly. Try changing <code>"C:dorian"</code> to any mode from the table.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>dorian melody over C drone</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0d">
+    <!--
+stack(
+  n("0 2 4 7 4 2").scale("C:dorian")
+    .s("sawtooth").lpf(1200).gain(0.3),
+  note("c2").s("sine").gain(0.5)
+)
+    -->
+    </strudel-editor>
+</div>
+
+</section>
+
+<!-- ============ SECTION 1: RELATIVE KEYS ============ -->
+<section id="relative">
+<h2><span class="num">01</span>Relative Keys</h2>
+
+<p>C major. Seven notes. C D E F G A B:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>C major scale</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+n("0 1 2 3 4 5 6 7").scale("C:major")
+  .s("sawtooth").lpf(1200)
+  .decay(0.15).sustain(0.3).gain(0.4)
+    -->
+    </strudel-editor>
+</div>
+
+<p>A minor. Seven notes. A B C D E F G:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>A minor (aeolian) scale</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+n("0 1 2 3 4 5 6 7").scale("A:minor")
+  .s("sawtooth").lpf(1200)
+  .decay(0.15).sustain(0.3).gain(0.4)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Same notes. C D E F G A B. But C major feels like home is C. A minor feels like home is A. The starting point determines which note feels like rest. That&rsquo;s what &ldquo;key&rdquo; means&mdash;which note is home.</p>
+
+<p>A minor is just the 6th mode of C major (aeolian). Same seven pitches, reordered. The difference is which note your ear treats as the resting point.</p>
+
+<div class="concept">
+    <span class="c-label">relative major/minor</span>
+    <p>Every major key has a relative minor that shares all the same notes. The relative minor starts on the 6th degree of the major scale. C major &harr; A minor. G major &harr; E minor. Eb major &harr; C minor.</p>
+</div>
+
+<h3>Our phonk key</h3>
+
+<p>The phonk track lives in C minor. C minor is the relative minor of Eb major. Same notes, different home:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>Eb major then C minor &mdash; same notes</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1c">
+    <!--
+setcpm(25)
+cat(
+  n("0 1 2 3 4 5 6 7").scale("Eb:major").s("sawtooth").lpf(1200).decay(0.15).sustain(0.3).gain(0.4),
+  n("0 1 2 3 4 5 6 7").scale("C:minor").s("sawtooth").lpf(1200).decay(0.15).sustain(0.3).gain(0.4)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Cycle 1: Eb major. Bright. Cycle 2: C minor. Dark. Same pitches&mdash;Eb F G Ab Bb C D. But Eb major orbits around Eb. C minor orbits around C. The tonal center shifted.</p>
+
+<div class="concept">
+    <span class="c-label">why this matters</span>
+    <p>When you see &ldquo;key of C minor,&rdquo; you know the notes are the same as Eb major. When you see &ldquo;key of A minor,&rdquo; the notes are C major. This becomes critical for chord progressions and choosing scales for soloing&mdash;you can borrow from the relative major any time you want to brighten the mood.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: modal jazz and Kind of Blue</summary>
+    <div class="rh-body">
+        <h4>Miles Davis, 1959</h4>
+        <p>Before <em>Kind of Blue</em>, jazz was dominated by bebop&mdash;fast chord changes, every two beats a new harmony, improvisers threading through dense vertical structures. Miles Davis wanted something different. Horizontal playing. One scale, sit in it, explore.</p>
+
+        <h4>&ldquo;So What&rdquo;</h4>
+        <p>The opening track uses exactly two scales: D dorian for 16 bars, Eb dorian for 8 bars, then D dorian for 8 bars. That&rsquo;s it. No chord changes to navigate. The soloist picks notes from the mode and finds melody through rhythm and contour instead of chord tones.</p>
+
+        <p>This is the difference between <strong>vertical</strong> improvisation (navigating chord-to-chord) and <strong>horizontal</strong> improvisation (exploring one scale&rsquo;s possibilities). Modal jazz strips harmony to its minimum so melody and rhythm take over.</p>
+
+        <h4>A dorian vamp</h4>
+        <p>The feel: a bass note holds, a chord floats over it, and a melody wanders through dorian. This is what modal playing sounds like.</p>
+
+        <div class="strudel-block">
+            <div class="strudel-label"><span>dorian vamp</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-modal">
+            <!--
+setcpm(25)
+stack(
+  note("d2").s("sine").gain(0.5),
+  note("[d3,f3,a3,c4]").s("sawtooth")
+    .lpf(600).attack(0.3).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8).gain(0.15),
+  n("<[0 2 4 ~ 6 4 2 ~] [4 6 7 ~ 4 2 0 ~]>")
+    .scale("D:dorian").s("sawtooth")
+    .lpf(1500).decay(0.1).sustain(0.3).gain(0.3)
+)
+            -->
+            </strudel-editor>
+        </div>
+
+        <p>The album sold millions and changed the direction of jazz. Coltrane, Hancock, Bill Evans&mdash;every musician on the session went on to push modal ideas further. The lesson: constraint breeds creativity. Fewer chords, more room.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 2: PENTATONIC + BLUES ============ -->
+<section id="pentatonic">
+<h2><span class="num">02</span>Pentatonic + Blues Scale</h2>
+
+<p>Seven notes in a scale means seven possible intervals. Some of those intervals are more dissonant than others. Remove the two most dissonant ones and you get five notes that sound good over almost anything.</p>
+
+<p>C major pentatonic&mdash;five notes, no wrong answers:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>C pentatonic</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+n("0 1 2 3 4 5 6 7").scale("C:pentatonic")
+  .s("sawtooth").lpf(1200)
+  .decay(0.15).sustain(0.3).gain(0.4)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Five unique notes per octave. Degrees 0&ndash;4 are one octave; 5 and above repeat in the next octave up. No tension. Every note wants to cooperate. This is why pentatonic melodies show up in folk music on every continent&mdash;the scale is almost impossible to make sound bad.</p>
+
+<p>Now add one note. The blues scale is the minor pentatonic plus a chromatic &ldquo;blue note&rdquo;&mdash;the flat 5th. That single extra note adds grit:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>C blues scale</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+n("0 1 2 3 4 5 6 7").scale("C:blues")
+  .s("sawtooth").lpf(1200)
+  .decay(0.15).sustain(0.3).gain(0.4)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Six notes. The blue note (degree 3 in the scale) creates a moment of tension that wants to resolve up or down. It&rsquo;s the sound of blues, rock, and a lot of hip-hop melody.</p>
+
+<h3>Blues melody over the phonk beat</h3>
+
+<p>The blues scale dropped into the phonk context. The melody uses scale degrees, so strudel maps them to the right pitches:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>blues melody + phonk drums</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2c">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9),
+  s("~ ~ ~ ~ cp ~ ~ ~").room(0.3).size(0.5).gain(0.85),
+  s("hh*16").gain("0.3 0.5 0.3 0.8"),
+  n("<[0 ~ 3 ~ 2 ~ 4 ~] [3 ~ 0 ~ 1 ~ 2 ~]>").scale("C:blues").s("sawtooth")
+    .lpf(2000).decay(0.06).sustain(0)
+    .gain(0.3).pan(0.6)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The melody sits on top of the beat. Short, percussive notes&mdash;<code>.decay(0.06).sustain(0)</code> makes them click rather than sing. Blues scale over C minor drums. It fits because the blues scale is a subset of the minor scale&rsquo;s territory.</p>
+
+<div class="concept">
+    <span class="c-label">pentatonic and blues scale</span>
+    <p>The <strong>pentatonic</strong> is a 5-note subset of the full scale. It removes the two most dissonant intervals. What&rsquo;s left always sounds consonant. The <strong>blues scale</strong> adds one chromatic &ldquo;blue note&rdquo; (the flat 5th) for tension. Pentatonic = safety net. Blues = safety net with an edge.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>In the melody editor above, swap <code>"C:blues"</code> for <code>"C:minor"</code> (7 notes), then <code>"C:pentatonic"</code> (5 notes). More notes = more options but also more risk of &ldquo;wrong&rdquo; notes against the chords. The pentatonic is the safety net. The full minor gives you more color but demands more care.</p>
+</div>
+
+</section>
+
+<!-- ============ SECTION 3: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">03</span>Modes in the Mix</h2>
+
+<div class="punchline">
+    <p><strong>The phonk track with a blues-scale melody and dorian pad color.</strong> The beat holds the foundation. The 808 drives the low end. A dorian pad adds warmth&mdash;that raised 6th gives the minor chord progression a jazz tint. And the blues scale melody threads through it all, percussive and gritty. Modes and scales are not theory&mdash;they are the palette.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: modes in the mix</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9),
+  s("~ ~ ~ ~ cp ~ ~ ~").room(0.3).size(0.5).gain(0.85),
+  s("hh*16").gain("0.3 0.5 0.3 0.8").pan(0.35),
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4)
+    .delay(0.2).delaytime(0.125).delayfeedback(0.3).pan(0.6),
+  note("<[c2 ~ c2 ~ ~ ~ eb2 ~] [f1 ~ f1 ~ ~ ~ ab1 ~]>")
+    .s("sine").decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  note("<[c3,eb3,g3] [f3,ab3,c4]>").s("sawtooth")
+    .lpf(sine.range(400, 1000).slow(8)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8).gain(0.2),
+  n("<[0 ~ 3 ~ 4 ~ 2 ~] [4 ~ 2 ~ 0 ~ 3 ~] [0 ~ 1 ~ 3 ~ 4 ~] [3 ~ 4 ~ 2 ~ 0 ~]>")
+    .scale("C:blues").s("sawtooth")
+    .lpf(2000).decay(0.06).sustain(0)
+    .gain(0.3).pan(0.65)
+    .delay(0.15).delaytime(0.125).delayfeedback(0.2)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Swap <code>"C:blues"</code> for <code>"C:dorian"</code> in the melody line. Warmer, jazzier. The dorian&rsquo;s raised 6th brightens the minor feel without going full major.</li>
+        <li>Add <code>.every(4, rev)</code> to the melody line. Every fourth cycle the melody plays backwards&mdash;same notes, different direction, instant variation.</li>
+        <li>Try <code>"C:phrygian"</code> for a darker, more aggressive feel. The flat 2nd in phrygian adds tension that fits the phonk aggression.</li>
+        <li>Share it. You built a track that uses modes as a compositional choice, not a theory exercise.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>mode</td><td>scale from a different starting degree</td><td><code>.scale("C:dorian")</code></td></tr>
+        <tr><td>ionian</td><td>1st mode&mdash;the major scale</td><td><code>.scale("C:major")</code></td></tr>
+        <tr><td>dorian</td><td>2nd mode&mdash;minor, warm</td><td><code>.scale("D:dorian")</code></td></tr>
+        <tr><td>phrygian</td><td>3rd mode&mdash;dark, Spanish</td><td><code>.scale("E:phrygian")</code></td></tr>
+        <tr><td>lydian</td><td>4th mode&mdash;dreamy, bright</td><td><code>.scale("F:lydian")</code></td></tr>
+        <tr><td>mixolydian</td><td>5th mode&mdash;bluesy, rock</td><td><code>.scale("G:mixolydian")</code></td></tr>
+        <tr><td>aeolian</td><td>6th mode&mdash;natural minor</td><td><code>.scale("A:minor")</code></td></tr>
+        <tr><td>locrian</td><td>7th mode&mdash;unstable, dark</td><td><code>.scale("B:locrian")</code></td></tr>
+        <tr><td>relative major/minor</td><td>keys that share all the same notes</td><td>C major &harr; A minor</td></tr>
+        <tr><td>pentatonic</td><td>5-note scale, no dissonance</td><td><code>.scale("C:pentatonic")</code></td></tr>
+        <tr><td>blues scale</td><td>pentatonic + blue note (b5)</td><td><code>.scale("C:blues")</code></td></tr>
+        </tbody>
+    </table>
+    <p class="earned-next">Next: <em>Melody Over Changes</em>. The melody follows the harmony.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td>Calibre</td><td>Even If (2010)</td><td>(liquid DnB) liquid DnB, jazz/blues/folk influenced melody</td></tr>
+        <tr><td>Kordhell</td><td>Live Another Day (2022)</td><td>(drift phonk) melodic drift phonk with piano</td></tr>
+        <tr><td>Miles Davis</td><td>So What (1959)</td><td>(liquid DnB) modal jazz landmark: D dorian for 16 bars, then Eb dorian</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Modes are older than major and minor. For most of Western music history, they were the primary organizing system.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Medieval church modes (c. 800&ndash;1500)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The medieval church used eight modes (later expanded to twelve) to classify chant melodies. Each mode had a &ldquo;final&rdquo; (home note) and a characteristic range. Dorian, Phrygian, Lydian, and Mixolydian were the primary four (with &ldquo;hypo-&rdquo; variants). These weren&rsquo;t theoretical abstractions &mdash; they determined which melodies could be sung at which liturgical moments. The shift from modes to major/minor happened gradually over the 16th&ndash;17th centuries.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Miles Davis and modal jazz (1959)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Davis was frustrated with bebop&rsquo;s rapid chord changes. He wanted space to develop melodic ideas over sustained harmonies. George Russell&rsquo;s <em>Lydian Chromatic Concept of Tonal Organization</em> (1953) provided the theoretical framework. <em>Kind of Blue</em> (1959) applied it: &ldquo;So What&rdquo; uses D dorian for 16 bars, then Eb dorian for 8, then back. Bill Evans&rsquo;s liner notes described the approach as &ldquo;modal&rdquo; &mdash; playing on scales rather than through chord changes. The album sold over 4 million copies and remains the best-selling jazz album in history.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Modes in electronic music</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Dorian is everywhere in funk, soul, and house (the raised 6th gives it warmth). Phrygian dominates flamenco and metal. Mixolydian is the sound of rock and blues (dominant 7th on the I chord). Electronic producers use modes to set mood without explicit chord progressions &mdash; a filter sweep over a dorian bass riff implies harmony without stating chords.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Powers, &ldquo;Mode&rdquo; in <em>New Grove</em> (2001); Kahn, <em>Kind of Blue</em> (2000); Russell, <em>Lydian Chromatic Concept</em> (1953); Tagg, <em>Everyday Tonality II</em> (2014).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(2.5, 0.04, 0.6)
+            .color(0.3, 0.1, 0.8)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.3)
+            .modulateScale(
+                h.osc(5, 0.12).rotate(0.2),
+                () => 0.1 + window._audioData.fft[1] * 0.5
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.4)
+            .saturate(() => 0.7 + window._audioData.fft[2] * 1.5)
+            .kaleid(() => 3 + Math.floor(window._audioData.fft[3] * 2))
+            .contrast(1.5)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>

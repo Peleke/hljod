@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.9d: Cadences + Form</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#cadences">Cadences</a>
+    <a href="#phrases">Phrase Structure</a>
+    <a href="#form">Song Form</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">Cadences + Form</span></h1>
+<div class="subtitle">EDM.9d: how phrases end and how tracks are shaped</div>
+
+<p>You know chords. You know progressions. You know ii&ndash;V&ndash;I. But a progression needs to go somewhere&mdash;and a track needs shape. This lesson covers four ways a phrase can end (cadences), two ways to build a phrase (sentence and period), and three forms that give a track its architecture (verse-chorus, AABA, 12-bar blues). By the end, your phonk loop becomes a composition.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>cat()</code>, <code>setcpm(35)</code>,
+    mini-notation (<code>~ * [] &lt;&gt; / @</code>),
+    <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>,
+    <code>.every()</code>, <code>.sometimes()</code>, <code>.jux()</code>, <code>.off()</code>,
+    arrangement with <code>cat()</code> and gain automation,
+    scales, modes, chords, intervals, non-chord tones,
+    diatonic harmony, ii&ndash;V&ndash;I, and the phonk palette from EDM.4&ndash;9c.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: CADENCES ============ -->
+<section id="cadences">
+<h2><span class="num">00</span>Cadences</h2>
+
+<p>You already know V&rarr;I from 9b. That&rsquo;s the authentic cadence&mdash;the strongest way to end a phrase. But there are three more. Four cadences total. Four ways to punctuate.</p>
+
+<p>The authentic cadence. V7&rarr;I. Full stop:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>authentic cadence &mdash; V7 &rarr; I</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(20)
+cat(
+  note("[g2,b2,d3,f3]").s("sawtooth").lpf(800).sustain(0.8).release(0.5).room(0.5).size(0.8).gain(0.3),
+  note("[c3,e3,g3,c4]").s("sawtooth").lpf(800).sustain(0.8).release(0.5).room(0.5).size(0.8).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>G7 to C major. The tritone inside G7 resolves outward. B pulls up to C, F pulls down to E. Maximum tension to maximum rest. The period at the end of a sentence.</p>
+
+<p>The plagal cadence. IV&rarr;I. Gentler:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>plagal cadence &mdash; IV &rarr; I</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+setcpm(20)
+cat(
+  note("[f3,a3,c4,e4]").s("sawtooth").lpf(800).sustain(0.8).release(0.5).room(0.5).size(0.8).gain(0.3),
+  note("[c3,e3,g3,c4]").s("sawtooth").lpf(800).sustain(0.8).release(0.5).room(0.5).size(0.8).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>F major 7 to C major. No tritone to resolve. The motion is softer. This is the &ldquo;amen&rdquo; cadence&mdash;literally what church choirs sing at the end of a hymn. IV&rarr;I. A gentle close.</p>
+
+<p>The deceptive cadence. V7&rarr;vi. Same setup as authentic, different landing:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>deceptive cadence &mdash; V7 &rarr; vi</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0c">
+    <!--
+setcpm(20)
+cat(
+  note("[g2,b2,d3,f3]").s("sawtooth").lpf(800).sustain(0.8).release(0.5).room(0.5).size(0.8).gain(0.3),
+  note("[a2,c3,e3,a3]").s("sawtooth").lpf(800).sustain(0.8).release(0.5).room(0.5).size(0.8).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>You expect C major. You get A minor. The surprise. G7 sets up the same tension as the authentic cadence, but the resolution lands on vi instead of I. Your ear was ready for rest. It got something close but not quite. That unmet expectation is what makes it deceptive.</p>
+
+<p>The half cadence. Ends on V. No resolution at all:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>half cadence &mdash; I &rarr; V</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0d">
+    <!--
+setcpm(20)
+cat(
+  note("[c3,e3,g3,c4]").s("sawtooth").lpf(800).sustain(0.8).release(0.5).room(0.5).size(0.8).gain(0.3),
+  note("[g2,b2,d3,f3]").s("sawtooth").lpf(800).sustain(0.8).release(0.5).room(0.5).size(0.8).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Ends on G7. Unresolved. A question without an answer. Tension held open. The phrase stops but the music isn&rsquo;t done. Half cadences are how you keep the listener leaning forward.</p>
+
+<div class="concept">
+    <span class="c-label">cadence</span>
+    <p>How a musical phrase ends. Four types. <strong>Authentic</strong> (V&rarr;I) = full stop, strongest resolution. <strong>Plagal</strong> (IV&rarr;I) = gentle close, the &ldquo;amen.&rdquo; <strong>Deceptive</strong> (V&rarr;vi) = surprise turn, you expect I but get vi. <strong>Half</strong> (&rarr;V) = question mark, tension held open. Every phrase lands on one of these.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Play each cadence back to back. Feel the difference in finality. The authentic cadence settles completely. The plagal settles gently. The deceptive catches you off guard. The half cadence leaves you hanging. Now go back to the authentic and notice how much more final it sounds after hearing the half cadence.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: PHRASE STRUCTURE ============ -->
+<section id="phrases">
+<h2><span class="num">01</span>Phrase Structure</h2>
+
+<p>A phrase is a musical sentence. A complete thought that starts, develops, and ends on a cadence. Two common phrase types: the sentence and the period.</p>
+
+<h3>The Sentence (1+1+2)</h3>
+
+<p>A 4-bar phrase. Bar 1: a motive&mdash;a short melodic/harmonic idea. Bar 2: repeat or variation of that motive. Bars 3&ndash;4: continuation with new material, ending on a cadence. State it, confirm it, develop it, land.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>4-bar sentence in C minor</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(35)
+stack(
+  note("<[c3,eb3,g3] [c3,eb3,g3] [f3,ab3,c4] [g2,b2,d3]>").s("sawtooth")
+    .lpf(800).attack(0.2).sustain(0.6).release(0.5).room(0.5).size(0.8).gain(0.25),
+  note("<[c4 eb4 g4 ~] [c4 eb4 g4 ~] [f4 ab4 c5 ab4] [g4 f4 d4 b3]>").s("sawtooth")
+    .lpf(2000).decay(0.06).sustain(0).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Bars 1&ndash;2: the motive. Cm chord, same melody shape. Stated, then confirmed. Bars 3&ndash;4: continuation. New chords (Fm, then G major), new melodic material, ending on the dominant&mdash;a half cadence. The phrase opens a question.</p>
+
+<div class="concept">
+    <span class="c-label">sentence</span>
+    <p>A 4-bar phrase: <strong>motive</strong> (1 bar) + <strong>repetition</strong> (1 bar) + <strong>continuation/cadence</strong> (2 bars). Pattern: state, confirm, develop, resolve. The simplest way to build a phrase with direction.</p>
+</div>
+
+<h3>The Period (question + answer)</h3>
+
+<p>An 8-bar phrase. Two halves. The first 4 bars (the antecedent) end on a half cadence&mdash;open, unresolved. The second 4 bars (the consequent) use similar material but end on an authentic cadence&mdash;closed, resolved. A question, then its answer.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>8-bar period &mdash; antecedent + consequent</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(35)
+stack(
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3] [c3,eb3,g3] [ab2,c3,eb3] [f3,ab3,c4] [c3,eb3,g3]>")
+    .s("sawtooth").lpf(800).attack(0.2).sustain(0.6).release(0.5).room(0.5).size(0.8).gain(0.25),
+  note("<[c4 ~ eb4 ~] [ab3 ~ c4 ~] [bb3 ~ d4 ~] [g3 ~ b3 ~] [c4 ~ eb4 ~] [ab3 ~ c4 ~] [f4 ~ ab4 ~] [c4 ~ g3 ~]>")
+    .s("sawtooth").lpf(2000).decay(0.06).sustain(0).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Bars 1&ndash;4: the antecedent. Cm&rarr;Ab&rarr;Bb&rarr;G. Ends on G major = dominant = half cadence. Unresolved. Bars 5&ndash;8: the consequent. Starts the same way (Cm&rarr;Ab) but takes a different turn (Fm&rarr;Cm). Ends on Cm = tonic = authentic cadence. Resolved. The antecedent asks. The consequent answers.</p>
+
+<div class="concept">
+    <span class="c-label">period</span>
+    <p>Two phrases paired: <strong>antecedent</strong> (open ending, usually a half cadence) + <strong>consequent</strong> (closed ending, usually an authentic cadence). The antecedent asks a question. The consequent answers it. 8 bars total. The most common phrase structure in Western music.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>In the period editor, change bar 4 from <code>[g2,b2,d3]</code> to <code>[c3,eb3,g3]</code>. Now both halves end on the tonic. The question/answer feeling disappears&mdash;it just sounds like the same thing twice. Change it back. The half cadence at bar 4 is what creates the forward motion.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 2: SONG FORM ============ -->
+<section id="form">
+<h2><span class="num">02</span>Song Form</h2>
+
+<p>Phrases combine into sections. Sections combine into forms. Form is the architecture of a track&mdash;the floor plan. Three common forms.</p>
+
+<h3>Verse-Chorus</h3>
+
+<p>Two sections that alternate. The verse is sparse, low energy. The chorus is full, high energy. <code>cat()</code> switches between them:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>verse / chorus alternation</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+setcpm(35)
+cat(
+  stack(
+    s("bd ~ ~ ~ bd ~ ~ ~").gain(0.7),
+    s("hh*8").gain(0.3),
+    note("[c3,eb3,g3]").s("sawtooth").lpf(600).attack(0.2).sustain(0.6).release(0.5).room(0.3).gain(0.2)
+  ),
+  stack(
+    s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9),
+    s("~ ~ ~ ~ cp ~ ~ ~").room(0.3).gain(0.85),
+    s("hh*16").gain("0.3 0.5 0.3 0.8"),
+    note("[c3,eb3,g3]").s("sawtooth").lpf(1200).attack(0.1).sustain(0.6).release(0.3).room(0.5).gain(0.3)
+  )
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Cycle 1: verse. Kick and hats only, pad low and filtered dark. Cycle 2: chorus. Kick gets a syncopation, clap arrives, hats double to 16ths, pad opens up brighter. Same chord, different energy. <code>cat()</code> alternates them&mdash;verse, chorus, verse, chorus.</p>
+
+<h3>AABA</h3>
+
+<p>The standard form for jazz tunes and classic pop. 32 bars: A (8 bars) + A (8 bars) + B (8 bars, the &ldquo;bridge&rdquo;&mdash;contrasting material) + A (8 bars). Three statements of the main idea with a departure in the middle. &ldquo;I Got Rhythm,&rdquo; &ldquo;Somewhere Over the Rainbow,&rdquo; &ldquo;Yesterday.&rdquo;</p>
+
+<h3>The 12-Bar Blues</h3>
+
+<p>Three chords. Twelve bars. The form that built American music. I7&ndash;IV7&ndash;V7, all dominant 7ths:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>12-bar blues in Bb</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+setcpm(30)
+note("<[bb2,d3,f3,ab3] [bb2,d3,f3,ab3] [bb2,d3,f3,ab3] [bb2,d3,f3,ab3] [eb3,g3,bb3,db4] [eb3,g3,bb3,db4] [bb2,d3,f3,ab3] [bb2,d3,f3,ab3] [f3,a3,c4,eb4] [eb3,g3,bb3,db4] [bb2,d3,f3,ab3] [f3,a3,c4,eb4]>")
+  .s("sawtooth").lpf(1000).attack(0.1).sustain(0.6).release(0.3)
+  .room(0.4).size(0.6).gain(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p>12 bars: I7 I7 I7 I7 | IV7 IV7 I7 I7 | V7 IV7 I7 V7. All dominant 7th chords. Every chord has a tritone inside it. The blues breaks the rules of diatonic harmony&mdash;I and IV &ldquo;should&rdquo; be major 7th, not dominant. That rule-breaking IS the blues sound. The V7 in bar 12 is the turnaround&mdash;it creates tension that loops you back to bar 1.</p>
+
+<div class="concept">
+    <span class="c-label">common forms</span>
+    <p><strong>Verse-Chorus</strong> (pop, EDM, phonk): two sections alternating, low energy vs. high energy. <strong>AABA</strong> (jazz standards, Tin Pan Alley): 32 bars, three A sections with a contrasting B (bridge). <strong>12-bar blues</strong> (I7&ndash;IV7&ndash;V7): 3 chords, 12 bars, all dominant 7ths, AAB lyric structure. Form gives a track its shape. Without form, it&rsquo;s a loop. With form, it&rsquo;s a composition.</p>
+</div>
+
+<div class="concept">
+    <span class="c-label">12-bar blues</span>
+    <p>12 bars using only I7, IV7, V7&mdash;all dominant 7th chords. The form repeats. The harmony is simple. The expression comes from what you play over it. This is where the Blues track begins.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: form as architecture</summary>
+    <div class="rh-body">
+        <h4>Songs have shapes</h4>
+        <p>Songs have shapes the way buildings have floor plans. Each form creates a different energy curve over time.</p>
+
+        <svg viewBox="0 0 800 360" style="width:100%;max-width:800px;margin:1rem 0;background:#141418;border-radius:6px;">
+            <!-- Verse-Chorus wave -->
+            <text x="20" y="30" fill="#ff6b35" font-family="SF Mono, monospace" font-size="12" letter-spacing="0.08em">VERSE-CHORUS</text>
+            <polyline points="20,100 100,90 200,60 300,90 400,60 500,90 600,60 700,90 780,80" fill="none" stroke="#ff6b35" stroke-width="2"/>
+            <text x="60" y="108" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">V</text>
+            <text x="200" y="50" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">C</text>
+            <text x="300" y="108" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">V</text>
+            <text x="400" y="50" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">C</text>
+            <text x="500" y="108" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">V</text>
+            <text x="600" y="50" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">C</text>
+
+            <!-- AABA plateau -->
+            <text x="20" y="160" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="12" letter-spacing="0.08em">AABA</text>
+            <polyline points="20,220 200,190 210,190 390,190 400,220 590,220 600,190 780,190" fill="none" stroke="#4fc3f7" stroke-width="2"/>
+            <text x="100" y="185" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">A</text>
+            <text x="290" y="185" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">A</text>
+            <text x="490" y="238" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">B</text>
+            <text x="690" y="185" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">A</text>
+
+            <!-- 12-bar blues rise -->
+            <text x="20" y="280" fill="#66bb6a" font-family="SF Mono, monospace" font-size="12" letter-spacing="0.08em">12-BAR BLUES</text>
+            <polyline points="20,340 130,330 260,325 390,310 460,305 520,320 590,330 650,310 720,300 750,335 780,340" fill="none" stroke="#66bb6a" stroke-width="2"/>
+            <text x="60" y="348" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">I7</text>
+            <text x="280" y="348" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">IV7</text>
+            <text x="500" y="348" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">I7</text>
+            <text x="680" y="295" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">V7</text>
+            <text x="740" y="348" fill="#8a8780" font-family="SF Mono, monospace" font-size="9">turn</text>
+        </svg>
+
+        <p>Verse-Chorus: a wave. Energy dips, then crests, repeating. AABA: a plateau with a valley in the middle&mdash;the bridge drops energy before the final A returns. 12-Bar Blues: a gradual rise to the V7 at bar 9, then a turnaround that resets the cycle.</p>
+
+        <h4>Form types at a glance</h4>
+        <table>
+            <thead><tr><th>form</th><th>structure</th><th>genre</th><th>examples</th></tr></thead>
+            <tbody>
+            <tr><td>Verse-Chorus</td><td>V C V C (bridge) C</td><td>pop, EDM, phonk, rock</td><td>&ldquo;Billie Jean,&rdquo; &ldquo;Blinding Lights&rdquo;</td></tr>
+            <tr><td>AABA</td><td>A A B A (32 bars)</td><td>jazz standards, classic pop</td><td>&ldquo;I Got Rhythm,&rdquo; &ldquo;Yesterday&rdquo;</td></tr>
+            <tr><td>12-Bar Blues</td><td>I-IV-I-V-IV-I (12 bars)</td><td>blues, rock &rsquo;n&rsquo; roll, R&amp;B</td><td>&ldquo;Sweet Home Chicago,&rdquo; &ldquo;Hound Dog&rdquo;</td></tr>
+            <tr><td>Through-composed</td><td>no repeats</td><td>art song, film scores</td><td>Schubert lieder, some prog rock</td></tr>
+            <tr><td>Rondo</td><td>A B A C A</td><td>classical</td><td>Mozart piano sonatas</td></tr>
+            <tr><td>Binary (AB)</td><td>A B (each repeated)</td><td>Baroque dance, marches</td><td>minuets, gavottes</td></tr>
+            </tbody>
+        </table>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 3: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">03</span>Cadences + Form</h2>
+
+<div class="punchline">
+    <p><strong>A phonk track with actual phrase structure.</strong> 8-bar period over drums. Bars 1&ndash;4: antecedent, ends on the dominant (half cadence). Bars 5&ndash;8: consequent, ends on the tonic (authentic cadence). The track has direction now. It asks a question and answers it.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: cadences + form</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9),
+  s("~ ~ ~ ~ cp ~ ~ ~").room(0.3).size(0.5).gain(0.85),
+  s("hh*16").gain("0.3 0.5 0.3 0.8").pan(0.35),
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4).delay(0.2).delaytime(0.125).delayfeedback(0.3).pan(0.6),
+  note("<c2 ab1 bb1 g1 c2 ab1 f1 c2>").s("sine")
+    .decay(0.3).sustain(0.2).release(0.1).distort(0.3).gain(0.8),
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3] [c3,eb3,g3] [ab2,c3,eb3] [f3,ab3,c4] [c3,eb3,g3]>")
+    .s("sawtooth").lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5).room(0.5).size(0.8).gain(0.2),
+  note("<[c4 ~ eb4 ~ g4 ~ eb4 ~] [ab3 ~ c4 ~ eb4 ~ c4 ~] [bb3 ~ d4 ~ f4 ~ d4 ~] [g3 ~ b3 ~ d4 ~ b3 ~] [c4 ~ eb4 ~ g4 ~ eb4 ~] [ab3 ~ c4 ~ eb4 ~ c4 ~] [f4 ~ ab4 ~ c5 ~ ab4 ~] [c4 ~ g4 ~ eb4 ~ c4 ~]>")
+    .s("sawtooth").lpf(2000).decay(0.06).sustain(0).gain(0.3).pan(0.65)
+    .delay(0.15).delaytime(0.125).delayfeedback(0.2)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>8-bar period. Bars 1&ndash;4: Cm&rarr;Ab&rarr;Bb&rarr;G. The antecedent. Ends on G = dominant = half cadence. The question. Bars 5&ndash;8: Cm&rarr;Ab&rarr;Fm&rarr;Cm. The consequent. Ends on Cm = tonic = authentic cadence. The answer. The 808 follows the roots. The melody traces the chord tones. The pad sweeps with <code>sine.range(400, 1000).slow(16)</code>. Everything serves the phrase structure.</p>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Change the antecedent ending: replace bar 4&rsquo;s <code>[g2,b2,d3]</code> with <code>[c3,eb3,g3]</code>. Now both halves end on the tonic. The question/answer structure collapses. Change it back. The half cadence at bar 4 is what gives the period its forward motion.</li>
+        <li>Add a deceptive cadence: change bar 8&rsquo;s chord from <code>[c3,eb3,g3]</code> to <code>[ab2,c3,eb3]</code> (Ab major = bVI). The consequent no longer resolves. It surprises. A deceptive ending that makes you want to hear another 8 bars.</li>
+        <li>Build a verse-chorus: wrap the capstone in a <code>cat()</code> with a sparse verse before it. Use just kick + hats + a single pad chord for the verse, then the full capstone as the chorus. Energy contrast = form.</li>
+        <li>Share it. You can explain the cadence type and phrase structure.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>concept</th><th>means</th><th>example</th></tr></thead>
+        <tbody>
+        <tr><td>authentic cadence</td><td>V&rarr;I &mdash; strongest resolution, full stop</td><td>G7&rarr;Cmaj</td></tr>
+        <tr><td>plagal cadence</td><td>IV&rarr;I &mdash; gentle close, the &ldquo;amen&rdquo;</td><td>Fmaj7&rarr;Cmaj</td></tr>
+        <tr><td>deceptive cadence</td><td>V&rarr;vi &mdash; surprise, you expect I</td><td>G7&rarr;Am</td></tr>
+        <tr><td>half cadence</td><td>&rarr;V &mdash; unresolved, a question</td><td>Cmaj&rarr;G7</td></tr>
+        <tr><td>sentence</td><td>4-bar phrase: motive + repeat + continuation/cadence</td><td>1+1+2 bars</td></tr>
+        <tr><td>period</td><td>8-bar phrase: antecedent (half cad.) + consequent (auth. cad.)</td><td>question &rarr; answer</td></tr>
+        <tr><td>antecedent</td><td>first half of a period &mdash; open ending</td><td>bars 1&ndash;4, ends on V</td></tr>
+        <tr><td>consequent</td><td>second half of a period &mdash; closed ending</td><td>bars 5&ndash;8, ends on I</td></tr>
+        <tr><td>verse-chorus</td><td>two sections alternating: sparse vs. full</td><td>low energy / high energy</td></tr>
+        <tr><td>AABA</td><td>32-bar form: A A B(bridge) A</td><td>jazz standards</td></tr>
+        <tr><td>12-bar blues</td><td>I7 IV7 V7 form, all dominant 7ths, 12 bars</td><td>Bb7&ndash;Eb7&ndash;F7</td></tr>
+        </tbody>
+    </table>
+    <div class="concept" style="margin: 1rem 0 0; border-radius: 6px;">
+        <span class="c-label">cadences + form checklist</span>
+        <p>Four cadences: authentic (V&rarr;I), plagal (IV&rarr;I), deceptive (V&rarr;vi), half (&rarr;V). Two phrase types: sentence (4 bars, 1+1+2) and period (8 bars, antecedent + consequent). Three forms: verse-chorus (energy contrast), AABA (departure and return), 12-bar blues (I7-IV7-V7 cycle). Cadences end phrases. Phrases build sections. Sections build forms. Forms build tracks.</p>
+    </div>
+    <p class="earned-next">Next: <em>Non-Chord Tones in Context</em> &mdash; passing tones, neighbor tones, suspensions, and appoggiaturas over phrase structures. Tension between the beats.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Musical form &mdash; the large-scale structure of a piece &mdash; evolved from dance forms, liturgical practice, and eventually, commercial demands.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">The cadence as punctuation (1600s)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Baroque theorists compared cadences to rhetorical punctuation. A perfect authentic cadence (V&rarr;I with both voices moving to the root) was a period. A half cadence (ending on V) was a comma. The deceptive cadence (V&rarr;vi) was a rhetorical surprise &mdash; the musical equivalent of an unexpected plot twist. Christoph Bernhard, a student of Heinrich Sch&uuml;tz, made this analogy explicit in his <em>Tractatus compositionis augmentatus</em> (c. 1657).</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Song form in popular music (1900s&ndash;present)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The 32-bar AABA form dominated American popular song from the 1920s through the 1950s (&ldquo;I Got Rhythm,&rdquo; &ldquo;Over the Rainbow,&rdquo; &ldquo;Autumn Leaves&rdquo;). Rock and soul shifted to verse-chorus form in the 1960s. The 12-bar blues predates both &mdash; its 3&times;4 structure (AAB lyric scheme over I-IV-V harmony) was codified by W.C. Handy in publications like &ldquo;The Memphis Blues&rdquo; (1912), though the form itself emerged from African-American oral tradition decades earlier.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Electronic music and structural freedom</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Dance music simultaneously formalized structure (the 32-bar build, the 8-bar breakdown) and destroyed it (ambient, noise, drone). The tension between convention and freedom defines the genre landscape: pop-EDM follows form rigidly for commercial radio; experimental electronic music rejects form entirely; the most interesting work (Aphex Twin, Autechre, Burial) negotiates between them.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Caplin, <em>Classical Form</em> (1998); Covach, &ldquo;Form in Rock Music&rdquo; (2005); Titon, <em>Early Downhome Blues</em> (1994); Butler, <em>Unlocking the Groove</em> (2006).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(5, 0.04, 0.6)
+            .color(0.8, 0.2, 0.1)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.3)
+            .modulateScale(
+                h.osc(3, 0.06).rotate(0.6),
+                () => 0.2 + window._audioData.fft[1] * 0.5
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.4)
+            .saturate(() => 0.5 + window._audioData.fft[2] * 1.0)
+            .kaleid(() => 2 + Math.floor(window._audioData.fft[3] * 4))
+            .contrast(1.5)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>

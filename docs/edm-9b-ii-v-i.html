@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.9b: ii-V-I</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Voice leading SVG --- */
+.vl-svg-wrap {
+    margin: 1.5rem 0;
+    display: flex; justify-content: center;
+}
+.vl-svg-wrap svg text {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+}
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#cadence">The Cadence</a>
+    <a href="#voiceleading">Voice Leading</a>
+    <a href="#autumn">Autumn Leaves</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">ii-V-I</span></h1>
+<div class="subtitle">EDM.9b: the cadence, voice leading, and Autumn Leaves</div>
+
+<p>Three chords. The strongest pull in Western harmony. Dm7 &rarr; G7 &rarr; Cmaj7. Every jazz standard, most pop bridges, half the film scores you&rsquo;ve ever heard. Once you hear ii-V-I, you can&rsquo;t un-hear it.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>cat()</code>, <code>setcpm()</code>,
+    mini-notation (<code>~ * [] &lt;&gt; / @</code>),
+    <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>,
+    <code>.every()</code>, <code>.sometimes()</code>, <code>.jux()</code>, <code>.off()</code>,
+    <code>n()</code>, <code>.scale()</code>, modes, melody over changes,
+    arpeggiation, and the phonk palette from EDM.4&ndash;7.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: THE CADENCE ============ -->
+<section id="cadence">
+<h2><span class="num">00</span>The Cadence</h2>
+
+<p>Three chords in C major. Dm7, then G7, then Cmaj7. Hit play:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>ii-V-I in C major</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(20)
+cat(
+  note("[d3,f3,a3,c4]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.6).release(0.3).room(0.3).size(0.5).gain(0.3),
+  note("[g2,b2,d3,f3]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.6).release(0.3).room(0.3).size(0.5).gain(0.3),
+  note("[c3,e3,g3,b3]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.6).release(0.3).room(0.3).size(0.5).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Hear the resolution. Dm7 builds tension. G7 pushes harder&mdash;maximum tension. Cmaj7 releases. Home. The V chord wants to resolve to I. That pull is the strongest harmonic force in tonal music.</p>
+
+<p>Now the same skeleton in C minor. Dm7b5 &rarr; G7 &rarr; Cm7:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>ii-V-i in C minor</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+setcpm(20)
+cat(
+  note("[d3,f3,ab3,c4]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.6).release(0.3).room(0.3).size(0.5).gain(0.3),
+  note("[g2,b2,d3,f3]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.6).release(0.3).room(0.3).size(0.5).gain(0.3),
+  note("[c3,eb3,g3,bb3]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.6).release(0.3).room(0.3).size(0.5).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The ii chord is now half-diminished (m7b5) because of the minor key&mdash;the Ab instead of A natural. The G7 still has B natural. That&rsquo;s the leading tone, and it pulls to C just as hard. The resolution lands on Cm7 instead of Cmaj7. Darker, but the same gravitational pull.</p>
+
+<div class="concept">
+    <span class="c-label">ii-V-I</span>
+    <p>The strongest chord progression in Western harmony. <strong>ii</strong> (pre-dominant) sets up <strong>V</strong> (dominant), which resolves to <strong>I</strong> (tonic). Root motion by descending fifths: D&rarr;G&rarr;C. Each chord pulls the next one forward. In minor, ii becomes half-diminished, I becomes minor, but V stays dominant. The leading tone does the work.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Play just V&rarr;I: copy the G7 and Cmaj7 editors into a <code>cat()</code> with two chords. Feel the resolution. Then add the ii (Dm7) before the V. The ii makes the V stronger.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: VOICE LEADING ============ -->
+<section id="voiceleading">
+<h2><span class="num">01</span>Voice Leading</h2>
+
+<p>Same three chords. Root position&mdash;the notes jump around between voicings:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>root position ii-V-I (notes jump)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(20)
+cat(
+  note("[d3,f3,a3,c4]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3),
+  note("[g2,b2,d3,f3]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3),
+  note("[c3,e3,g3,b3]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Now the same chords rearranged so each note moves the smallest possible distance to the next:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>voice-led ii-V-I (notes glide)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(20)
+cat(
+  note("[f3,a3,c4,d4]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3),
+  note("[f3,g3,b3,d4]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3),
+  note("[e3,g3,b3,c4]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The first version jumps. The second version glides. Same chords, different voicings. In the voice-led version: F stays from ii to V, then moves down to E for I. C moves to B from ii to V, then stays for I. The 3rd of one chord becomes the 7th of the next. Smooth connections, not leaps.</p>
+
+<!-- Voice leading SVG diagram -->
+<div class="vl-svg-wrap">
+<svg viewBox="0 0 560 220" width="100%" style="max-width:560px;">
+    <rect width="560" height="220" fill="#141418" rx="6"/>
+    <!-- Chord labels -->
+    <text x="120" y="30" fill="#ff6b35" font-size="14" text-anchor="middle" font-weight="600">Dm7 (ii)</text>
+    <text x="280" y="30" fill="#ff6b35" font-size="14" text-anchor="middle" font-weight="600">G7 (V)</text>
+    <text x="440" y="30" fill="#ff6b35" font-size="14" text-anchor="middle" font-weight="600">Cmaj7 (I)</text>
+    <!-- Vertical lines for each chord -->
+    <line x1="120" y1="45" x2="120" y2="195" stroke="#1e1e24" stroke-width="1"/>
+    <line x1="280" y1="45" x2="280" y2="195" stroke="#1e1e24" stroke-width="1"/>
+    <line x1="440" y1="45" x2="440" y2="195" stroke="#1e1e24" stroke-width="1"/>
+    <!-- Voice 4 (top): D4 -> D4 -> C4 -->
+    <circle cx="120" cy="60" r="5" fill="#4fc3f7"/>
+    <text x="85" y="64" fill="#4fc3f7" font-size="11" text-anchor="end">D4</text>
+    <circle cx="280" cy="60" r="5" fill="#4fc3f7"/>
+    <text x="315" y="64" fill="#4fc3f7" font-size="11">D4</text>
+    <circle cx="440" cy="72" r="5" fill="#4fc3f7"/>
+    <text x="475" y="76" fill="#4fc3f7" font-size="11">C4</text>
+    <line x1="125" y1="60" x2="275" y2="60" stroke="#4fc3f7" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+    <line x1="285" y1="60" x2="435" y2="72" stroke="#4fc3f7" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+    <!-- Voice 3: C4 -> B3 -> B3 -->
+    <circle cx="120" cy="95" r="5" fill="#66bb6a"/>
+    <text x="85" y="99" fill="#66bb6a" font-size="11" text-anchor="end">C4</text>
+    <circle cx="280" cy="105" r="5" fill="#66bb6a"/>
+    <text x="315" y="109" fill="#66bb6a" font-size="11">B3</text>
+    <circle cx="440" cy="105" r="5" fill="#66bb6a"/>
+    <text x="475" y="109" fill="#66bb6a" font-size="11">B3</text>
+    <line x1="125" y1="95" x2="275" y2="105" stroke="#66bb6a" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+    <line x1="285" y1="105" x2="435" y2="105" stroke="#66bb6a" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+    <!-- Voice 2: A3 -> G3 -> G3 -->
+    <circle cx="120" cy="135" r="5" fill="#ab47bc"/>
+    <text x="85" y="139" fill="#ab47bc" font-size="11" text-anchor="end">A3</text>
+    <circle cx="280" cy="145" r="5" fill="#ab47bc"/>
+    <text x="315" y="149" fill="#ab47bc" font-size="11">G3</text>
+    <circle cx="440" cy="145" r="5" fill="#ab47bc"/>
+    <text x="475" y="149" fill="#ab47bc" font-size="11">G3</text>
+    <line x1="125" y1="135" x2="275" y2="145" stroke="#ab47bc" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+    <line x1="285" y1="145" x2="435" y2="145" stroke="#ab47bc" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+    <!-- Voice 1 (bottom): F3 -> F3 -> E3 -->
+    <circle cx="120" cy="175" r="5" fill="#ff6b35"/>
+    <text x="85" y="179" fill="#ff6b35" font-size="11" text-anchor="end">F3</text>
+    <circle cx="280" cy="175" r="5" fill="#ff6b35"/>
+    <text x="315" y="179" fill="#ff6b35" font-size="11">F3</text>
+    <circle cx="440" cy="185" r="5" fill="#ff6b35"/>
+    <text x="475" y="189" fill="#ff6b35" font-size="11">E3</text>
+    <line x1="125" y1="175" x2="275" y2="175" stroke="#ff6b35" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+    <line x1="285" y1="175" x2="435" y2="185" stroke="#ff6b35" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.6"/>
+    <!-- Annotations -->
+    <text x="200" y="210" fill="#5a584f" font-size="10" text-anchor="middle">F stays</text>
+    <text x="360" y="210" fill="#5a584f" font-size="10" text-anchor="middle">F&rarr;E (half step)</text>
+</svg>
+</div>
+
+<p>Each colored line is one voice. Flat lines mean the note stays put. Slight slopes mean half-step or whole-step movement. No leaps. That&rsquo;s voice leading.</p>
+
+<div class="concept">
+    <span class="c-label">voice leading</span>
+    <p>How individual notes within chords connect to notes in the next chord. Good voice leading means small movements. The 3rd of ii becomes the 7th of V. The 7th of V resolves down to the 3rd of I. Each voice is its own melody. That&rsquo;s counterpoint within harmony.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Play just the top voice of each chord: <code>cat(note("d4"), note("d4"), note("c4"))</code> with <code>.s("sawtooth").lpf(1000).sustain(0.8).gain(0.3)</code>. Then just the bottom: <code>cat(note("f3"), note("f3"), note("e3"))</code>. Each individual line is a melody. That&rsquo;s counterpoint within harmony.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 2: AUTUMN LEAVES ============ -->
+<section id="autumn">
+<h2><span class="num">02</span>Autumn Leaves</h2>
+
+<p>A real standard. Autumn Leaves, in G major / E minor. Seven chords. Two ii-V-Is hiding inside. First four bars&mdash;the major ii-V-I plus IV:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>Autumn Leaves &mdash; major ii-V-I-IV</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+setcpm(25)
+// Am7 -> D7 -> Gmaj7 -> Cmaj7 (voice-led inversions)
+note("<[a2,c3,e3,g3] [d3,fs3,a3,c4] [g2,b2,d3,fs3] [c3,e3,g3,b3]>").s("sawtooth")
+  .lpf(1000).attack(0.1).sustain(0.8).release(0.3)
+  .room(0.3).size(0.5).gain(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Am7&rarr;D7&rarr;Gmaj7 is a ii-V-I in G major. The Cmaj7 is the IV chord&mdash;it extends the phrase before the tune shifts to minor.</p>
+
+<p>Last three bars. The minor ii-V-i:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>Autumn Leaves &mdash; minor ii-V-i</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+setcpm(25)
+// F#m7b5 -> B7 -> Em7 -> Em7 (voice-led inversions)
+note("<[fs2,a2,c3,e3] [b2,ds3,fs3,a3] [e2,g2,b2,d3] [e2,g2,b2,d3]>").s("sawtooth")
+  .lpf(1000).attack(0.1).sustain(0.8).release(0.3)
+  .room(0.3).size(0.5).gain(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p>F#m7b5&rarr;B7&rarr;Em7 is a ii-V-i in E minor. E minor is the relative minor of G major. Same key signature, different home.</p>
+
+<p>Now both halves together. The full Autumn Leaves changes:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>Autumn Leaves &mdash; full changes</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2c">
+    <!--
+setcpm(25)
+// full Autumn Leaves: Am7 D7 Gmaj7 Cmaj7 | F#m7b5 B7 Em7 Em7
+chord("<Am7 D7 Gmaj7 Cmaj7 F#m7b5 B7 Em7 Em7>").voicing().s("sawtooth")
+  .lpf(1000).attack(0.1).sustain(0.8).release(0.3)
+  .room(0.3).size(0.5).gain(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Two ii-V-Is back to back. One in G major, one in E minor. The entire tune is built on this one concept. Seven chords, two ideas.</p>
+
+<div class="concept">
+    <span class="c-label">analysis &mdash; spotting ii-V-Is</span>
+    <p>Most jazz standards are sequences of ii-V-Is in different keys. When you see a m7 chord followed by a dom7 chord a fourth below, followed by a maj7 or m7 chord a fourth below that&mdash;that&rsquo;s a ii-V-I. The 7 chords of Autumn Leaves reduce to 2 patterns once you see it.</p>
+</div>
+
+<p>Arpeggiate the changes. Same chords, broken into individual notes:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>Autumn Leaves &mdash; arpeggiated</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2d">
+    <!--
+setcpm(30)
+// Autumn Leaves arpeggiated via .arp() with index numbers
+chord("<Am7 D7 Gmaj7 Cmaj7 F#m7b5 B7 Em7 Em7>").voicing().arp("0 1 2 3").s("sawtooth")
+  .lpf(2000).decay(0.06).sustain(0)
+  .gain(0.3)
+  .room(0.3).size(0.5)
+    -->
+    </strudel-editor>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: why ii-V-I dominates</summary>
+    <div class="rh-body">
+        <h4>Root motion by fifths</h4>
+        <p>D&rarr;G&rarr;C. Each root drops by a fifth (or rises by a fourth&mdash;same interval, different direction). This is the strongest resolution in tonal harmony. Stack two of these fifth-drops and you get the ii-V-I chain.</p>
+
+        <h4>The overtone series</h4>
+        <p>Play any note. The 2nd harmonic is an octave. The 3rd harmonic is a fifth above that. The relationship between a note and the fifth above it is baked into the physics of vibrating strings and air columns. V&rarr;I mimics this natural relationship. The dominant literally contains the tonic in its overtone series.</p>
+
+        <h4>The circle of fifths</h4>
+        <p>Arrange all 12 notes by fifths: C-G-D-A-E-B-F#-Db-Ab-Eb-Bb-F-C. A ii-V-I moves three steps counterclockwise on this circle. Every chord pulls the next one forward by the same interval. The circle of fifths is the map of this gravity.</p>
+
+        <table>
+            <thead><tr><th>key</th><th>ii</th><th>V</th><th>I</th></tr></thead>
+            <tbody>
+            <tr><td>C major</td><td>Dm7</td><td>G7</td><td>Cmaj7</td></tr>
+            <tr><td>G major</td><td>Am7</td><td>D7</td><td>Gmaj7</td></tr>
+            <tr><td>F major</td><td>Gm7</td><td>C7</td><td>Fmaj7</td></tr>
+            <tr><td>Bb major</td><td>Cm7</td><td>F7</td><td>Bbmaj7</td></tr>
+            <tr><td>Eb major</td><td>Fm7</td><td>Bb7</td><td>Ebmaj7</td></tr>
+            <tr><td>C minor</td><td>Dm7b5</td><td>G7</td><td>Cm7</td></tr>
+            <tr><td>E minor</td><td>F#m7b5</td><td>B7</td><td>Em7</td></tr>
+            <tr><td>A minor</td><td>Bm7b5</td><td>E7</td><td>Am7</td></tr>
+            </tbody>
+        </table>
+
+        <p>Same pattern in every key. Memorize the shape, transpose it. The chord qualities stay fixed: m7&rarr;dom7&rarr;maj7 (major), m7b5&rarr;dom7&rarr;m7 (minor).</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 3: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">03</span>Autumn Leaves</h2>
+
+<div class="punchline">
+    <p><strong>Autumn Leaves as a complete piece.</strong> Drums, pad with a sweeping filter, arpeggiated lead with delay. Two ii-V-Is&mdash;one major, one minor&mdash;cycling through eight bars. Everything you&rsquo;ve learned about harmony, applied to a real standard.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: autumn leaves</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(30)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.85),
+  s("~ ~ ~ ~ cp ~ ~ ~").room(0.4).size(0.6).gain(0.8),
+  s("hh*8").gain("0.3 0.5 0.3 0.7").pan(0.35),
+  // pad: Autumn Leaves chords via chord() + .voicing()
+  chord("<Am7 D7 Gmaj7 Cmaj7 F#m7b5 B7 Em7 Em7>").voicing().s("sawtooth")
+    .lpf(sine.range(400, 1200).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8).gain(0.2),
+  // arp: each chord arpeggiated in varying index orders
+  chord("<Am7 D7 Gmaj7 Cmaj7 F#m7b5 B7 Em7 Em7>").voicing()
+    .arp("<[0 1 2 3] [3 2 1 0] [0 1 2 3 2 1] [0 3 1 2] [3 2 1 0] [0 1 2 3] [0 1 2 3] [3 2 1 0]>").s("sawtooth")
+    .lpf(2000).decay(0.06).sustain(0)
+    .gain(0.25).pan(0.65)
+    .delay(0.15).delaytime(0.125).delayfeedback(0.2)
+)._spiral()
+    -->
+    </strudel-editor>
+</div>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Change the arp line to use the same note order (low to high) for every chord. Hear how consistent arpeggiation changes the character versus the varied orderings.</li>
+        <li>Add an 808 bass following the roots: <code>note("&lt;a1 d2 g1 c2 [f1 fs1] b1 e2 e2&gt;").s("sine").decay(0.3).sustain(0.2).distort(0.2).gain(0.7)</code>. Drop it into the <code>stack()</code> as a new layer.</li>
+        <li>Replace the changes with a simple ii-V-I vamp in C: Dm7 <code>[d3,f3,a3,c4]</code>, G7 <code>[g2,b2,d3,f3]</code>, Cmaj7 <code>[c3,e3,g3,b3]</code>. Same arrangement, different progression.</li>
+        <li>Share it. A real jazz standard, arranged from scratch.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>ii-V-I (major)</td><td>strongest progression: m7 &rarr; dom7 &rarr; maj7</td><td><code>Dm7 &rarr; G7 &rarr; Cmaj7</code></td></tr>
+        <tr><td>ii-V-i (minor)</td><td>minor version: m7b5 &rarr; dom7 &rarr; m7</td><td><code>Dm7b5 &rarr; G7 &rarr; Cm7</code></td></tr>
+        <tr><td>voice leading</td><td>small note movements between chords</td><td><code>[f3,a3,c4,d4] &rarr; [f3,g3,b3,d4] &rarr; [e3,g3,b3,c4]</code></td></tr>
+        <tr><td>inversions</td><td>reorder chord tones for smooth voice leading</td><td>3rd in bass, 7th on top, etc.</td></tr>
+        <tr><td>voicings</td><td>compact inversions for smooth chord movement</td><td><code>[a2,c3,e3,g3]</code></td></tr>
+        <tr><td>arpeggiation</td><td>sequence notation for broken chords</td><td><code>[a2 c3 e3 g3]</code> (spaces)</td></tr>
+        <tr><td>Roman numeral analysis</td><td>chord function relative to key</td><td>ii = pre-dominant, V = dominant, I = tonic</td></tr>
+        <tr><td>Autumn Leaves analysis</td><td>ii-V-I in G major + ii-V-i in E minor</td><td>Am7 D7 Gmaj7 Cmaj7 | F#m7b5 B7 Em7</td></tr>
+        </tbody>
+    </table>
+    <div class="concept" style="margin: 1rem 0 0; border-radius: 6px;">
+        <span class="c-label">ii-V-I checklist</span>
+        <p>ii-V-I in major: m7&rarr;dom7&rarr;maj7. In minor: m7b5&rarr;dom7&rarr;m7. Root motion by descending fifths. Voice leading: 3rd of ii &rarr; 7th of V &rarr; 3rd of I. Write voice-led inversions as explicit note arrays for smooth movement. Most jazz standards are sequences of ii-V-Is in different keys.</p>
+    </div>
+    <p class="earned-next">Next: <em>The Monster</em>. Every tool. One original piece. Built from scratch.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td>Roni Size / Reprazent</td><td>Brown Paper Bag (1997)</td><td>(DnB/jazz) jazz bass walks + ii-V-I in DnB</td></tr>
+        <tr><td>Charlie Parker</td><td>Donna Lee (1947)</td><td>(DnB/jazz) bebop at speed: ii-V-I chains as the harmonic engine</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The ii-V-I progression is the most common harmonic motion in jazz. Its dominance traces back to a specific moment in popular music history.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Tin Pan Alley (1900s&ndash;1940s)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The songwriting factories of Manhattan&rsquo;s 28th Street produced thousands of songs using predictable harmonic formulae &mdash; I-vi-ii-V (&ldquo;Heart and Soul&rdquo; changes), ii-V-I cadences, and 32-bar AABA form. Cole Porter, George Gershwin, Irving Berlin, Richard Rodgers, and Harold Arlen wrote within these conventions. The ii-V-I wasn&rsquo;t invented here, but it was industrialized.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Bebop and the ii-V-I (1940s)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Charlie Parker, Dizzy Gillespie, and Thelonious Monk took Tin Pan Alley harmony and reharmonized it &mdash; adding chromatic passing chords, tritone substitutions, and extended chord voicings. The ii-V-I became the building block: Parker&rsquo;s heads and solos are largely chains of ii-V-Is in different keys. &ldquo;Autumn Leaves&rdquo; (music: Joseph Kosma, 1945; English lyrics: Johnny Mercer, 1947) became a jazz standard because its changes are two ii-V-Is &mdash; one major, one minor &mdash; making it a perfect vehicle for practicing the progression.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Autumn Leaves</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Originally a French chanson (&ldquo;Les feuilles mortes,&rdquo; poetry by Jacques Pr&eacute;vert, 1945), it became a jazz standard after Cannonball Adderley recorded it with Miles Davis on <em>Somethin&rsquo; Else</em> (1958). It appears in virtually every jazz Real Book and is often the first standard taught in jazz education because its changes are clear, functional, and illustrate both major and minor ii-V-I progressions.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Forte, <em>The American Popular Ballad</em> (1995); Levine, <em>The Jazz Theory Book</em> (1995); Gioia, <em>The Jazz Standards</em> (2012).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(3, 0.06, 0.8)
+            .color(0.2, 0.6, 1.0)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.2)
+            .modulateScale(
+                h.osc(7, 0.08).rotate(0.4),
+                () => 0.15 + window._audioData.fft[1] * 0.4
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.3)
+            .saturate(() => 0.6 + window._audioData.fft[2] * 1.2)
+            .kaleid(() => 4 + Math.floor(window._audioData.fft[3] * 3))
+            .contrast(1.4)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>

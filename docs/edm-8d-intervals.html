@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.8d: Intervals</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Interval reference table --- */
+.interval-table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 1.5rem 0; }
+.interval-table th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+.interval-table td { padding: 0.45rem 0.6rem; border-bottom: 1px solid #111115; font-size: 0.9rem; }
+.interval-table tr:nth-child(even) td { background: var(--table-row); }
+.interval-table td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+.interval-table td:nth-child(3) { font-family: 'SF Mono', monospace; color: var(--accent); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#hearing">Hearing Intervals</a>
+    <a href="#quality">Quality</a>
+    <a href="#tritone">The Tritone</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">Intervals</span></h1>
+<div class="subtitle">EDM.8d: the distance between two notes has a name</div>
+
+<p>You&rsquo;ve been using intervals without naming them. A chord is built from intervals. A melody moves by intervals. Every time you stacked a root and a fifth, or stepped from one note to the next&mdash;that was an interval. This lesson names every distance from 1 to 12 semitones, teaches interval quality, and reveals the tritone&mdash;the most unstable interval and the reason V7&rarr;I resolves.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>cat()</code>, <code>setcpm(35)</code>,
+    mini-notation (<code>~ * [] &lt;&gt; / @</code>),
+    <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>,
+    <code>.every()</code>, <code>.sometimes()</code>, <code>.jux()</code>, <code>.off()</code>,
+    arrangement with <code>cat()</code> and gain automation,
+    scales, modes, chords, and the phonk palette from EDM.4&ndash;8c.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: HEARING INTERVALS ============ -->
+<section id="hearing">
+<h2><span class="num">00</span>Hearing Intervals</h2>
+
+<p>Two notes at the same time. The distance between them is an interval. Hit play:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>unison, then octave</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(25)
+cat(
+  note("[c3,c3]").s("sawtooth").lpf(1200).sustain(0.8).release(0.3).gain(0.35),
+  note("[c3,c4]").s("sawtooth").lpf(1200).sustain(0.8).release(0.3).gain(0.35)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>First cycle: two C3s. Same pitch, same note&mdash;unison. Zero semitones apart. Second cycle: C3 and C4. One octave. Twelve semitones. The widest interval before you repeat the same note name.</p>
+
+<p>Now walk up from C3, one semitone at a time. All 13 intervals from unison to octave:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>all 13 intervals &mdash; unison to octave</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+setcpm(20)
+cat(
+  note("[c3,c3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,db3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,d3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,eb3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,e3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,f3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,gb3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,g3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,ab3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,a3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,bb3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,b3]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35),
+  note("[c3,c4]").s("sawtooth").lpf(1200).sustain(0.6).release(0.2).gain(0.35)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Thirteen intervals, one per cycle. C3 stays fixed on the bottom. The top note climbs one semitone each time. Some sound smooth&mdash;consonant, stable. Others grate&mdash;dissonant, tense. Each distance has its own character.</p>
+
+<div class="concept">
+    <span class="c-label">interval</span>
+    <p>The distance between two pitches, measured in <strong>semitones</strong>. Every interval has a name based on its size and quality. A chord is intervals stacked from a root. A melody is intervals played in sequence.</p>
+</div>
+
+<p>The full map. Every interval from 0 to 12 semitones:</p>
+
+<table class="interval-table">
+    <thead><tr><th>semitones</th><th>name</th><th>abbr</th><th>character</th><th>example</th></tr></thead>
+    <tbody>
+    <tr><td>0</td><td>Unison</td><td>P1</td><td>identical</td><td>C&ndash;C</td></tr>
+    <tr><td>1</td><td>Minor 2nd</td><td>m2</td><td>tense, close</td><td>C&ndash;Db</td></tr>
+    <tr><td>2</td><td>Major 2nd</td><td>M2</td><td>step, motion</td><td>C&ndash;D</td></tr>
+    <tr><td>3</td><td>Minor 3rd</td><td>m3</td><td>dark, sad</td><td>C&ndash;Eb</td></tr>
+    <tr><td>4</td><td>Major 3rd</td><td>M3</td><td>bright, happy</td><td>C&ndash;E</td></tr>
+    <tr><td>5</td><td>Perfect 4th</td><td>P4</td><td>open, suspended</td><td>C&ndash;F</td></tr>
+    <tr><td>6</td><td>Tritone</td><td>TT</td><td>unstable, demonic</td><td>C&ndash;Gb</td></tr>
+    <tr><td>7</td><td>Perfect 5th</td><td>P5</td><td>stable, powerful</td><td>C&ndash;G</td></tr>
+    <tr><td>8</td><td>Minor 6th</td><td>m6</td><td>bittersweet</td><td>C&ndash;Ab</td></tr>
+    <tr><td>9</td><td>Major 6th</td><td>M6</td><td>warm, sweet</td><td>C&ndash;A</td></tr>
+    <tr><td>10</td><td>Minor 7th</td><td>m7</td><td>bluesy, tense</td><td>C&ndash;Bb</td></tr>
+    <tr><td>11</td><td>Major 7th</td><td>M7</td><td>bright tension</td><td>C&ndash;B</td></tr>
+    <tr><td>12</td><td>Octave</td><td>P8</td><td>same note, higher</td><td>C&ndash;C</td></tr>
+    </tbody>
+</table>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>In the 13-interval editor, listen for which intervals sound stable and which sound tense. The perfect intervals (0, 5, 7, 12) are the anchors. The tritone (6) is the most restless. Try pausing on one you like&mdash;delete the other <code>cat()</code> entries and loop just that pair.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: QUALITY ============ -->
+<section id="quality">
+<h2><span class="num">01</span>Quality</h2>
+
+<p>Intervals come in families. Perfect intervals: P1, P4, P5, P8&mdash;they&rsquo;re neither major nor minor, just stable. Major/minor intervals: 2nds, 3rds, 6ths, 7ths&mdash;they come in pairs, one semitone apart. And the tritone at 6 semitones, which belongs to no family.</p>
+
+<p>The most important pair: minor 3rd vs major 3rd. This is the interval that decides whether a chord is major or minor:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>minor 3rd vs major 3rd</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(25)
+cat(
+  note("[c3,eb3]").s("sawtooth").lpf(1200).sustain(0.8).release(0.3).gain(0.35),
+  note("[c3,e3]").s("sawtooth").lpf(1200).sustain(0.8).release(0.3).gain(0.35)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>First cycle: C and Eb. Minor 3rd. Dark. Second cycle: C and E. Major 3rd. Bright. One semitone difference between them. That single semitone is why C minor and C major feel so different. The 3rd is the identity of the chord.</p>
+
+<div class="concept">
+    <span class="c-label">interval quality</span>
+    <p><strong>Perfect</strong> intervals (P1, P4, P5, P8) are neither major nor minor. <strong>2nds, 3rds, 6ths, 7ths</strong> come in major and minor pairs&mdash;always one semitone apart. Major = wider = brighter. Minor = narrower = darker. The quality determines the character.</p>
+</div>
+
+<h3>Inversion</h3>
+
+<p>Flip an interval: move the bottom note up an octave. What was a major 3rd becomes something else. Hit play:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>M3 inverts to m6</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(25)
+cat(
+  note("[c3,e3]").s("sawtooth").lpf(1200).sustain(0.8).release(0.3).gain(0.35),
+  note("[e3,c4]").s("sawtooth").lpf(1200).sustain(0.8).release(0.3).gain(0.35)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>C&ndash;E is a major 3rd (4 semitones). E&ndash;C is a minor 6th (8 semitones). Same two note names, different order, different interval. The sizes add to 12. The qualities swap: major becomes minor. Perfect stays perfect.</p>
+
+<div class="concept">
+    <span class="c-label">inversion</span>
+    <p>Flip an interval by moving the bottom note up an octave. <strong>Major becomes minor.</strong> Perfect stays perfect. The semitone counts always add to 12. M3 (4) inverts to m6 (8). P4 (5) inverts to P5 (7). m2 (1) inverts to M7 (11).</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Invert P4: change <code>[c3,e3]</code> to <code>[c3,f3]</code> and <code>[e3,c4]</code> to <code>[f3,c4]</code>. C&ndash;F is P4 (5 semitones). F&ndash;C is P5 (7 semitones). Now try m2: <code>[c3,db3]</code> inverts to <code>[db3,c4]</code>&mdash;M7. The tightest interval inverts to the widest.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 2: THE TRITONE ============ -->
+<section id="tritone">
+<h2><span class="num">02</span>The Tritone</h2>
+
+<p>Six semitones. Exactly half an octave. The most unstable interval in tonal music. Hit play:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>the tritone: B and F</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+setcpm(35)
+note("[b2,f3]").s("sawtooth")
+  .lpf(1200).sustain(0.8).release(0.3).gain(0.35)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Tense. Restless. It wants to move somewhere. It doesn&rsquo;t rest. Historically called &ldquo;diabolus in musica&rdquo;&mdash;the devil in music.</p>
+
+<p>Now hear what happens when the tritone resolves. B and F live inside a G7 chord. When G7 moves to C major, B pulls up to C and F pulls down to E:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>G7 &rarr; Cmaj &mdash; tritone resolution</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+setcpm(25)
+cat(
+  note("[g2,b2,d3,f3]").s("sawtooth").lpf(1200).sustain(0.8).release(0.3).gain(0.35),
+  note("[c3,e3,g3,c4]").s("sawtooth").lpf(1200).sustain(0.8).release(0.3).gain(0.35)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>G7 contains B and F&mdash;a tritone. They resolve outward: B steps up to C, F steps down to E. That&rsquo;s why V7&rarr;I resolves. The tritone inside the dominant chord creates the tension. The tonic chord releases it. Every V7&rarr;I you&rsquo;ve ever heard works because of this.</p>
+
+<div class="concept">
+    <span class="c-label">the tritone</span>
+    <p><strong>6 semitones.</strong> Exactly half an octave. The most unstable interval. Found inside every dominant 7th chord&mdash;between the 3rd and the 7th of that chord. Its resolution outward is the engine of tonal harmony. V7&rarr;I works because the tritone inside the V7 demands resolution.</p>
+</div>
+
+<p>The phonk progression. Four bars. Listen for the G7 in bar 4&mdash;it has the tritone (B and F) that pulls back to Cm in bar 1:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>phonk progression &mdash; tritone in bar 4</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2c">
+    <!--
+setcpm(35)
+stack(
+  note("<[c3,eb3,g3,bb3] [ab2,c3,eb3,g3] [bb2,d3,f3,ab3] [g2,b2,d3,f3]>")
+    .s("sawtooth").lpf(800).attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8).gain(0.3),
+  note("<c2 ab1 bb1 g1>").s("sine")
+    .decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Bar 4: G7 &mdash; <code>[g2,b2,d3,f3]</code>. B and F are a tritone apart. When it loops to bar 1, Cm7 &mdash; <code>[c3,eb3,g3,bb3]</code> &mdash; B resolves up to C, F resolves down to Eb. You&rsquo;ve been hearing this resolution since EDM.4. Now you know why it works.</p>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: diabolus in musica</summary>
+    <div class="rh-body">
+        <h4>The banned interval</h4>
+        <p>Medieval monks avoided the tritone in choral music. The interval was considered so dissonant it was associated with the devil&mdash;&ldquo;diabolus in musica.&rdquo; Singing it in plainchant was discouraged. The ban was more practical than theological: without a clear resolution context, the tritone destabilized the mode. It sounded wrong with no way to make it right.</p>
+
+        <h4>Jazz: the most important interval</h4>
+        <p>What medieval monks avoided, jazz musicians made foundational. Every dominant 7th chord contains a tritone. Every ii&ndash;V&ndash;I progression depends on it. Tritone substitution&mdash;replacing V7 with a chord a tritone away&mdash;became one of bebop&rsquo;s signature moves. The interval that was forbidden became the engine of harmonic motion.</p>
+
+        <h4>Blues: the blue note</h4>
+        <p>The &ldquo;blue note&rdquo; in a blues scale is the b5&mdash;a tritone above the root. It&rsquo;s the note that makes blues sound like blues. Play a C blues scale: C Eb F Gb G Bb C. That Gb is the tritone. It bends, it wails, it doesn&rsquo;t belong to major or minor. That tension is the point.</p>
+
+        <h4>The symmetry</h4>
+        <p>The tritone is its own inversion. Flip it and you get another tritone. C to Gb = 6 semitones. Gb to C = 6 semitones. It divides the octave exactly in half. No other interval does this. That symmetry is what makes it so unstable&mdash;there&rsquo;s no &ldquo;direction&rdquo; built in. It could resolve either way.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 3: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">03</span>Intervals</h2>
+
+<div class="punchline">
+    <p><strong>The full phonk track. Drums, 808, pad, and a melody that uses different intervals for different emotional effects.</strong> Bar 1 melody: minor 3rds and perfect 5ths&mdash;dark, stable. Bar 4 melody: major 3rd and tritone&mdash;bright tension pulling toward resolution. The intervals carry the emotion.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: intervals</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9),
+  s("~ ~ ~ ~ cp ~ ~ ~").room(0.3).size(0.5).gain(0.85),
+  s("hh*16").gain("0.3 0.5 0.3 0.8").pan(0.35),
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4)
+    .delay(0.2).delaytime(0.125).delayfeedback(0.3).pan(0.6),
+  note("<c2 ab1 bb1 g1>").s("sine")
+    .decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  note("<[c3,eb3,g3,bb3] [ab2,c3,eb3,g3] [bb2,d3,f3,ab3] [g2,b2,d3,f3]>")
+    .s("sawtooth").lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8).gain(0.2),
+  note("<[c4 ~ eb4 ~ g4 ~ eb4 ~] [ab3 ~ c4 ~ eb4 ~ c4 ~] [bb3 ~ d4 ~ f4 ~ d4 ~] [g3 ~ b3 ~ d4 ~ f4 ~]>")
+    .s("sawtooth").lpf(2000).decay(0.06).sustain(0)
+    .gain(0.3).pan(0.65)
+    .delay(0.15).delaytime(0.125).delayfeedback(0.2)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The melody in bar 1: C&ndash;Eb (m3), Eb&ndash;G (M3), G&ndash;Eb (m3). Dark minor intervals, stable. Bar 4: G&ndash;B (M3), B&ndash;D (m3), D&ndash;F (m3)&mdash;and B to F across the chord is the tritone. Maximum tension. When it loops back to bar 1, the tritone resolves. The intervals do the emotional work.</p>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Change the bar 4 melody to resolve the tritone explicitly: <code>[g3 ~ c4 ~ e4 ~ c4 ~]</code>. The B&rarr;C and F&rarr;E resolution happens in the melody itself. Hear the release.</li>
+        <li>Write a melody using only P5s and P4s&mdash;open, powerful intervals. Try <code>[c4 ~ g4 ~ f4 ~ c4 ~]</code> for bar 1. Medieval, hollow, strong.</li>
+        <li>Write a melody using only m2s and M7s&mdash;maximum dissonance. Try <code>[c4 ~ db4 ~ b3 ~ c4 ~]</code>. Anxious. Claustrophobic. Useful for tension sections.</li>
+        <li>Share it. You can explain what intervals your melody uses and why it sounds the way it does.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>concept</th><th>means</th><th>example</th></tr></thead>
+        <tbody>
+        <tr><td>interval</td><td>distance between two pitches in semitones</td><td>C&ndash;Eb = 3 semitones = m3</td></tr>
+        <tr><td>m2 / M2</td><td>minor 2nd (1) / major 2nd (2)</td><td>C&ndash;Db / C&ndash;D</td></tr>
+        <tr><td>m3 / M3</td><td>minor 3rd (3) / major 3rd (4) &mdash; decides major vs minor</td><td>C&ndash;Eb / C&ndash;E</td></tr>
+        <tr><td>P4 / P5</td><td>perfect 4th (5) / perfect 5th (7) &mdash; stable, open</td><td>C&ndash;F / C&ndash;G</td></tr>
+        <tr><td>tritone (TT)</td><td>6 semitones, half an octave &mdash; most unstable</td><td>B&ndash;F inside G7</td></tr>
+        <tr><td>m6 / M6</td><td>minor 6th (8) / major 6th (9)</td><td>C&ndash;Ab / C&ndash;A</td></tr>
+        <tr><td>m7 / M7</td><td>minor 7th (10) / major 7th (11)</td><td>C&ndash;Bb / C&ndash;B</td></tr>
+        <tr><td>P1 / P8</td><td>unison (0) / octave (12)</td><td>C&ndash;C / C&ndash;C</td></tr>
+        <tr><td>quality</td><td>perfect, major, or minor &mdash; determines character</td><td>P4 is open; m3 is dark; M3 is bright</td></tr>
+        <tr><td>inversion</td><td>flip bottom note up &mdash; sizes add to 12, M&harr;m</td><td>M3 (4) inverts to m6 (8)</td></tr>
+        <tr><td>V7&rarr;I resolution</td><td>tritone inside V7 resolves outward to tonic</td><td>G7 [B,F] &rarr; C [C,E]</td></tr>
+        </tbody>
+    </table>
+    <div class="concept" style="margin: 1rem 0 0; border-radius: 6px;">
+        <span class="c-label">interval checklist</span>
+        <p>13 intervals from unison (0) to octave (12). Perfect intervals: P1, P4, P5, P8. Major/minor pairs: 2nds, 3rds, 6ths, 7ths. The tritone (6) stands alone. Inversion flips M&harr;m, sizes add to 12. The tritone inside V7 is why dominant chords resolve. Every chord and every melody is built from intervals.</p>
+    </div>
+    <p class="earned-next">Next: <em>Non-Chord Tones</em>. Every type of tension between the notes that matter.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The naming system for intervals is ancient. The emotional associations are not universal &mdash; they&rsquo;re culturally constructed.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Pythagoras and consonance (c. 500 BC)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The Pythagorean tradition ranked intervals by the simplicity of their frequency ratio: octave (2:1), fifth (3:2), fourth (4:3) = &ldquo;perfect&rdquo; consonances. Thirds (5:4 and 6:5) were considered dissonant until the Renaissance. The cultural shift from &ldquo;thirds are dissonant&rdquo; to &ldquo;thirds are the foundation of harmony&rdquo; took 500 years and reshaped all of Western music.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">The tritone and the Church</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The augmented fourth / diminished fifth (6 semitones) earned the nickname &ldquo;diabolus in musica&rdquo; (the devil in music) &mdash; though this attribution is more legend than documented medieval practice. What IS documented is that theorists from Guido d&rsquo;Arezzo (11th c.) onward treated it with caution. The interval was not literally banned but was avoided in chant and early polyphony. Its rehabilitation began with the development of dominant seventh chords in the Baroque era &mdash; the tritone inside V7 became the engine of tonal resolution.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Tenney, <em>A History of &lsquo;Consonance&rsquo; and &lsquo;Dissonance&rsquo;</em> (1988); Drabkin, &ldquo;Tritone&rdquo; in <em>New Grove</em> (2001).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(5, 0.04, 0.6)
+            .color(0.8, 0.2, 0.1)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.3)
+            .modulateScale(
+                h.osc(3, 0.06).rotate(0.6),
+                () => 0.2 + window._audioData.fft[1] * 0.5
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.4)
+            .saturate(() => 0.5 + window._audioData.fft[2] * 1.0)
+            .kaleid(() => 2 + Math.floor(window._audioData.fft[3] * 4))
+            .contrast(1.5)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>

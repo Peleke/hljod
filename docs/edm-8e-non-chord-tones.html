@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.8e: Non-Chord Tones</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</head><body>
+
+<!-- Hydra background canvas -->
+<canvas id="hydra-canvas"></canvas>
+
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#neighbor">Neighbor</a>
+    <a href="#suspension">Suspension</a>
+    <a href="#pedal">Pedal Point</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<!-- Floating controls -->
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">Non-Chord Tones</span></h1>
+<div class="subtitle">EDM.8e: every type of tension between the notes that matter</div>
+
+<p>EDM.8c covered passing tones&mdash;scale notes that connect one chord tone to another by step. That&rsquo;s one type. There are more. Each creates a specific kind of tension. This lesson fills in the rest.</p>
+
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>cat()</code>, <code>setcpm(35)</code>,
+    mini-notation (<code>~ * [] &lt;&gt; / @</code>),
+    <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>,
+    chord tones, passing tones, intervals, scale degrees,
+    and the phonk palette from EDM.4&ndash;7.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 0: NEIGHBOR TONES ============ -->
+<section id="neighbor">
+<h2><span class="num">00</span>Neighbor Tones</h2>
+
+<p>A neighbor tone steps away from a chord tone and steps back. It doesn&rsquo;t connect two different notes&mdash;it decorates one. Upper neighbor first. C minor chord, melody on the 5th:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>upper neighbor on the 5th</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(35)
+stack(
+  note("[c3,eb3,g3]").s("sawtooth").lpf(800).attack(0.2).sustain(0.6).release(0.5).room(0.5).size(0.8).gain(0.25),
+  note("g4 ab4 g4 ~").s("sawtooth").lpf(2000).decay(0.06).sustain(0).gain(0.35)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>G is a chord tone. Ab steps up&mdash;not in the chord. G returns. The Ab decorates without going anywhere. Compare that to a passing tone: a passing tone connects two <strong>different</strong> chord tones. A neighbor tone decorates <strong>one</strong> chord tone by stepping away and coming back.</p>
+
+<p>Now the lower neighbor. Same chord tone, approached from below:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>lower neighbor on the 5th</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+setcpm(35)
+stack(
+  note("[c3,eb3,g3]").s("sawtooth").lpf(800).attack(0.2).sustain(0.6).release(0.5).room(0.5).size(0.8).gain(0.25),
+  note("g4 f4 g4 ~").s("sawtooth").lpf(2000).decay(0.06).sustain(0).gain(0.35)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>G &rarr; F (lower neighbor) &rarr; G. Same note decorated from below. The F pulls down, the return to G releases.</p>
+
+<div class="concept">
+    <span class="c-label">neighbor tone</span>
+    <p>A <strong>neighbor tone</strong> is a non-chord tone that steps away from a chord tone (up or down) and returns immediately. It decorates a single note rather than connecting two different notes. Upper neighbor = step up then back. Lower neighbor = step down then back.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Double neighbor&mdash;surround the chord tone from both sides. Change the melody to <code>"g4 ab4 f4 g4"</code>. Up, then down, then home. The chord tone gets bracketed.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: SUSPENSION ============ -->
+<section id="suspension">
+<h2><span class="num">01</span>Suspension</h2>
+
+<p>A suspension holds a note from the previous chord into the new chord. The held note clashes, then resolves downward. First, a clean chord change with no suspension:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>clean chord change &mdash; G7 to Cmaj7</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(25)
+cat(
+  note("[g2,b2,d3,f3]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3),
+  note("[c3,e3,g3,b3]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>G7 to Cmaj7. Every note resolves at once. Now add a 4-3 suspension&mdash;the F from G7 holds into the C chord before dropping to E:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>4-3 suspension &mdash; F hangs over into C</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(25)
+cat(
+  note("[g2,b2,d3,f3]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3),
+  note("[c3,f3,g3,b3]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3),
+  note("[c3,e3,g3,b3]").s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Three stages. <strong>Preparation</strong>: F is a chord tone in G7&mdash;it belongs. <strong>Suspension</strong>: F hangs over into the C chord, creating a sus4 clash against E. <strong>Resolution</strong>: F drops to E. The tension and release happen within the chord change. The F is technically a non-chord tone in the C chord, but it got there by staying put, not by moving.</p>
+
+<div class="concept">
+    <span class="c-label">suspension</span>
+    <p>A <strong>suspension</strong> is a note from the previous chord held into the new chord, creating a dissonance that resolves downward by step. Named by the interval of the clash and its resolution: <strong>4-3 sus</strong> (the 4th resolves to the 3rd), <strong>7-6 sus</strong>, <strong>9-8 sus</strong>. When the resolution goes up instead of down, it&rsquo;s called a <strong>retardation</strong>.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try a 7-6 suspension. Hold B from Cmaj7 into an Am chord: <code>cat(note("[c3,e3,g3,b3]"), note("[a2,e3,b3,c4]"), note("[a2,e3,a3,c4]"))</code>. Apply the same <code>.s("sawtooth").lpf(1000).attack(0.1).sustain(0.8).release(0.3).gain(0.3)</code> to each. The B clashes against Am, then resolves down to A.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 2: PEDAL POINT ============ -->
+<section id="pedal">
+<h2><span class="num">02</span>Pedal Point</h2>
+
+<p>A pedal point is a sustained or repeated note&mdash;usually the bass&mdash;that holds while the harmony changes above it. You&rsquo;ve been doing this without knowing. Every time you played a drone under different chords, that was a pedal point. C pedal, chords moving above:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>tonic pedal &mdash; C holds under changing chords</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2a">
+    <!--
+setcpm(35)
+stack(
+  note("c2").s("sine").sustain(0.8).gain(0.7),
+  note("<[c3,eb3,g3] [f3,ab3,c4] [ab2,c3,eb3] [g2,b2,d3]>")
+    .s("sawtooth").lpf(800).attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8).gain(0.25)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The bass holds C while the chords change. When the chord is Cm, the bass agrees. When it&rsquo;s Fm or Ab, the C clashes. When it&rsquo;s G, the C is a dissonant 4th against the root. The bass is an anchor. The harmony pulls against it.</p>
+
+<div class="concept">
+    <span class="c-label">pedal point</span>
+    <p>A <strong>pedal point</strong> is a sustained or repeated note (usually the root or fifth) held against changing harmony. Creates tension when the harmony moves away and resolution when it returns. Named after organ pedals&mdash;organists held bass notes with their feet while playing chords with their hands.</p>
+</div>
+
+<p>Now a dominant pedal. Hold G under changing chords&mdash;this builds tension toward resolution:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>dominant pedal &mdash; G builds tension</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2b">
+    <!--
+setcpm(35)
+stack(
+  note("g1").s("sine").sustain(0.8).gain(0.7),
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth").lpf(800).attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8).gain(0.25)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The G pedal creates increasing tension as chords move away from G, then maximum alignment when G major arrives. Dominant pedal = building toward resolution. Tonic pedal = holding ground.</p>
+
+<h3>Appoggiatura and anticipation</h3>
+
+<p>Two more types, briefly. An <strong>appoggiatura</strong> leaps TO a dissonance, then resolves by step. Different from a neighbor tone, which steps to the dissonance. An <strong>anticipation</strong> arrives at the next chord&rsquo;s note early, before the chord actually changes. A melody with both, over the phonk progression:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>appoggiaturas and anticipations in context</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-2c">
+    <!--
+setcpm(35)
+stack(
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth").lpf(800).attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8).gain(0.25),
+  note("<[c4 d4 eb4 g4] [ab3 bb3 c4 eb4] [d4 c4 bb3 f4] [b3 a3 g3 d4]>")
+    .s("sawtooth").lpf(2000).decay(0.06).sustain(0)
+    .gain(0.3).pan(0.6)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Some of those melody notes are chord tones. Some are passing tones. Some are neighbors. Some are appoggiaturas&mdash;the leaps to d4 in bar 1 and f4 in bar 3 land on dissonances that resolve by step. You can identify each one now.</p>
+
+<div class="concept">
+    <span class="c-label">appoggiatura / anticipation</span>
+    <p><strong>Appoggiatura</strong>: a dissonance approached by leap (not step) that resolves by step. Dramatic emphasis&mdash;it arrives with force. <strong>Anticipation</strong>: arriving at the next chord&rsquo;s note before the chord changes. Eagerness. Each non-chord tone type has a specific recipe: how you arrive + how you leave.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole &mdash; the vocabulary of tension</summary>
+    <div class="rh-body">
+        <h4>Every type of non-chord tone</h4>
+        <p>Each type is defined by two things: how you arrive at the dissonance and how you leave it. That&rsquo;s the whole system.</p>
+
+        <table>
+            <thead><tr><th>type</th><th>approach</th><th>leave</th><th>character</th></tr></thead>
+            <tbody>
+            <tr><td>Passing tone</td><td>step</td><td>step (same direction)</td><td>smooth connection</td></tr>
+            <tr><td>Neighbor</td><td>step</td><td>step (opposite direction)</td><td>decoration</td></tr>
+            <tr><td>Suspension</td><td>held from prev chord</td><td>step down</td><td>tension-release</td></tr>
+            <tr><td>Retardation</td><td>held from prev chord</td><td>step up</td><td>tension-release (upward)</td></tr>
+            <tr><td>Appoggiatura</td><td>leap</td><td>step</td><td>dramatic emphasis</td></tr>
+            <tr><td>Escape tone</td><td>step</td><td>leap (opposite direction)</td><td>surprising exit</td></tr>
+            <tr><td>Anticipation</td><td>any</td><td>held into next chord</td><td>eagerness</td></tr>
+            <tr><td>Pedal point</td><td>sustained</td><td>sustained</td><td>anchor / tension</td></tr>
+            </tbody>
+        </table>
+
+        <p>Passing tones and neighbors are the most common. Suspensions and appoggiaturas are the most dramatic. Anticipations are subtle. Escape tones are rare and unpredictable&mdash;they step into a dissonance and leap away in the opposite direction, like changing your mind mid-sentence.</p>
+
+        <p>Pedal point is the outlier. It&rsquo;s not a single melodic event but a sustained structural device. Everything else is one note long. A pedal point can last bars.</p>
+
+        <h4>How to identify them</h4>
+        <p>For any note that sounds dissonant against the current chord, ask two questions. How did it arrive? (Step, leap, or held over?) How does it leave? (Step up, step down, leap, or held?) The answers give you the type. Every dissonance in tonal music fits one of these eight categories.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 3: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">03</span>Non-Chord Tones</h2>
+
+<div class="punchline">
+    <p><strong>Phonk track with a melody that uses every non-chord tone type from this lesson.</strong> C pedal point in the bass. Passing tones, neighbors, appoggiaturas in the lead. The full vocabulary of tension, deliberate and stacked.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: non-chord tones</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9),
+  s("~ ~ ~ ~ cp ~ ~ ~").room(0.3).size(0.5).gain(0.85),
+  s("hh*16").gain("0.3 0.5 0.3 0.8").pan(0.35),
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4)
+    .delay(0.2).delaytime(0.125).delayfeedback(0.3).pan(0.6),
+  note("c2").s("sine").sustain(0.8).gain(0.6),
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth").lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8).gain(0.2),
+  note("<[c4 d4 eb4 ~ g4 ab4 g4 ~] [ab3 ~ c4 d4 eb4 ~ c4 bb3] [bb3 c4 d4 ~ f4 eb4 d4 ~] [g3 ~ b3 c4 d4 ~ b3 ~]>")
+    .s("sawtooth").lpf(2000).decay(0.06).sustain(0)
+    .gain(0.3).pan(0.65)
+    .delay(0.1).delaytime(0.125).delayfeedback(0.15)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>C pedal point in the bass&mdash;it holds through all four chords. Bar 1: d4 is a passing tone between c4 and eb4, ab4 is an upper neighbor to g4. Bar 2: the c4 at the end anticipates the Bb chord. Bar 3: f4 leaps in as an appoggiatura, resolves down to eb4. Bar 4: b3 is a chord tone in G, the d4 connects by step. The full vocabulary in action.</p>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Add a suspension: in bar 4, hold the f4 from bar 3 before resolving to d4. Try <code>[g3 ~ f4 d4 b3 ~ g3 ~]</code> for bar 4&mdash;the f4 clashes against G major and resolves down.</li>
+        <li>Replace the tonic pedal (<code>note("c2")</code>) with a dominant pedal (<code>note("g1")</code>). Hear how the tension changes&mdash;the bass pulls toward resolution instead of anchoring.</li>
+        <li>Write a melody using only neighbor tones on each chord&rsquo;s 5th. Bar 1: <code>[g4 ab4 g4 ~ g4 f4 g4 ~]</code>. Bar 2: <code>[eb4 f4 eb4 ~ eb4 d4 eb4 ~]</code>. Nothing but decoration.</li>
+        <li>Share it. The track has drums, bass drone, pad, and a melody built from the tension vocabulary.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>neighbor tone (upper)</td><td>step up from chord tone, return</td><td><code>g4 ab4 g4</code></td></tr>
+        <tr><td>neighbor tone (lower)</td><td>step down from chord tone, return</td><td><code>g4 f4 g4</code></td></tr>
+        <tr><td>double neighbor</td><td>surround chord tone from both sides</td><td><code>g4 ab4 f4 g4</code></td></tr>
+        <tr><td>suspension (4-3)</td><td>hold note from prev chord, resolve down</td><td><code>[c3,f3,g3,b3]</code> &rarr; <code>[c3,e3,g3,b3]</code></td></tr>
+        <tr><td>suspension (7-6)</td><td>hold 7th from prev chord, resolve down</td><td>B held into Am &rarr; resolves to A</td></tr>
+        <tr><td>suspension (9-8)</td><td>hold 9th from prev chord, resolve down</td><td>same mechanism, higher interval</td></tr>
+        <tr><td>retardation</td><td>like suspension, but resolves up</td><td>held note &rarr; step up</td></tr>
+        <tr><td>pedal point (tonic)</td><td>hold root under changing harmony</td><td><code>note("c2").s("sine")</code></td></tr>
+        <tr><td>pedal point (dominant)</td><td>hold 5th under changing harmony</td><td><code>note("g1").s("sine")</code></td></tr>
+        <tr><td>appoggiatura</td><td>leap to dissonance, resolve by step</td><td>leap to f4 &rarr; step to eb4</td></tr>
+        <tr><td>anticipation</td><td>arrive at next chord&rsquo;s note early</td><td>c4 before Bb chord</td></tr>
+        <tr><td>escape tone</td><td>step to dissonance, leap away</td><td>step in, leap out opposite</td></tr>
+        </tbody>
+    </table>
+    <div class="concept" style="margin: 1rem 0 0; border-radius: 6px;">
+        <span class="c-label">non-chord tone checklist</span>
+        <p>Every non-chord tone is defined by two things: how it arrives and how it leaves. Passing tone = step in, step out same direction. Neighbor = step out, step back. Suspension = held, resolve down. Appoggiatura = leap in, step out. Anticipation = early arrival. Pedal = sustained anchor. Know the recipe, identify the tension.</p>
+    </div>
+    <p class="earned-next">Next: <em>Diatonic Harmony</em> &mdash; continue to 9d: Cadences + Form.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The names for non-chord tones come from 18th-century counterpoint. The sounds themselves have been used since people first sang against a drone.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Suspensions in Renaissance polyphony</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The suspension &mdash; holding a note from one chord into the next, creating a dissonance that resolves &mdash; was a core expressive device in Renaissance and Baroque music. Palestrina&rsquo;s masses (1560s&ndash;1590s) use chains of suspensions to create a flowing, ethereal texture. Bach&rsquo;s chorales (1700s&ndash;1740s) systematized suspensions into 4-3, 7-6, and 9-8 types. The suspension is still the most dramatic non-chord tone &mdash; it creates and resolves tension in a single gesture.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Pedal point in organ music</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The sustained bass note (pedal point) gets its name from organ pedals &mdash; the large bass keys played with the feet. Organists would hold a bass note while changing chords with their hands. Bach&rsquo;s Toccata and Fugue in D minor opens over a dominant pedal. In modern production, the &ldquo;drone&rdquo; serves the same function &mdash; EDM buildups over a sustained bass note are pedal points.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Gauldin, <em>A Practical Approach to 18th-Century Counterpoint</em> (2013); Williams, <em>The Organ Music of J.S. Bach</em> (2003).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(3, 0.06, 0.8)
+            .color(0.2, 0.6, 1.0)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.2)
+            .modulateScale(
+                h.osc(7, 0.08).rotate(0.4),
+                () => 0.15 + window._audioData.fft[1] * 0.4
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.3)
+            .saturate(() => 0.6 + window._audioData.fft[2] * 1.2)
+            .kaleid(() => 4 + Math.floor(window._audioData.fft[3] * 3))
+            .contrast(1.4)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>

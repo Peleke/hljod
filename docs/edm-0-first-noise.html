@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en"><head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EDM.0 — First Noise</title>
+<title>EDM.0: First Noise</title>
 <style>
 :root {
     --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
@@ -274,7 +274,7 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 <!-- ============ HERO ============ -->
 <section id="hero">
 <h1>First <span class="accent">Noise</span></h1>
-<div class="subtitle">EDM.0 &mdash; the part where you make sound come out of the computer</div>
+<div class="subtitle">EDM.0: the part where you make sound come out of the computer</div>
 
 <p>Strudel is a live coding instrument in your browser. Type a pattern, press play, and sound comes out.
 No install. Runs in a tab.</p>
@@ -334,7 +334,7 @@ Fewer sounds, more time each.</p>
 <div class="concept">
     <span class="c-label">pattern</span>
     <p>What you just played is a <em>pattern</em>: events spread across a repeating cycle.
-    Sounds, notes, effects: everything in strudel is a pattern. The cycle is the clock.</p>
+    Sounds, notes, effects. Everything in strudel is a pattern. The cycle is the clock.</p>
 </div>
 </section>
 
@@ -377,7 +377,7 @@ s("hh*8")
 
 <h3>Rest: leave a gap</h3>
 
-<p>Tilde <code>~</code> holds a slot open but plays nothing. Without gaps, everything runs together. The rest gives each hit space.</p>
+<p>Tilde <code>~</code> holds a slot open but plays nothing. Without gaps, everything runs together.</p>
 
 <div class="strudel-block">
     <div class="strudel-label"><span>kick, gap, snare, gap</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
@@ -391,10 +391,10 @@ s("bd ~ sd ~")
 <h3>Euclidean: let math place the hits</h3>
 
 <p><code>(3,8)</code> distributes three kicks as evenly as possible across eight slots.
-The math picks the spacing. It ends up sounding good because even distribution tends to.</p>
+The math picks the spacing. Even distribution tends to sound good.</p>
 
 <div class="strudel-block">
-    <div class="strudel-label"><span>three in eight &mdash; euclidean</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <div class="strudel-label"><span>three in eight: euclidean</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
     <strudel-editor id="ed-2d">
     <!--
 s("bd(3,8)")
@@ -410,7 +410,7 @@ s("bd(3,8)")
 
 <!-- Euclidean rabbit hole -->
 <details class="rabbit-hole">
-    <summary>rabbit hole &mdash; euclidean rhythms, the algorithm, and 500 years of rhythm</summary>
+    <summary>rabbit hole: euclidean rhythms, the algorithm, and 500 years of rhythm</summary>
     <div class="rh-body">
         <h4>E(3,8): the tresillo</h4>
         <p>Hear that pattern you just played? That&rsquo;s the tresillo. Three hits, eight slots, spaced as evenly as possible.</p>
@@ -424,6 +424,7 @@ s("bd(3,8)")
                 <button class="eucl-btn" data-k="7" data-n="12" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">(7,12)</button>
                 <button class="eucl-btn" data-k="5" data-n="16" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">(5,16)</button>
                 <button class="eucl-btn" data-k="7" data-n="16" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">(7,16)</button>
+                <button id="eucl-play" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">&#9654; animate</button>
             </div>
             <svg id="euclidean-svg" viewBox="0 0 300 300" width="300" height="300" style="display:block; margin: 0 auto;">
                 <rect width="300" height="300" fill="#141418" rx="6"/>
@@ -431,6 +432,7 @@ s("bd(3,8)")
                 <g id="eucl-arcs"></g>
                 <g id="eucl-labels"></g>
                 <g id="eucl-dots"></g>
+                <g id="eucl-playhead"></g>
             </svg>
             <p style="font-family: 'SF Mono', monospace; font-size: 0.75rem; color: #8a8780; text-align: center; margin-top: 0.5rem;" id="eucl-binary"></p>
         </div>
@@ -441,9 +443,6 @@ s("bd(3,8)")
                 if (k >= n) return Array(n).fill(1);
                 if (k === 0) return Array(n).fill(0);
 
-                // Two groups: 'front' (k copies of [1]) and 'back' (n-k copies of [0])
-                // Each round, append one back-group to each front-group until
-                // the smaller side is consumed. Leftovers become the new 'back'.
                 let front = Array.from({length: k}, () => [1]);
                 let back  = Array.from({length: n - k}, () => [0]);
 
@@ -464,30 +463,63 @@ s("bd(3,8)")
                 return front.concat(back).flat();
             }
 
-            function slotPos(i, n, cx, cy, r) {
+            const cx = 150, cy = 150, r = 110;
+            const svgNS = 'http://www.w3.org/2000/svg';
+
+            // --- Shared state for animation ---
+            let currentPattern = [];
+            let currentN = 8;
+            let euclPlaying = false;
+            let euclStep = 0;
+            let euclInterval = null;
+            let euclAudioCtx = null;
+
+            function slotPos(i, n, cxV, cyV, rV) {
                 const angle = (i / n) * Math.PI * 2 - Math.PI / 2;
                 return {
-                    x: cx + r * Math.cos(angle),
-                    y: cy + r * Math.sin(angle)
+                    x: cxV + rV * Math.cos(angle),
+                    y: cyV + rV * Math.sin(angle)
                 };
             }
 
-            function arcPath(p1, p2, r, largeArc) {
-                return `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
+            function arcPath(p1, p2, rV, largeArc) {
+                return `M ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${rV} ${rV} 0 ${largeArc} 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)}`;
             }
 
+            // --- Web Audio click ---
+            function playClick(freq, vol) {
+                if (!euclAudioCtx) {
+                    var ACtor = window._OrigAC || window.AudioContext || window.webkitAudioContext;
+                    euclAudioCtx = new ACtor();
+                }
+                var actx = euclAudioCtx;
+                var osc = actx.createOscillator();
+                var gain = actx.createGain();
+                osc.connect(gain);
+                gain.connect(actx.destination);
+                osc.frequency.value = freq;
+                gain.gain.value = vol;
+                osc.start();
+                gain.gain.exponentialRampToValueAtTime(0.001, actx.currentTime + 0.05);
+                osc.stop(actx.currentTime + 0.06);
+            }
+
+            // --- Draw the euclidean circle ---
             function drawEuclidean(k, n) {
                 const pattern = bjorklund(k, n);
-                const cx = 150, cy = 150, r = 110;
-                const svgNS = 'http://www.w3.org/2000/svg';
+                currentPattern = pattern;
+                currentN = n;
+
                 const arcsG = document.getElementById('eucl-arcs');
                 const labelsG = document.getElementById('eucl-labels');
                 const dotsG = document.getElementById('eucl-dots');
+                const playheadG = document.getElementById('eucl-playhead');
                 const binaryEl = document.getElementById('eucl-binary');
 
                 arcsG.innerHTML = '';
                 labelsG.innerHTML = '';
                 dotsG.innerHTML = '';
+                playheadG.innerHTML = '';
 
                 // show binary pattern
                 binaryEl.textContent = '[' + pattern.map(v => v ? 'x' : '.').join(' ') + ']';
@@ -505,7 +537,6 @@ s("bd(3,8)")
                     const p1 = slotPos(from, n, cx, cy, r);
                     const p2 = slotPos(to, n, cx, cy, r);
 
-                    // calculate steps between hits (wrapping)
                     const steps = (to - from + n) % n;
                     const largeArc = steps > n / 2 ? 1 : 0;
 
@@ -517,7 +548,6 @@ s("bd(3,8)")
                     path.setAttribute('opacity', '0.5');
                     arcsG.appendChild(path);
 
-                    // interval label at midpoint of arc
                     const midIdx = from + steps / 2;
                     const labelR = r + 18;
                     const labelPos = slotPos(midIdx, n, cx, cy, labelR);
@@ -534,23 +564,29 @@ s("bd(3,8)")
                     labelsG.appendChild(text);
                 }
 
-                // draw dots
+                // draw dots — each gets a data-index for animation targeting
                 for (let i = 0; i < n; i++) {
                     const pos = slotPos(i, n, cx, cy, r);
                     const isHit = pattern[i] === 1;
                     const circle = document.createElementNS(svgNS, 'circle');
                     circle.setAttribute('cx', pos.x.toFixed(2));
                     circle.setAttribute('cy', pos.y.toFixed(2));
+                    circle.setAttribute('data-index', i);
 
                     if (isHit) {
                         circle.setAttribute('r', n > 12 ? '6' : '8');
                         circle.setAttribute('fill', '#ff6b35');
+                        circle.setAttribute('data-hit', '1');
+                        circle.setAttribute('data-base-r', n > 12 ? '6' : '8');
                     } else {
                         circle.setAttribute('r', n > 12 ? '4' : '6');
                         circle.setAttribute('fill', 'none');
                         circle.setAttribute('stroke', '#8a8780');
                         circle.setAttribute('stroke-width', '1.5');
+                        circle.setAttribute('data-hit', '0');
+                        circle.setAttribute('data-base-r', n > 12 ? '4' : '6');
                     }
+                    circle.style.transition = 'r 0.08s ease, fill 0.08s ease, stroke 0.08s ease';
                     dotsG.appendChild(circle);
 
                     // beat 1 label
@@ -567,9 +603,165 @@ s("bd(3,8)")
                         dotsG.appendChild(label);
                     }
                 }
+
+                // draw initial playhead (hidden until animation starts)
+                var phLine = document.createElementNS(svgNS, 'line');
+                phLine.setAttribute('id', 'eucl-ph-line');
+                phLine.setAttribute('x1', cx);
+                phLine.setAttribute('y1', cy);
+                var initPos = slotPos(0, n, cx, cy, r);
+                phLine.setAttribute('x2', initPos.x.toFixed(2));
+                phLine.setAttribute('y2', initPos.y.toFixed(2));
+                phLine.setAttribute('stroke', '#4fc3f7');
+                phLine.setAttribute('stroke-width', '1.5');
+                phLine.setAttribute('opacity', '0');
+                phLine.style.transition = 'opacity 0.2s ease';
+                playheadG.appendChild(phLine);
+
+                var phDot = document.createElementNS(svgNS, 'circle');
+                phDot.setAttribute('id', 'eucl-ph-dot');
+                phDot.setAttribute('cx', initPos.x.toFixed(2));
+                phDot.setAttribute('cy', initPos.y.toFixed(2));
+                phDot.setAttribute('r', '5');
+                phDot.setAttribute('fill', '#4fc3f7');
+                phDot.setAttribute('opacity', '0');
+                phDot.style.transition = 'opacity 0.2s ease';
+                playheadG.appendChild(phDot);
+
+                // If animation is running, reset step and show playhead
+                if (euclPlaying) {
+                    euclStep = 0;
+                    phLine.setAttribute('opacity', '0.6');
+                    phDot.setAttribute('opacity', '1');
+                }
             }
 
-            // button handlers
+            // --- Playhead animation ---
+            function movePlayhead(step) {
+                var pos = slotPos(step, currentN, cx, cy, r);
+                var phLine = document.getElementById('eucl-ph-line');
+                var phDot = document.getElementById('eucl-ph-dot');
+                if (phLine) {
+                    phLine.setAttribute('x2', pos.x.toFixed(2));
+                    phLine.setAttribute('y2', pos.y.toFixed(2));
+                }
+                if (phDot) {
+                    phDot.setAttribute('cx', pos.x.toFixed(2));
+                    phDot.setAttribute('cy', pos.y.toFixed(2));
+                }
+            }
+
+            function flashDot(step) {
+                var dotsG = document.getElementById('eucl-dots');
+                var dots = dotsG.querySelectorAll('circle[data-index]');
+                // Reset all dots to their base state
+                dots.forEach(function(d) {
+                    var baseR = parseFloat(d.getAttribute('data-base-r'));
+                    var isHit = d.getAttribute('data-hit') === '1';
+                    d.setAttribute('r', baseR);
+                    if (isHit) {
+                        d.setAttribute('fill', '#ff6b35');
+                    } else {
+                        d.setAttribute('fill', 'none');
+                        d.setAttribute('stroke', '#8a8780');
+                    }
+                });
+                // Flash the current step
+                var current = dotsG.querySelector('circle[data-index="' + step + '"]');
+                if (!current) return;
+                var isHit = current.getAttribute('data-hit') === '1';
+                var baseR = parseFloat(current.getAttribute('data-base-r'));
+                if (isHit) {
+                    // Hit: big flash, bright white-yellow
+                    current.setAttribute('r', baseR + 5);
+                    current.setAttribute('fill', '#ffffff');
+                    setTimeout(function() {
+                        current.setAttribute('r', baseR);
+                        current.setAttribute('fill', '#ff6b35');
+                    }, 80);
+                } else {
+                    // Rest: no flash, just move the playhead silently
+                    // (only active beats flash)
+                    return;
+                    /* disabled dim pulse:
+                    current.setAttribute('r', baseR + 2);
+                    current.setAttribute('fill', '#4fc3f744');
+                    current.setAttribute('stroke', '#4fc3f7');
+                    setTimeout(function() {
+                        current.setAttribute('r', baseR);
+                        current.setAttribute('fill', 'none');
+                        current.setAttribute('stroke', '#8a8780');
+                    }, 80);
+                    */
+                }
+            }
+
+            function advancePlayhead() {
+                movePlayhead(euclStep);
+                flashDot(euclStep);
+                // Sound: hit = loud high click, rest = nothing
+                if (currentPattern[euclStep] === 1) {
+                    playClick(800, 0.3);
+                }
+                euclStep = (euclStep + 1) % currentN;
+            }
+
+            function resetPlayhead() {
+                euclStep = 0;
+                var phLine = document.getElementById('eucl-ph-line');
+                var phDot = document.getElementById('eucl-ph-dot');
+                if (phLine) phLine.setAttribute('opacity', '0');
+                if (phDot) phDot.setAttribute('opacity', '0');
+                // Reset all dots
+                var dotsG = document.getElementById('eucl-dots');
+                var dots = dotsG.querySelectorAll('circle[data-index]');
+                dots.forEach(function(d) {
+                    var baseR = parseFloat(d.getAttribute('data-base-r'));
+                    var isHit = d.getAttribute('data-hit') === '1';
+                    d.setAttribute('r', baseR);
+                    if (isHit) {
+                        d.setAttribute('fill', '#ff6b35');
+                    } else {
+                        d.setAttribute('fill', 'none');
+                        d.setAttribute('stroke', '#8a8780');
+                    }
+                });
+            }
+
+            function toggleEuclidean() {
+                var btn = document.getElementById('eucl-play');
+                if (euclPlaying) {
+                    clearInterval(euclInterval);
+                    euclPlaying = false;
+                    btn.innerHTML = '&#9654; animate';
+                    btn.style.borderColor = '#1e1e24';
+                    btn.style.color = '#8a8780';
+                    btn.style.background = '#141418';
+                    resetPlayhead();
+                } else {
+                    euclPlaying = true;
+                    euclStep = 0;
+                    btn.innerHTML = '&#9632; stop';
+                    btn.style.borderColor = '#4fc3f7';
+                    btn.style.color = '#4fc3f7';
+                    btn.style.background = '#4fc3f722';
+                    // Show playhead
+                    var phLine = document.getElementById('eucl-ph-line');
+                    var phDot = document.getElementById('eucl-ph-dot');
+                    if (phLine) phLine.setAttribute('opacity', '0.6');
+                    if (phDot) phDot.setAttribute('opacity', '1');
+                    // Immediately fire first step
+                    advancePlayhead();
+                    euclInterval = setInterval(function() {
+                        advancePlayhead();
+                    }, 150);
+                }
+            }
+
+            // --- Wire up the play button ---
+            document.getElementById('eucl-play').addEventListener('click', toggleEuclidean);
+
+            // --- Pattern button handlers ---
             const euclBtns = document.querySelectorAll('.eucl-btn');
             euclBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -583,7 +775,18 @@ s("bd(3,8)")
                     btn.style.background = '#ff6b3533';
                     const k = parseInt(btn.getAttribute('data-k'));
                     const n = parseInt(btn.getAttribute('data-n'));
-                    drawEuclidean(k, n);
+                    // If playing, stop the old interval, redraw, and restart
+                    if (euclPlaying) {
+                        clearInterval(euclInterval);
+                        drawEuclidean(k, n);
+                        euclStep = 0;
+                        advancePlayhead();
+                        euclInterval = setInterval(function() {
+                            advancePlayhead();
+                        }, 150);
+                    } else {
+                        drawEuclidean(k, n);
+                    }
                 });
             });
 
@@ -615,7 +818,7 @@ s("bd(3,8)")
         <p><code>(3,8,2)</code> is the same three hits, started from a different position. Same necklace, different downbeat. The tresillo and the son clave are rotations of each other. Same math, different groove.</p>
 
         <div class="strudel-block">
-            <div class="strudel-label"><span>rotation comparison &mdash; same hits, different start</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <div class="strudel-label"><span>rotation comparison: same hits, different start</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
             <strudel-editor id="ed-rh-euclidean">
             <!--
 stack(
@@ -642,10 +845,10 @@ s("bd <sd cp> hh oh")
 </div>
 
 <div class="concept">
-    <span class="c-label">mini-notation &mdash; the short version</span>
+    <span class="c-label">mini-notation: the short version</span>
     <p><code>[ ]</code> subdivide &bull; <code>*N</code> multiply &bull; <code>~</code> rest &bull;
     <code>(k,n)</code> euclidean &bull; <code>&lt; &gt;</code> alternate</p>
-    <p>Five tools. Every rhythm you&rsquo;ve heard uses some combination of these.</p>
+    <p>Five tools. Every rhythm in this course uses some combination of these.</p>
 </div>
 
 </section>
@@ -697,12 +900,12 @@ stack(
     </strudel-editor>
 </div>
 
-<p>C in the second octave. <code>.s("sawtooth")</code> swaps the sample for a synthesizer, a raw buzzy wave.
+<p>C in the second octave. <code>.s("sawtooth")</code> is a synthesizer instead of a sample. Raw, buzzy wave.
 <code>.lpf(500)</code> chops the harsh highs. <code>.decay()</code> and <code>.sustain(0)</code> make it short and punchy.</p>
 
 <!-- Synth/filter rabbit hole -->
 <details class="rabbit-hole">
-    <summary>rabbit hole &mdash; samples vs synths, wave shapes, and filters</summary>
+    <summary>rabbit hole: samples vs synths, wave shapes, and filters</summary>
     <div class="rh-body">
         <h4>Samples vs synths</h4>
         <p><code>s()</code> plays a recording. Someone hit a drum, we play it back. <code>note()</code> generates a wave from scratch. No recording, just math. Samples sound &ldquo;real.&rdquo; Synths sound &ldquo;electronic.&rdquo; Both are patterns.</p>
@@ -937,7 +1140,7 @@ stack(
 <div class="concept">
     <span class="c-label">method chaining</span>
     <p>Chain effects with dots: <code>note("c2").s("sawtooth").lpf(500)</code>.
-    Each one adds something: sound, filter, envelope. Order barely matters.</p>
+    Each dot adds something: sound, filter, envelope. Order barely matters.</p>
 </div>
 </section>
 
@@ -946,7 +1149,7 @@ stack(
 <h2><span class="num">04</span>Your First Loop</h2>
 
 <div class="punchline">
-    <p>Everything from this lesson, combined. Play it, wreck it, rebuild it until it sounds like <em>yours</em>.
+    <p>Everything so far, combined. Play it, wreck it, rebuild it until it sounds like <em>yours</em>.
     Then hit <em>share</em>.</p>
 </div>
 
@@ -970,7 +1173,7 @@ stack(
 </div>
 
 <div class="exercises">
-    <span class="ex-label">compose &mdash; make it yours</span>
+    <span class="ex-label">compose: make it yours</span>
     <ol>
         <li>Rewrite the bass line. Try <code>note("&lt;c2 [c2 eb2] f2 [eb2 c2]&gt;")</code></li>
         <li>Add a layer (a euclidean clap): <code>s("cp(3,8)").gain(.4)</code></li>
@@ -990,19 +1193,19 @@ stack(
         <tr><td>stack()</td><td>layers patterns on top of each other</td><td><code>stack(s("bd"), s("hh*8"))</code></td></tr>
         <tr><td>[ ]</td><td>subdivides a slot (crams sounds in)</td><td><code>s("bd [sd sd]")</code></td></tr>
         <tr><td>*N</td><td>repeats a sound N times in one slot</td><td><code>s("hh*8")</code></td></tr>
-        <tr><td>~</td><td>rest &mdash; holds the slot silent</td><td><code>s("bd ~ sd ~")</code></td></tr>
-        <tr><td>(k,n)</td><td>euclidean &mdash; distributes k hits across n slots</td><td><code>s("bd(3,8)")</code></td></tr>
+        <tr><td>~</td><td>rest: holds the slot silent</td><td><code>s("bd ~ sd ~")</code></td></tr>
+        <tr><td>(k,n)</td><td>euclidean: distributes k hits across n slots</td><td><code>s("bd(3,8)")</code></td></tr>
         <tr><td>&lt; &gt;</td><td>alternates options, one per cycle</td><td><code>s("bd &lt;sd cp&gt;")</code></td></tr>
         <tr><td>.method()</td><td>chains effects onto a pattern</td><td><code>.lpf(500).gain(.5)</code></td></tr>
         <tr><td>.s()</td><td>sets the sound source (sample or synth type)</td><td><code>.s("sawtooth")</code></td></tr>
         <tr><td>.gain()</td><td>sets volume (0 to 1+)</td><td><code>.gain(.5)</code></td></tr>
-        <tr><td>.lpf()</td><td>low-pass filter &mdash; cuts frequencies above cutoff</td><td><code>.lpf(500)</code></td></tr>
+        <tr><td>.lpf()</td><td>low-pass filter: cuts frequencies above cutoff</td><td><code>.lpf(500)</code></td></tr>
         <tr><td>.decay()</td><td>how fast the sound drops from peak</td><td><code>.decay(.15)</code></td></tr>
         <tr><td>.sustain()</td><td>level the sound holds at after decay</td><td><code>.sustain(0)</code></td></tr>
         <tr><td>sawtooth</td><td>a bright, buzzy synthesizer wave</td><td><code>.s("sawtooth")</code></td></tr>
         </tbody>
     </table>
-    <p class="earned-next">Next: <em>The Break</em> &mdash; 170bpm, half-time snare, an actual DnB beat.</p>
+    <p class="earned-next">Next: <em>The Break</em>. 170bpm, half-time snare, an actual DnB beat.</p>
     </div>
 </details>
 
@@ -1023,6 +1226,37 @@ stack(
         <tr><td>?</td><td>degrade</td><td>50% chance of silence</td><td><code>s("hh*8?")</code></td></tr>
         </tbody>
     </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td>Kraftwerk</td><td>Numbers (1981)</td><td>(electronic) minimal pattern construction from drum machine loops</td></tr>
+        <tr><td>Derrick May</td><td>Strings of Life (1987)</td><td>(electro) a piano loop becomes a complete dance track</td></tr>
+        <tr><td>New Order</td><td>Blue Monday (1983)</td><td>(synth-pop) programmed loop as the whole song</td></tr>
+        <tr><td>Afrika Bambaataa</td><td>Planet Rock (1982)</td><td>(electro) Kraftwerk samples fused with the South Bronx, bridging D&uuml;sseldorf to hip-hop</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The idea of repeating patterns as music predates electronics by centuries &mdash; player pianos, music boxes, barrel organs. But the electronic loop changed everything.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Karlheinz Stockhausen and tape loops (1950s)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">In 1952&ndash;53 at the WDR studio in Cologne, Stockhausen created <em>Studie I</em> and <em>Studie II</em> &mdash; the first purely electronic compositions, built from sine wave generators and tape splicing. He demonstrated that sound could be constructed, not just recorded. His student Holger Czukay went on to found Can. His ideas directly influenced Kraftwerk.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Kraftwerk and the sequencer (1970s)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Ralf H&uuml;tter and Florian Schneider built custom instruments &mdash; the Synthanorma sequencer could store 32 steps and repeat them. <em>Trans-Europe Express</em> (1977) and <em>Computer World</em> (1981) proved that machine repetition wasn&rsquo;t cold &mdash; it was hypnotic. Afrika Bambaataa sampled &ldquo;Numbers&rdquo; and &ldquo;Trans-Europe Express&rdquo; for &ldquo;Planet Rock&rdquo; (1982), connecting D&uuml;sseldorf to the South Bronx.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Detroit techno (1980s)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Juan Atkins, Derrick May, and Kevin Saunderson &mdash; the Belleville Three &mdash; heard Kraftwerk on late-night radio in Detroit and fused it with Parliament-Funkadelic. Atkins: &ldquo;I just thought it was some cool shit from outer space.&rdquo; May&rsquo;s &ldquo;Strings of Life&rdquo; (1987) demonstrated that a programmed loop could carry the emotional weight of a live performance.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Stockhausen, <em>Studie II</em> (1954); Bussy, <em>Kraftwerk: Man, Machine and Music</em> (2004); Sicko, <em>Techno Rebels</em> (2010); Reynolds, S. <em>Energy Flash</em> (1998).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
     </div>
 </details>
 </section>
