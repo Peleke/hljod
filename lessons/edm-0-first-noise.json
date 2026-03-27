@@ -1,0 +1,230 @@
+{
+  "id": "edm-0",
+  "slug": "edm-0-first-noise",
+  "title": "First Noise",
+  "titleAccent": "Noise",
+  "subtitle": "patterns · mini-notation · the smallest meaningful sounds in history",
+  "track": "edm",
+  "order": 0,
+  "repertoire": {
+    "pieces": [
+      {
+        "title": "Chest Opening Jingle",
+        "composer": "Koji Kondo",
+        "game": "The Legend of Zelda",
+        "year": 1986,
+        "concept": "4 notes ascending. Every human alive recognizes it. The smallest meaningful musical gesture. This is what sequencing sounds like."
+      },
+      {
+        "title": "Coin Sound",
+        "composer": "Koji Kondo",
+        "game": "Super Mario Bros.",
+        "year": 1985,
+        "concept": "Two notes. A reward signal burned into collective memory. Pitch, duration, and why sound design is composition."
+      }
+    ],
+    "why": "Before you can write a symphony you need to write 4 notes that mean something. Kondo did it in 1986 and 40 years later you still hear it in your sleep."
+  },
+  "dirdug": {
+    "node": "rome",
+    "nodeUrl": "https://grymoire.peleke.me/nodes/rome",
+    "composition": "Sparse koto pattern. 3-4 notes placed in silence. The first gesture of The North Atlantic.",
+    "technique": "Pattern placement. Where you put sounds matters more than which sounds you pick."
+  },
+  "grymoire": {
+    "essay": "A Song, an Heir, and the Ruler of All",
+    "url": "https://grymoire.peleke.me/nodes/rome",
+    "connection": "Rome is where the journey starts. The first sound of the Ðirðug score mirrors the first essay: a single gesture that sets everything in motion."
+  },
+  "sections": [
+    {
+      "id": "hear-it",
+      "num": "01",
+      "title": "Hear It First",
+      "blocks": [
+        {
+          "type": "text",
+          "content": "<p>Press play. Don't read anything else yet.</p>"
+        },
+        {
+          "type": "strudel",
+          "editorId": "ed-zelda-chest",
+          "editorLabel": "the chest opens",
+          "code": "note(\"c4 e4 g4 c5\").s(\"triangle\").gain(0.6)"
+        },
+        {
+          "type": "text",
+          "content": "<p>You just played the Zelda chest opening jingle. Four notes. Ascending. Koji Kondo wrote this in 1986. You heard it and your brain went <em>I found something valuable</em>. That's what a pattern does.</p><p>Now this one:</p>"
+        },
+        {
+          "type": "strudel",
+          "editorId": "ed-mario-coin",
+          "editorLabel": "coin",
+          "code": "note(\"b4 e5\").s(\"triangle\").gain(0.5)"
+        },
+        {
+          "type": "text",
+          "content": "<p>Two notes. The Mario coin. You've heard this ten thousand times. It means <em>you got something</em>. Two notes, and they carry meaning.</p><p>That's composition. Sounds placed in time that make a human feel something.</p>"
+        },
+        {
+          "type": "concept",
+          "variant": "cool",
+          "label": "What just happened",
+          "content": "<p><code>note(\"c4 e4 g4 c5\")</code> is a <strong>pattern</strong>. It tells Strudel <em>which</em> notes to play and <em>in what order</em>. The notes cycle through one per beat. That's all a pattern is: a sequence of events in time.</p>"
+        }
+      ]
+    },
+    {
+      "id": "pattern-language",
+      "num": "02",
+      "title": "The Pattern Language",
+      "blocks": [
+        {
+          "type": "text",
+          "content": "<p>Strudel's mini-notation is how you write patterns. Let's take the Zelda jingle apart.</p>"
+        },
+        {
+          "type": "strudel",
+          "editorId": "ed-zelda-slow",
+          "editorLabel": "one note per cycle",
+          "code": "note(\"c4\").s(\"triangle\")"
+        },
+        {
+          "type": "text",
+          "content": "<p>One note. Repeating. That's a pattern with one event. Now add the second:</p>"
+        },
+        {
+          "type": "strudel",
+          "editorId": "ed-zelda-two",
+          "editorLabel": "two notes",
+          "code": "note(\"c4 e4\").s(\"triangle\")"
+        },
+        {
+          "type": "text",
+          "content": "<p>Two notes. They split the cycle evenly. Each gets half the time. Add the third and fourth:</p>"
+        },
+        {
+          "type": "strudel",
+          "editorId": "ed-zelda-four",
+          "editorLabel": "the full jingle",
+          "code": "note(\"c4 e4 g4 c5\").s(\"triangle\").gain(0.6)"
+        },
+        {
+          "type": "concept",
+          "variant": "cool",
+          "label": "Mini-notation",
+          "content": "<p>Spaces separate events. More events = each one gets less time. <code>\"c4 e4 g4 c5\"</code> means four notes, evenly spaced across one cycle. This is <strong>mini-notation</strong>. Strudel's way of writing rhythmic sequences in a single string.</p>"
+        },
+        {
+          "type": "try-this",
+          "label": "Try this",
+          "content": "<p>Change <code>c5</code> to <code>e5</code>. What happens to the feeling? Now try <code>g3</code> instead. The pattern is the same (four notes, evenly spaced) but the <em>pitch</em> changes everything.</p>"
+        },
+        {
+          "type": "text",
+          "content": "<p>Now let's get percussive:</p>"
+        },
+        {
+          "type": "strudel",
+          "editorId": "ed-drums-basic",
+          "editorLabel": "your first beat",
+          "code": "s(\"bd hh sd hh\")"
+        },
+        {
+          "type": "text",
+          "content": "<p><code>s()</code> instead of <code>note()</code>. This plays <strong>samples</strong> instead of synth notes. <code>bd</code> is a kick drum. <code>hh</code> is a hi-hat. <code>sd</code> is a snare. Same pattern logic: four events, evenly spaced.</p>"
+        },
+        {
+          "type": "try-this",
+          "label": "Try this",
+          "content": "<p>Swap <code>sd</code> for <code>cp</code> (clap). Try <code>\"bd bd sd bd\"</code>. Try <code>\"bd hh sd hh bd hh sd oh\"</code>. Eight events now. Double-time. The pattern language is the same. Only the density changes.</p>"
+        }
+      ]
+    },
+    {
+      "id": "stacking",
+      "num": "03",
+      "title": "Stack It",
+      "blocks": [
+        {
+          "type": "text",
+          "content": "<p>One pattern is a melody. Two patterns playing at the same time is a <em>texture</em>. Strudel uses <code>stack()</code> to play multiple patterns simultaneously.</p>"
+        },
+        {
+          "type": "strudel",
+          "editorId": "ed-stack-zelda",
+          "editorLabel": "zelda + rhythm",
+          "code": "stack(\n  note(\"c4 e4 g4 c5\").s(\"triangle\").gain(0.5),\n  s(\"bd hh sd hh\")\n)"
+        },
+        {
+          "type": "text",
+          "content": "<p>The Zelda jingle over a basic beat. Two layers. This is how all music works. Independent voices happening at the same time. A melody doesn't exist alone. It exists <em>against</em> something.</p>"
+        },
+        {
+          "type": "concept",
+          "variant": "warm",
+          "label": "Repertoire note: Kondo's method",
+          "content": "<p>Koji Kondo composed on the NES. 5 audio channels: 2 pulse waves, 1 triangle, 1 noise, 1 sample. Every sound in every Nintendo game came from those 5 voices. You're working with the same idea. <code>stack()</code> lets you layer voices, but each one has to earn its place.</p>"
+        },
+        {
+          "type": "try-this",
+          "label": "Try this",
+          "content": "<p>Add a third layer: <code>note(\"c3\").s(\"sawtooth\").lpf(400)</code>. A low filtered bass note. Feel how it changes the weight of everything above it.</p>"
+        }
+      ]
+    },
+    {
+      "id": "dirdug-composition",
+      "num": "04",
+      "title": "The Score Begins",
+      "blocks": [
+        {
+          "type": "text",
+          "content": "<p>Every lesson in this course builds a piece of music for <a href=\"https://grymoire.peleke.me\" style=\"color: var(--accent)\">Ðirðug: The Long Road North</a>. A documentary expedition. Rome to Atlanta. Germanic migrations, traced in reverse.</p><p>Your first composition: three or four koto-like notes placed in silence. The beginning of <em>The North Atlantic</em>. The crossing between Norway and Iceland, the passage Guðríður made a thousand years ago in an open ship.</p>"
+        },
+        {
+          "type": "strudel",
+          "editorId": "ed-dirdug-0",
+          "editorLabel": "the north atlantic: first gesture",
+          "code": "note(\"e4 ~ ~ b3 ~ ~ g4 ~\")\n  .sound(\"gm_koto\")\n  .gain(0.4)\n  .room(0.8)\n  .delay(0.5).delaytime(0.375).delayfeedback(0.4)"
+        },
+        {
+          "type": "text",
+          "content": "<p>Sparse. Mostly silence. The <code>~</code> is a rest, a deliberate gap. The delay and room let each note ring out and decay into the space around it. This is the sound of open water.</p><p>This is the seed. Over the next 7 lessons, you'll add a pulse, a drone, a second voice, and effects. By Lesson 7, you'll have a finished 60-90 second piece.</p>"
+        },
+        {
+          "type": "try-this",
+          "label": "Your turn",
+          "content": "<p>Change the notes. Keep the silences. The <code>~</code> rests are doing as much work as the notes. Try <code>\"a3 ~ ~ ~ d4 ~ ~ e4\"</code>. Try your own. Find 3-4 notes that feel like grey water and distance.</p>"
+        }
+      ]
+    },
+    {
+      "id": "capstone",
+      "num": "05",
+      "title": "Your First Loop",
+      "blocks": [
+        {
+          "type": "text",
+          "content": "<p>Put it all together. A beat, a melody, and your Ðirðug sketch layered on top. This is yours. Change anything. Break it. Fix it. Share it.</p>"
+        },
+        {
+          "type": "strudel",
+          "editorId": "ed-capstone",
+          "editorLabel": "capstone: share this",
+          "code": "stack(\n  // your beat\n  s(\"bd ~ sd ~\"),\n  // zelda-inspired melody\n  note(\"c4 e4 g4 c5\").s(\"triangle\").gain(0.4),\n  // your dirdug sketch\n  note(\"e4 ~ ~ b3 ~ ~ g4 ~\")\n    .sound(\"gm_koto\").gain(0.3)\n    .room(0.7).delay(0.4).delaytime(0.375).delayfeedback(0.3)\n)"
+        },
+        {
+          "type": "exercises",
+          "label": "Before you go",
+          "items": [
+            "Replace the Zelda melody with the Mario coin (<code>note(\"b4 e5\")</code>). How does 2 notes vs 4 change the feel?",
+            "Write a 6-note pattern of your own. No theory. Just notes that sound good to you.",
+            "Remove the beat entirely. Just the Ðirðug sketch alone. Does it stand on its own?",
+            "Share your capstone. Hit the share button and post it."
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -490,10 +490,11 @@ stack(
     <strudel-editor id="ed-dirdug-0">
 <!--
 note("e4 ~ ~ b3 ~ ~ g4 ~")
-  .sound("gm_koto")
+  .s("pluck")
   .gain(0.4)
+  .delay(0.5)
+  .delaytime(0.75)
   .room(0.8)
-  .delay(0.5).delaytime(0.375).delayfeedback(0.4)
 -->
     </strudel-editor>
 </div>
@@ -502,6 +503,11 @@ note("e4 ~ ~ b3 ~ ~ g4 ~")
 <div class="try-this">
     <span class="label">Your turn</span>
     <p>Change the notes. Keep the silences. The <code>~</code> rests are doing as much work as the notes. Try <code>"a3 ~ ~ ~ d4 ~ ~ e4"</code>. Try your own. Find 3-4 notes that feel like grey water and distance.</p>
+</div>
+
+<div class="concept warm">
+    <span class="c-label">Grymoire connection</span>
+    <p>This composition scores Node 17 of Ðirðug: <em>The North Atlantic</em>. "The sea between Norway and Iceland. Guðríður crossed it a thousand years ago in an open ship." The music and the essay grow together. Read the full node at <a href="https://grymoire.peleke.me" style="color: var(--accent)">grymoire.peleke.me</a>.</p>
 </div>
 </section>
 
@@ -528,8 +534,8 @@ stack(
   note("c4 e4 g4 c5").s("triangle").gain(0.4),
   // your dirdug sketch
   note("e4 ~ ~ b3 ~ ~ g4 ~")
-    .sound("gm_koto").gain(0.3)
-    .room(0.7).delay(0.4).delaytime(0.375).delayfeedback(0.3)
+    .s("pluck").gain(0.3)
+    .delay(0.4).delaytime(0.75).room(0.7)
 )
 -->
     </strudel-editor>

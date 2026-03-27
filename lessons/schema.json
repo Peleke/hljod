@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "hljóð lesson data schema. Each lesson is a JSON file that the build script stamps into the HTML template.",
+  "type": "object",
+  "required": ["id", "slug", "title", "subtitle", "track", "order", "sections"],
+  "properties": {
+    "id": { "type": "string", "description": "Unique lesson identifier, e.g. 'edm-0'" },
+    "slug": { "type": "string", "description": "URL slug, e.g. 'edm-0-first-noise'" },
+    "title": { "type": "string", "description": "Display title, e.g. 'First Noise'" },
+    "titleAccent": { "type": "string", "description": "Word to highlight in accent color" },
+    "subtitle": { "type": "string", "description": "Mono subtitle line" },
+    "track": { "type": "string", "enum": ["edm", "blues", "jazz", "classical"] },
+    "order": { "type": "number" },
+    "repertoire": {
+      "type": "object",
+      "properties": {
+        "pieces": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": { "type": "string" },
+              "composer": { "type": "string" },
+              "game": { "type": "string" },
+              "year": { "type": "number" },
+              "concept": { "type": "string", "description": "What this piece teaches" }
+            }
+          }
+        },
+        "why": { "type": "string", "description": "Why these pieces for this lesson" }
+      }
+    },
+    "dirdug": {
+      "type": "object",
+      "description": "Parallel Ðirðug composition track",
+      "properties": {
+        "node": { "type": "string", "description": "Which Ðirðug node this scores" },
+        "nodeUrl": { "type": "string", "description": "Link to the node on grymoire" },
+        "composition": { "type": "string", "description": "What you add to the piece this lesson" },
+        "technique": { "type": "string", "description": "The technique being applied" }
+      }
+    },
+    "grymoire": {
+      "type": "object",
+      "description": "Link back to Grymoire essay/content",
+      "properties": {
+        "essay": { "type": "string", "description": "Related essay title" },
+        "url": { "type": "string", "description": "URL on grymoire.peleke.me" },
+        "connection": { "type": "string", "description": "How the music connects to the essay" }
+      }
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "blocks"],
+        "properties": {
+          "id": { "type": "string" },
+          "num": { "type": "string", "description": "Display number, e.g. '01'" },
+          "title": { "type": "string" },
+          "blocks": {
+            "type": "array",
+            "description": "Content blocks in order",
+            "items": {
+              "type": "object",
+              "required": ["type"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["text", "strudel", "concept", "try-this", "exercises", "rabbit-hole", "repertoire-ref"]
+                },
+                "content": { "type": "string", "description": "HTML content for text/concept/try-this blocks" },
+                "label": { "type": "string", "description": "Label for concept/try-this boxes" },
+                "variant": { "type": "string", "enum": ["cool", "warm"], "description": "Concept box color" },
+                "code": { "type": "string", "description": "Strudel code for editor blocks" },
+                "editorId": { "type": "string" },
+                "editorLabel": { "type": "string" },
+                "piece": { "type": "string", "description": "For repertoire-ref: which piece this references" },
+                "items": { "type": "array", "items": { "type": "string" }, "description": "For exercises" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
