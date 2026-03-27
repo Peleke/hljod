@@ -276,24 +276,12 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 <!-- ============ HERO ============ -->
 <section id="hero">
 <h1>The <span class="accent">Break</span></h1>
-<div class="subtitle">EDM.1: rhythm, groove, and the 170bpm pocket</div>
+<div class="subtitle">EDM.1: 170bpm and the half-time snare</div>
 
 <p>Drum &amp; bass is fast drums with a slow groove. 170bpm, but the snare only hits once a bar.</p>
 
-<p>You&rsquo;ll build a breakbeat from scratch: kick, snare, hats. One piece at a time,
-then stack them. By the end, you&rsquo;ll hear why Metroid and Mega Man feel the way they do.</p>
-
-<div class="concept">
-    <span class="c-label">repertoire for this lesson</span>
-    <p><strong>Brinstar</strong> &mdash; Hirokazu Tanaka (Metroid, 1986). A driving pulse built from almost nothing. The NES had no sampled drums. Tanaka made rhythm from noise channels and pitch bends. This is what groove sounds like under constraint.</p>
-    <p><strong>Dr. Wily Stage 1</strong> &mdash; Takashi Tateishi (Mega Man 2, 1988). The greatest 8-bit groove ever written. Syncopated, relentless, and composed on hardware that could barely make drums at all. Teaches what happens when rhythm is the melody.</p>
-    <p><em>Both tracks run at roughly 150-170bpm. Both use half-time feel. Both were composed on 5 audio channels. The DnB breakbeat you&rsquo;re about to build comes from the same lineage.</em></p>
-</div>
-
-<div class="concept warm">
-    <span class="c-label">ðirðug composition track</span>
-    <p><strong>Add a slow, deep pulse underneath the koto pattern from L0.</strong> Not a beat. A heartbeat. The North Atlantic doesn&rsquo;t need drums. It needs weight.</p>
-</div>
+<p>You&rsquo;ll build a DnB breakbeat from scratch: kick, snare, hats. One piece at a time,
+then stack them.</p>
 
 <div class="concept warm">
     <span class="c-label">what you already know</span>
@@ -301,17 +289,6 @@ then stack them. By the end, you&rsquo;ll hear why Metroid and Mega Man feel the
     (<code>[] * ~ () &lt;&gt;</code>), method chaining (<code>.lpf()</code>, <code>.gain()</code>,
     <code>.decay()</code>, <code>.sustain()</code>), and the <code>sawtooth</code> synth.
     All from EDM.0.</p>
-</div>
-
-<div class="concept">
-    <span class="c-label">listening list</span>
-    <p><strong>Before you start:</strong> Listen to these. All of them use rhythm as the primary compositional tool.</p>
-    <p>&bull; <strong>Metroid &mdash; Brinstar</strong> (Hirokazu Tanaka, 1986)</p>
-    <p>&bull; <strong>Mega Man 2 &mdash; Dr. Wily Stage 1</strong> (Takashi Tateishi, 1988)</p>
-    <p>&bull; <strong>The Winstons &mdash; Amen, Brother</strong> (1969) &mdash; the 6-second drum solo that built half of electronic music</p>
-    <p>&bull; <strong>Goldie &mdash; Inner City Life</strong> (1994) &mdash; the amen break chopped, stretched, and turned into art</p>
-    <p>&bull; <strong>LTJ Bukem &mdash; Music</strong> (1996) &mdash; atmospheric DnB, the gentle side of 170bpm</p>
-    <p style="font-size: 0.8rem; color: var(--text-faint); margin-top: 0.5rem;">Spotify playlist coming soon.</p>
 </div>
 </section>
 
@@ -506,67 +483,6 @@ s("bd ~ sd ~")
     <p>A break is a looped drum pattern. The kit is the set of sounds. A bar is 4 beats.
     Slots subdivide the bar. That&rsquo;s enough to build a DnB break.</p>
 </div>
-
-<h3>Repertoire: hear rhythm in the wild</h3>
-
-<p>Before we build ours, listen to how two NES composers solved the same problem: making rhythm feel alive on hardware that barely had drums.</p>
-
-<p><strong>Metroid &mdash; Brinstar</strong> (Hirokazu Tanaka, 1986). The NES noise channel is the only thing resembling percussion. Tanaka builds the groove from pitched noise bursts and bass note rhythm. The pulse IS the bassline. Play this approximation:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>brinstar (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-brinstar">
-    <!--
-setcpm(37.5)
-stack(
-  s("hh*8").gain(".3 .6 .3 .8 .3 .6 .3 1"),
-  note("e2 ~ e2 ~ g2 ~ e2 ~").s("sawtooth").lpf(300).decay(.15).sustain(0),
-  s("~ ~ ~ ~ bd ~ ~ ~")
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p><strong>Mega Man 2 &mdash; Dr. Wily Stage 1</strong> (Takashi Tateishi, 1988). The rhythm is inseparable from the melody. The driving pulse comes from the triangle channel bass and the noise channel hi-hats. Listen to how the bass rhythm carries the whole groove:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>wily stage 1 (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-wily">
-    <!--
-setcpm(37.5)
-stack(
-  s("hh*16").gain(".3 .5 .3 .7 .3 .5 .3 .9"),
-  s("bd ~ ~ ~ bd ~ ~ ~ bd ~ ~ ~ bd ~ [~ bd] ~"),
-  note("e3 e3 b3 e3 e3 b3 e3 g3").s("triangle").gain(.6)
-)
-    -->
-    </strudel-editor>
-</div>
-
-<div class="concept warm">
-    <span class="c-label">the constraint</span>
-    <p>Both composers had 5 channels. No sampled drums. No effects. Tanaka and Tateishi made rhythm from noise and pitch. That&rsquo;s what you&rsquo;re learning: rhythm isn&rsquo;t about having a drum kit. It&rsquo;s about where you put the weight.</p>
-</div>
-
-<h3>Japanese rhythm: the spaces between</h3>
-
-<p>Japanese traditional music treats silence differently. In <em>ma</em> (&#38291;), the space between notes is as important as the notes themselves. A taiko pattern breathes. A koto arpeggio floats. Compare this with the driving DnB groove you&rsquo;re about to build:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>taiko-inspired pulse</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-taiko">
-    <!--
-setcpm(25)
-stack(
-  s("bd ~ ~ bd ~ ~ bd ~").gain(".9 0 0 .6 0 0 1 0"),
-  note("e4 ~ ~ ~ b3 ~ ~ ~").sound("gm_koto").gain(.35).room(.6)
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p>Slower. Sparser. The rests do the work. This is the other end of rhythm from DnB, and it&rsquo;s what your &ETH;ir&eth;ug composition is drawing from. Both traditions understand that where you <em>don&rsquo;t</em> put a hit matters as much as where you do.</p>
-
 </section>
 
 <!-- ============ SECTION 1: THE TEMPO ============ -->
@@ -879,31 +795,6 @@ stack(
     </ol>
 </div>
 
-<h3>The Score Continues</h3>
-
-<p>Add a pulse underneath your koto sketch from L0. Not a beat. A heartbeat:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>the north atlantic: adding weight</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-dirdug-1">
-    <!--
-setcpm(15)
-stack(
-  // koto from L0
-  note("e4 ~ ~ b3 ~ ~ g4 ~")
-    .sound("gm_koto").gain(0.35)
-    .room(0.8).delay(0.5).delaytime(0.375).delayfeedback(0.4),
-  // the pulse: a low, filtered thud
-  note("e2 ~ ~ ~ ~ ~ e2 ~")
-    .s("sawtooth").lpf(200).decay(.4).sustain(0).gain(0.5)
-    .room(0.6)
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p>Slow. Deep. The koto floats above it. The pulse is the ocean underneath. Two layers now.</p>
-
 <details class="earned">
     <summary>what you earned</summary>
     <div class="earned-body">
@@ -936,8 +827,6 @@ stack(
     <table>
         <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
         <tbody>
-        <tr><td style="color: var(--accent);">Hirokazu Tanaka</td><td>Metroid &mdash; Brinstar (1986)</td><td>(game) rhythm from noise channels. The NES as percussion instrument.</td></tr>
-        <tr><td style="color: var(--accent);">Takashi Tateishi</td><td>Mega Man 2 &mdash; Dr. Wily Stage 1 (1988)</td><td>(game) the greatest 8-bit groove. Rhythm IS the melody.</td></tr>
         <tr><td>The Winstons</td><td>Amen, Brother (1969)</td><td>(breakbeat) the 7-second break that built jungle and DnB</td></tr>
         <tr><td>Shy FX &amp; UK Apache</td><td>Original Nuttah (1994)</td><td>(jungle) chopped amen + dancehall, crossover jungle</td></tr>
         <tr><td>Roni Size / Reprazent</td><td>Brown Paper Bag (1997)</td><td>(DnB) live bass over programmed breaks</td></tr>
