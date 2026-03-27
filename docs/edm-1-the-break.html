@@ -262,6 +262,7 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
     <a href="#kick">Kick</a>
     <a href="#snare">Snare</a>
     <a href="#hats">Hats</a>
+    <a href="#rhythm-space">Space</a>
     <a href="#capstone">Capstone</a>
 </div></nav>
 
@@ -278,41 +279,17 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 <h1>The <span class="accent">Break</span></h1>
 <div class="subtitle">EDM.1: rhythm, groove, and the 170bpm pocket</div>
 
-<p>Drum &amp; bass is fast drums with a slow groove. 170bpm, but the snare only hits once a bar.</p>
+<p>Drum &amp; bass is fast drums with a slow groove. 170bpm, but the snare only hits once a bar.
+You&rsquo;ll build a DnB breakbeat from scratch: kick, snare, hats. One piece at a time, then stack them.</p>
 
-<p>You&rsquo;ll build a breakbeat from scratch: kick, snare, hats. One piece at a time,
-then stack them. By the end, you&rsquo;ll hear why Metroid and Mega Man feel the way they do.</p>
-
-<div class="concept">
-    <span class="c-label">repertoire for this lesson</span>
-    <p><strong>Brinstar</strong> &mdash; Hirokazu Tanaka (Metroid, 1986). A driving pulse built from almost nothing. The NES had no sampled drums. Tanaka made rhythm from noise channels and pitch bends. This is what groove sounds like under constraint.</p>
-    <p><strong>Dr. Wily Stage 1</strong> &mdash; Takashi Tateishi (Mega Man 2, 1988). The greatest 8-bit groove ever written. Syncopated, relentless, and composed on hardware that could barely make drums at all. Teaches what happens when rhythm is the melody.</p>
-    <p><em>Both tracks run at roughly 150-170bpm. Both use half-time feel. Both were composed on 5 audio channels. The DnB breakbeat you&rsquo;re about to build comes from the same lineage.</em></p>
-</div>
-
-<div class="concept warm">
-    <span class="c-label">ðirðug composition track</span>
-    <p><strong>Add a slow, deep pulse underneath the koto pattern from L0.</strong> Not a beat. A heartbeat. The North Atlantic doesn&rsquo;t need drums. It needs weight.</p>
-</div>
-
-<div class="concept warm">
-    <span class="c-label">what you already know</span>
-    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, mini-notation
-    (<code>[] * ~ () &lt;&gt;</code>), method chaining (<code>.lpf()</code>, <code>.gain()</code>,
-    <code>.decay()</code>, <code>.sustain()</code>), and the <code>sawtooth</code> synth.
-    All from EDM.0.</p>
-</div>
-
-<div class="concept">
-    <span class="c-label">listening list</span>
-    <p><strong>Before you start:</strong> Listen to these. All of them use rhythm as the primary compositional tool.</p>
-    <p>&bull; <strong>Metroid &mdash; Brinstar</strong> (Hirokazu Tanaka, 1986)</p>
-    <p>&bull; <strong>Mega Man 2 &mdash; Dr. Wily Stage 1</strong> (Takashi Tateishi, 1988)</p>
-    <p>&bull; <strong>The Winstons &mdash; Amen, Brother</strong> (1969) &mdash; the 6-second drum solo that built half of electronic music</p>
-    <p>&bull; <strong>Goldie &mdash; Inner City Life</strong> (1994) &mdash; the amen break chopped, stretched, and turned into art</p>
-    <p>&bull; <strong>LTJ Bukem &mdash; Music</strong> (1996) &mdash; atmospheric DnB, the gentle side of 170bpm</p>
-    <p style="font-size: 0.8rem; color: var(--text-faint); margin-top: 0.5rem;">Spotify playlist coming soon.</p>
-</div>
+<details class="earned">
+    <summary>about this lesson</summary>
+    <div class="earned-body">
+    <p><strong>Repertoire:</strong> <em>Brinstar</em> (Hirokazu Tanaka, Metroid, 1986) and <em>Dr. Wily Stage 1</em> (Takashi Tateishi, Mega Man 2, 1988). Two NES composers who made rhythm feel alive on hardware that barely had drums.</p>
+    <p><strong>Parallel composition:</strong> Adding a slow pulse underneath the koto pattern from L0. The &ETH;ir&eth;ug score grows.</p>
+    <p><strong>What you already know:</strong> <code>s()</code>, <code>note()</code>, <code>stack()</code>, mini-notation (<code>[] * ~ () &lt;&gt;</code>), method chaining (<code>.lpf()</code>, <code>.gain()</code>, <code>.decay()</code>, <code>.sustain()</code>), and the <code>sawtooth</code> synth. All from EDM.0.</p>
+    </div>
+</details>
 </section>
 
 <!-- ============ SECTION 0: THE KIT ============ -->
@@ -346,6 +323,41 @@ That loop is &ldquo;the break.&rdquo;</p>
         <p>The Amen break (a 6-second drum solo from 1969 by The Winstons) is the backbone of jungle and early DnB. Nearly every breakbeat in the genre traces back to it. Chopped, timestretched, pitched, layered. That one solo became the most sampled loop in music history.</p>
 
         <p style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0;">History adapted from u/GardenerInAWar on r/DnB and Wikipedia&rsquo;s History of Drum and Bass.</p>
+    </div>
+</details>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: the NES sound chip &mdash; 5 voices that built a generation</summary>
+    <div class="rh-body">
+        <h4>The Ricoh 2A03</h4>
+        <p>Every sound in every NES game came from 5 channels:</p>
+        <table>
+            <thead><tr><th>channel</th><th>type</th><th>what it does</th></tr></thead>
+            <tbody>
+            <tr><td>Pulse 1</td><td>square wave</td><td>melody, lead, harmony. Variable duty cycle changes the timbre.</td></tr>
+            <tr><td>Pulse 2</td><td>square wave</td><td>same as Pulse 1. Two melody voices total. That&rsquo;s your polyphony budget.</td></tr>
+            <tr><td>Triangle</td><td>triangle wave</td><td>bass and soft leads. No volume control. It&rsquo;s either on or off.</td></tr>
+            <tr><td>Noise</td><td>pseudo-random noise</td><td>percussion, sound effects, atmosphere. Short bursts = hi-hats. Long bursts = snares.</td></tr>
+            <tr><td>DPCM</td><td>1-bit sample</td><td>low-quality sampled audio. Used sparingly for kicks and vocal shouts.</td></tr>
+            </tbody>
+        </table>
+
+        <h4>Two composers, same chip, different worlds</h4>
+        <p><strong>Koji Kondo</strong> (Mario, Zelda) used the noise channel as percussion. Clear beats. The triangle carries the bass. His music sounds like a band playing.</p>
+        <p><strong>Hirokazu Tanaka</strong> (Metroid) used the noise channel as atmosphere. Long noise sweeps, environmental texture. His music sounds like a place.</p>
+        <p>Same 5 channels. Kondo made you want to move. Tanaka made you afraid to.</p>
+
+        <h4>The hardware lineage</h4>
+        <table>
+            <thead><tr><th>system</th><th>year</th><th>channels</th><th>what changed</th></tr></thead>
+            <tbody>
+            <tr><td>NES</td><td>1983</td><td>5</td><td>the constraint era. Everything composed within 5 voices.</td></tr>
+            <tr><td>SNES</td><td>1990</td><td>8 (sampled)</td><td>the Sony SPC700 chip. Real instrument samples.</td></tr>
+            <tr><td>PS1</td><td>1994</td><td>24 (CD audio)</td><td>the constraint disappears. Game music becomes indistinguishable from film scores.</td></tr>
+            <tr><td>Modern</td><td>2000+</td><td>unlimited</td><td>full orchestras, live recording. The constraint is budget, not hardware.</td></tr>
+            </tbody>
+        </table>
+        <p>The NES era produced some of the most inventive composition in gaming history because there was nowhere to hide.</p>
     </div>
 </details>
 
@@ -506,148 +518,6 @@ s("bd ~ sd ~")
     <p>A break is a looped drum pattern. The kit is the set of sounds. A bar is 4 beats.
     Slots subdivide the bar. That&rsquo;s enough to build a DnB break.</p>
 </div>
-
-<h3>Less hits harder</h3>
-
-<p>Every great rhythm tradition figured out the same thing: where you <em>don&rsquo;t</em> put a hit matters as much as where you do. Four examples. Same principle.</p>
-
-<p><strong>1. Metroid &mdash; Brinstar</strong> (Hirokazu Tanaka, 1986). The NES noise channel is the only thing resembling percussion. Tanaka builds the groove from pitched noise bursts and bass note rhythm. The pulse IS the bassline:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>brinstar (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-brinstar">
-    <!--
-setcpm(37.5)
-stack(
-  s("hh*8").gain(".3 .6 .3 .8 .3 .6 .3 1"),
-  note("e2 ~ e2 ~ g2 ~ e2 ~").s("sawtooth").lpf(300).decay(.15).sustain(0),
-  s("~ ~ ~ ~ bd ~ ~ ~")
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p><strong>2. Mega Man 2 &mdash; Dr. Wily Stage 1</strong> (Takashi Tateishi, 1988). Same hardware. Different solution. The rhythm is inseparable from the melody. The bass carries the whole groove:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>wily stage 1 (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-wily">
-    <!--
-setcpm(37.5)
-stack(
-  s("hh*16").gain(".3 .5 .3 .7 .3 .5 .3 .9"),
-  s("bd ~ ~ ~ bd ~ ~ ~ bd ~ ~ ~ bd ~ [~ bd] ~"),
-  note("e3 e3 b3 e3 e3 b3 e3 g3").s("triangle").gain(.6)
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p><strong>3. Taiko</strong>. A tradition 2000 years older than the NES. A taiko ensemble might use 3 drums. The player who hits less isn&rsquo;t playing less. They&rsquo;re composing with air:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>taiko-inspired pulse</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-taiko">
-    <!--
-setcpm(25)
-stack(
-  s("bd ~ ~ bd ~ ~ bd ~").gain(".9 0 0 .6 0 0 1 0"),
-  note("e4 ~ ~ ~ b3 ~ ~ ~").sound("gm_koto").gain(.35).room(.6)
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p><strong>4. Your composition</strong>. Three notes, a delay line, and mostly silence. The seed from L0:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>the north atlantic (from L0)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-dirdug-recall">
-    <!--
-note("e4 ~ ~ b3 ~ ~ g4 ~")
-  .sound("gm_koto").gain(0.35)
-  .room(0.8).delay(0.5).delaytime(0.375).delayfeedback(0.4)
-    -->
-    </strudel-editor>
-</div>
-
-<div class="concept warm">
-    <span class="c-label">the thread</span>
-    <p>Tanaka had 5 channels. A taiko ensemble has 3 drums. You have 3 notes and a delay line. Constraint isn&rsquo;t a limitation. It&rsquo;s what makes you choose. Choosing is composing.</p>
-</div>
-
-<details class="rabbit-hole">
-    <summary>rabbit hole: ma (&#38291;) and the art of negative space</summary>
-    <div class="rh-body">
-        <h4>Not just music</h4>
-        <p><em>Ma</em> (&#38291;) is a Japanese concept of negative space. It appears in architecture (the empty room is the room), calligraphy (the space between strokes defines the character), theater (the pause in Noh drama that holds more tension than the action), and garden design (the rocks are placed to shape the emptiness between them).</p>
-
-        <h4>In music</h4>
-        <p>A taiko player who hits less is not playing less. The silence between strikes has rhythmic weight. A shakuhachi player breathes audibly between phrases. The breath is part of the piece. Compare this to Western classical music, where rests are often treated as absence. In <em>ma</em>, silence is presence.</p>
-
-        <h4>The Western connection: Debussy</h4>
-        <p>Claude Debussy attended the 1889 Paris Exposition and heard a Javanese gamelan ensemble. He came back and started writing music full of space, unresolved harmonics, and suspended time. <em>Pr&eacute;lude &agrave; l&rsquo;Apr&egrave;s-midi d&rsquo;un Faune</em> (1894) sounds nothing like the German Romantic tradition he was trained in. It sounds like someone who learned that silence has shape.</p>
-
-        <h4>In your composition</h4>
-        <p>The <code>~</code> rests in your koto pattern aren&rsquo;t gaps. They&rsquo;re structural. The delay and room effects extend each note into the silence around it. The space IS the piece. That&rsquo;s <em>ma</em>.</p>
-    </div>
-</details>
-
-<details class="rabbit-hole">
-    <summary>rabbit hole: taiko &mdash; 2000 years of hitting things with purpose</summary>
-    <div class="rh-body">
-        <h4>Origins</h4>
-        <p>Taiko drumming is at least 2000 years old. The earliest references are Shinto and Buddhist: temple drums marking time, calling communities, driving away evil spirits. The <em>wadaiko</em> (Japanese drum) is a ritual object before it&rsquo;s a musical instrument. The physical stance matters. The body posture, the breathing, the way you hold the <em>bachi</em> (sticks). Taiko is martial as much as musical.</p>
-
-        <h4>The modern reinvention</h4>
-        <p>In 1951, Daihachi Oguchi, a jazz drummer from Nagano, arranged traditional taiko patterns for a group ensemble. Before Oguchi, taiko was typically a solo instrument in ceremonial contexts. He invented <em>kumi-daiko</em>: the ensemble form. A jazz drummer reinvented a 2000-year-old tradition. One person bridging two worlds.</p>
-
-        <h4>The ensemble</h4>
-        <p>A kumi-daiko group might include: the <em>odaiko</em> (the massive barrel drum, felt in the chest), the <em>shime-daiko</em> (the small, high, tight one that keeps time), and the <em>nagado-daiko</em> (the mid-range workhorse). Three drums. The entire dynamic range of an orchestra. The players rotate, shout (<em>kakegoe</em>), and move. A taiko performance is visual, physical, and sonic simultaneously.</p>
-
-        <h4>Why this matters for you</h4>
-        <p>Taiko teaches something that grid-based electronic music forgets: a drum hit has weight based on the body behind it. When you program <code>.gain(".9 0 0 .6 0 0 1 0")</code>, you&rsquo;re approximating what a taiko player does with their arms. The dynamic pattern IS the rhythm, not just the timing.</p>
-    </div>
-</details>
-
-<details class="rabbit-hole">
-    <summary>rabbit hole: the NES sound chip &mdash; 5 voices that built a generation</summary>
-    <div class="rh-body">
-        <h4>The Ricoh 2A03</h4>
-        <p>Every sound in every NES game came from 5 channels:</p>
-        <table>
-            <thead><tr><th>channel</th><th>type</th><th>what it does</th></tr></thead>
-            <tbody>
-            <tr><td>Pulse 1</td><td>square wave</td><td>melody, lead, harmony. Variable duty cycle (12.5%, 25%, 50%, 75%) changes the timbre.</td></tr>
-            <tr><td>Pulse 2</td><td>square wave</td><td>same as Pulse 1. Two melody voices total. That&rsquo;s your polyphony budget.</td></tr>
-            <tr><td>Triangle</td><td>triangle wave</td><td>bass and soft leads. No volume control. It&rsquo;s either on or off. Kondo used it for Mario&rsquo;s bass.</td></tr>
-            <tr><td>Noise</td><td>pseudo-random noise</td><td>percussion, sound effects, atmosphere. Short bursts = hi-hats. Long bursts = snares. Tanaka used it for Brinstar&rsquo;s entire mood.</td></tr>
-            <tr><td>DPCM</td><td>1-bit sample</td><td>low-quality sampled audio. Used sparingly. The &ldquo;voice&rdquo; samples in some late NES games. Mostly for kicks and vocal shouts.</td></tr>
-            </tbody>
-        </table>
-
-        <h4>Two composers, same chip, different worlds</h4>
-        <p><strong>Koji Kondo</strong> (Mario, Zelda) used the noise channel as percussion. Clear beats. The triangle carries the bass. The two pulse channels handle melody and harmony. His music sounds like a band playing.</p>
-        <p><strong>Hirokazu Tanaka</strong> (Metroid) used the noise channel as atmosphere. Long noise sweeps, hissing, environmental texture. The percussion is minimal or absent. The triangle and pulse channels create drones and slow melodies. His music sounds like a place.</p>
-        <p>Same 5 channels. Kondo made you want to move. Tanaka made you afraid to.</p>
-
-        <h4>The hardware lineage</h4>
-        <table>
-            <thead><tr><th>system</th><th>year</th><th>channels</th><th>what changed</th></tr></thead>
-            <tbody>
-            <tr><td>NES</td><td>1983</td><td>5</td><td>the constraint era. Everything composed within 5 voices.</td></tr>
-            <tr><td>SNES</td><td>1990</td><td>8 (sampled)</td><td>the Sony SPC700 chip. Real instrument samples. Uematsu&rsquo;s FF6 sounds orchestral.</td></tr>
-            <tr><td>PS1</td><td>1994</td><td>24 (CD audio)</td><td>the constraint disappears. Uematsu records a real choir for FF7. Game music becomes indistinguishable from film scores.</td></tr>
-            <tr><td>Modern</td><td>2000+</td><td>unlimited</td><td>full orchestras, live recording, spatial audio. The constraint is now budget, not hardware.</td></tr>
-            </tbody>
-        </table>
-        <p>Every step up in hardware meant more voices. More voices meant less forced creativity per channel. The NES era produced some of the most inventive composition in gaming history because there was nowhere to hide. Every voice had to earn its place.</p>
-
-        <h4>The Strudel connection</h4>
-        <p>When you write <code>stack()</code> with 3 layers, you&rsquo;re working closer to Tanaka and Kondo than to a modern DAW producer with 100 tracks. That&rsquo;s not a limitation. That&rsquo;s the sweet spot.</p>
-    </div>
-</details>
-
 </section>
 
 <!-- ============ SECTION 1: THE TEMPO ============ -->
@@ -766,6 +636,26 @@ of that slot. It&rsquo;s not on a main beat. It&rsquo;s between beats. That off-
     <p>Move the ghost. Try <code>s("bd ~ ~ ~ ~ [~ bd] ~ ~")</code>. Or put it earlier:
     <code>s("bd ~ ~ ~ [~ bd] ~ ~ ~")</code>. Different placement, different pull.</p>
 </div>
+
+<h3>Repertoire: Tanaka&rsquo;s kick in Brinstar</h3>
+
+<p>Hirokazu Tanaka had the same tools you just used. NES noise channel for hi-hats, the triangle for bass. Listen to how he placed the kick in Brinstar. Sparse. Atmospheric. The bass note rhythm does most of the work:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>brinstar kick + bass (approximation, ~130bpm)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-brinstar">
+    <!--
+setcpm(32.5)
+stack(
+  s("~ ~ ~ ~ bd ~ ~ ~"),
+  note("a2 ~ a2 ~ c3 ~ a2 ~").s("triangle").gain(.6)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>One kick per bar. The bass carries the pulse. Tanaka didn&rsquo;t need more. Compare this to the DnB kick pattern you just built. Same idea: kick on the downbeat, space everywhere else. The bass fills in what the kick leaves out.</p>
+
 </section>
 
 <!-- ============ SECTION 3: THE SNARE ============ -->
@@ -862,6 +752,32 @@ stack(
         billions in music sales.</p>
     </div>
 </details>
+
+<h3>Repertoire: Tateishi&rsquo;s groove in Wily Stage 1</h3>
+
+<p>Takashi Tateishi composed Dr. Wily Stage 1 in C&#x266f; minor at 180bpm. That&rsquo;s fast. DnB territory. The snare pattern is half-time. The bass drives through root and fifth. The groove is inseparable from the melody:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>wily stage 1 (approximation, C#m, 180bpm)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-wily">
+    <!--
+setcpm(45)
+stack(
+  s("hh*16").gain(".3 .5 .3 .7 .3 .5 .3 .9"),
+  s("~ ~ ~ ~ sd ~ ~ ~"),
+  note("cs3 cs3 gs3 cs3 cs3 gs3 cs3 e3").s("triangle").gain(.6)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>180bpm. Half-time snare on beat 3. The bass IS the rhythm. Tateishi made the triangle channel do the work of both a bass guitar and a drummer. On 5 channels. In 1988.</p>
+
+<div class="try-this">
+    <span class="label">compare</span>
+    <p>Play the Brinstar approximation from earlier (scroll up), then play this one. Same hardware, same era. Tanaka made atmosphere. Tateishi made adrenaline. The difference is in the note density and tempo, not the tools.</p>
+</div>
+
 </section>
 
 <!-- ============ SECTION 4: THE HATS ============ -->
@@ -926,9 +842,189 @@ stack(
 </div>
 </section>
 
-<!-- ============ SECTION 5: CAPSTONE ============ -->
+<!-- ============ SECTION 5: RHYTHM AS SPACE ============ -->
+<section id="rhythm-space">
+<h2><span class="num">05</span>Rhythm as Space</h2>
+
+<p>You just built a dense groove. 16th-note hats, kick, snare, open hat. Now the opposite question: what happens when you take almost everything away?</p>
+
+<h3>Taiko: weight without density</h3>
+
+<p>A taiko ensemble might use 3 drums. The player who hits less isn&rsquo;t playing less. Listen:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>taiko-inspired pulse</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-taiko">
+    <!--
+setcpm(25)
+s("bd ~ ~ bd ~ ~ bd ~").gain(".9 0 0 .6 0 0 1 0")
+    -->
+    </strudel-editor>
+</div>
+
+<p>Slower. Three hits per bar. The rests carry as much weight as the strikes. Now add the koto on top:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>taiko + koto</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-taiko-koto">
+    <!--
+setcpm(25)
+stack(
+  s("bd ~ ~ bd ~ ~ bd ~").gain(".9 0 0 .6 0 0 1 0"),
+  note("e4 ~ ~ ~ b3 ~ ~ ~").sound("gm_koto").gain(.35)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Compare this to the 170bpm DnB break you just built. Same tools: <code>s()</code>, <code>.gain()</code>, <code>stack()</code>. The difference is density and tempo. The dense groove fills every slot. This one leaves most of them empty.</p>
+
+<!-- Ma visualization: two rhythm necklaces side by side -->
+<div style="display: flex; gap: 2rem; justify-content: center; margin: 2rem 0; flex-wrap: wrap;">
+    <!-- Dense: DnB pattern -->
+    <div style="text-align: center;">
+        <svg viewBox="0 0 160 160" width="140" height="140">
+            <circle cx="80" cy="80" r="65" fill="none" stroke="#1e1e24" stroke-width="1.5"/>
+            <!-- 16 slots, most filled -->
+            <circle cx="80" cy="15" r="5" fill="#ff6b35"/><!-- bd -->
+            <circle cx="116" cy="22" r="3" fill="#4fc3f7"/><!-- hh -->
+            <circle cx="141" cy="48" r="3" fill="#4fc3f7"/><!-- hh -->
+            <circle cx="145" cy="80" r="3" fill="#4fc3f7"/><!-- hh -->
+            <circle cx="141" cy="112" r="5" fill="#66bb6a"/><!-- sd -->
+            <circle cx="116" cy="138" r="3" fill="#4fc3f7"/><!-- hh -->
+            <circle cx="80" cy="145" r="3" fill="#4fc3f7"/><!-- hh -->
+            <circle cx="44" cy="138" r="3" fill="#4fc3f7"/><!-- hh -->
+            <circle cx="19" cy="112" r="3" fill="#4fc3f7"/><!-- hh -->
+            <circle cx="15" cy="80" r="3" fill="#4fc3f7"/><!-- hh -->
+            <circle cx="19" cy="48" r="3" fill="#4fc3f7"/><!-- hh -->
+            <circle cx="44" cy="22" r="3" fill="#4fc3f7"/><!-- hh -->
+        </svg>
+        <p style="font-family: 'SF Mono', monospace; font-size: 0.6rem; color: #8a8780; margin-top: 0.3rem;">DnB: dense. most slots filled.</p>
+    </div>
+    <!-- Sparse: taiko/koto pattern -->
+    <div style="text-align: center;">
+        <svg viewBox="0 0 160 160" width="140" height="140">
+            <circle cx="80" cy="80" r="65" fill="none" stroke="#1e1e24" stroke-width="1.5"/>
+            <!-- 8 slots, mostly empty -->
+            <circle cx="80" cy="15" r="6" fill="#ff6b35"/><!-- bd hit -->
+            <circle cx="145" cy="80" r="3" fill="#1e1e24" stroke="#5a584f" stroke-width="1"/><!-- rest -->
+            <circle cx="80" cy="145" r="3" fill="#1e1e24" stroke="#5a584f" stroke-width="1"/><!-- rest -->
+            <circle cx="15" cy="80" r="5" fill="#ff6b35" opacity=".6"/><!-- bd ghost -->
+            <circle cx="126" cy="30" r="3" fill="#1e1e24" stroke="#5a584f" stroke-width="1"/><!-- rest -->
+            <circle cx="126" cy="130" r="3" fill="#1e1e24" stroke="#5a584f" stroke-width="1"/><!-- rest -->
+            <circle cx="34" cy="130" r="5" fill="#ff6b35"/><!-- bd hit -->
+            <circle cx="34" cy="30" r="3" fill="#1e1e24" stroke="#5a584f" stroke-width="1"/><!-- rest -->
+        </svg>
+        <p style="font-family: 'SF Mono', monospace; font-size: 0.6rem; color: #8a8780; margin-top: 0.3rem;">taiko: sparse. the space IS the rhythm.</p>
+    </div>
+</div>
+
+<div class="concept">
+    <span class="c-label">the principle</span>
+    <p>Both patterns are rhythm. One fills every slot. The other leaves most of them empty. The DnB break drives you forward. The taiko pattern makes you wait. Both work because the composer chose where NOT to put a hit.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: <em>ma</em> (&#38291;) and the art of negative space</summary>
+    <div class="rh-body">
+        <h4>Not just music</h4>
+        <p><em>Ma</em> (&#38291;) is a Japanese concept of negative space. It appears in architecture (the empty room is the room), calligraphy (the space between strokes defines the character), theater (the pause in Noh drama holds more tension than the action), and garden design (the rocks are placed to shape the emptiness between them).</p>
+
+        <!-- Ma visualization: calligraphy stroke spacing -->
+        <div style="text-align: center; margin: 1.5rem 0;">
+            <svg viewBox="0 0 400 100" width="360" height="90">
+                <rect width="400" height="100" fill="#141418" rx="4"/>
+                <!-- Strokes with ma between them -->
+                <rect x="40" y="20" width="8" height="60" rx="2" fill="#ff6b35" opacity=".8"/>
+                <rect x="90" y="25" width="6" height="50" rx="2" fill="#ff6b35" opacity=".6"/>
+                <!-- ma label -->
+                <text x="65" y="92" fill="#ab47bc" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">ma</text>
+                <line x1="52" y1="85" x2="78" y2="85" stroke="#ab47bc" stroke-width="0.5" opacity=".6"/>
+
+                <rect x="170" y="15" width="10" height="70" rx="2" fill="#ff6b35" opacity=".9"/>
+                <rect x="250" y="20" width="7" height="55" rx="2" fill="#ff6b35" opacity=".5"/>
+                <!-- wider ma -->
+                <text x="210" y="92" fill="#ab47bc" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">ma</text>
+                <line x1="184" y1="85" x2="246" y2="85" stroke="#ab47bc" stroke-width="0.5" opacity=".6"/>
+
+                <rect x="330" y="18" width="9" height="64" rx="2" fill="#ff6b35" opacity=".7"/>
+            </svg>
+            <p style="font-family: 'SF Mono', monospace; font-size: 0.6rem; color: #ab47bc; margin-top: 0.3rem;">the space between strokes defines the character</p>
+        </div>
+
+        <h4>In music</h4>
+        <p>A taiko player who hits less is not playing less. The silence between strikes has rhythmic weight. A shakuhachi player breathes audibly between phrases. The breath is part of the piece. In Western notation, rests are absence. In <em>ma</em>, silence is presence.</p>
+
+        <h4>The Western connection: Debussy</h4>
+        <p>Claude Debussy attended the 1889 Paris Exposition and heard a Javanese gamelan ensemble. He came back and started writing music full of space, unresolved harmonics, and suspended time. <em>Pr&eacute;lude &agrave; l&rsquo;Apr&egrave;s-midi d&rsquo;un Faune</em> (1894) sounds nothing like the German Romantic tradition he was trained in. It sounds like someone who learned that silence has shape.</p>
+
+        <h4>In Strudel</h4>
+        <p>The <code>~</code> rest is your <em>ma</em>. It&rsquo;s not a gap. It&rsquo;s structure. When you write <code>s("bd ~ ~ bd ~ ~ bd ~")</code>, those tildes aren&rsquo;t empty. They&rsquo;re carrying the rhythm.</p>
+    </div>
+</details>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: taiko &mdash; 2000 years of hitting things with purpose</summary>
+    <div class="rh-body">
+        <h4>Origins</h4>
+        <p>Taiko drumming is at least 2000 years old. The earliest references are Shinto and Buddhist: temple drums marking time, calling communities, driving away evil spirits. The <em>wadaiko</em> (Japanese drum) is a ritual object before it&rsquo;s a musical instrument. The physical stance matters. The breathing, the way you hold the <em>bachi</em> (sticks). Taiko is martial as much as musical.</p>
+
+        <!-- Taiko ensemble diagram -->
+        <div style="text-align: center; margin: 1.5rem 0;">
+            <svg viewBox="0 0 320 140" width="300" height="130">
+                <rect width="320" height="140" fill="#141418" rx="4"/>
+                <!-- Odaiko (big) -->
+                <ellipse cx="160" cy="50" rx="40" ry="25" fill="none" stroke="#ff6b35" stroke-width="2"/>
+                <text x="160" y="54" fill="#ff6b35" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">odaiko</text>
+                <text x="160" y="90" fill="#5a584f" font-family="SF Mono, monospace" font-size="7" text-anchor="middle">the chest. the floor.</text>
+                <!-- Shime-daiko (small, left) -->
+                <ellipse cx="50" cy="55" rx="18" ry="12" fill="none" stroke="#4fc3f7" stroke-width="1.5"/>
+                <text x="50" y="58" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="7" text-anchor="middle">shime</text>
+                <text x="50" y="80" fill="#5a584f" font-family="SF Mono, monospace" font-size="6" text-anchor="middle">the timekeeper</text>
+                <!-- Nagado-daiko (mid, right) -->
+                <ellipse cx="270" cy="50" rx="28" ry="18" fill="none" stroke="#66bb6a" stroke-width="1.5"/>
+                <text x="270" y="54" fill="#66bb6a" font-family="SF Mono, monospace" font-size="7" text-anchor="middle">nagado</text>
+                <text x="270" y="80" fill="#5a584f" font-family="SF Mono, monospace" font-size="6" text-anchor="middle">the workhorse</text>
+                <!-- Label -->
+                <text x="160" y="125" fill="#8a8780" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">3 drums. the dynamic range of an orchestra.</text>
+            </svg>
+        </div>
+
+        <h4>The modern reinvention</h4>
+        <p>In 1951, Daihachi Oguchi, a jazz drummer from Nagano, arranged traditional taiko patterns for a group ensemble. Before Oguchi, taiko was typically solo in ceremonial contexts. He invented <em>kumi-daiko</em>: the ensemble form. A jazz drummer reinvented a 2000-year-old tradition.</p>
+
+        <h4>Why this matters for you</h4>
+        <p>Taiko teaches something grid-based electronic music forgets: a drum hit has weight based on the body behind it. When you program <code>.gain(".9 0 0 .6 0 0 1 0")</code>, you&rsquo;re approximating what a taiko player does with their arms. The dynamic pattern IS the rhythm.</p>
+    </div>
+</details>
+
+<h3>The score continues</h3>
+
+<p>Add a pulse underneath your koto sketch from L0. No delay. No reverb. Just <code>s()</code>, <code>.gain()</code>, and <code>setcpm()</code>. The tools you know:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>the north atlantic: adding weight</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-dirdug-1">
+    <!--
+setcpm(15)
+stack(
+  // koto from L0
+  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.35),
+  // the pulse: a low, filtered thud
+  note("e2 ~ ~ ~ ~ ~ e2 ~")
+    .s("sawtooth").lpf(200).decay(.4).sustain(0).gain(0.5)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Two layers. The koto floats. The pulse sits underneath like a heartbeat. No effects yet. Those come in L4.</p>
+
+</section>
+
+<!-- ============ SECTION 6: CAPSTONE ============ -->
 <section id="capstone">
-<h2><span class="num">05</span>Your First Break</h2>
+<h2><span class="num">06</span>Your First Break</h2>
 
 <div class="punchline">
     <p>All four pieces stacked. Play it. Listen for each layer: kick on 1, snare on 3,
@@ -959,31 +1055,6 @@ stack(
         <li>When it grooves, hit <em>share</em>. That&rsquo;s a DnB beat you coded.</li>
     </ol>
 </div>
-
-<h3>The Score Continues</h3>
-
-<p>Add a pulse underneath your koto sketch from L0. Not a beat. A heartbeat:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>the north atlantic: adding weight</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-dirdug-1">
-    <!--
-setcpm(15)
-stack(
-  // koto from L0
-  note("e4 ~ ~ b3 ~ ~ g4 ~")
-    .sound("gm_koto").gain(0.35)
-    .room(0.8).delay(0.5).delaytime(0.375).delayfeedback(0.4),
-  // the pulse: a low, filtered thud
-  note("e2 ~ ~ ~ ~ ~ e2 ~")
-    .s("sawtooth").lpf(200).decay(.4).sustain(0).gain(0.5)
-    .room(0.6)
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p>Slow. Deep. The koto floats above it. The pulse is the ocean underneath. Two layers now.</p>
 
 <details class="earned">
     <summary>what you earned</summary>
@@ -1017,8 +1088,8 @@ stack(
     <table>
         <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
         <tbody>
-        <tr><td style="color: var(--accent);">Hirokazu Tanaka</td><td>Metroid &mdash; Brinstar (1986)</td><td>(game) rhythm from noise channels. The NES as percussion instrument.</td></tr>
-        <tr><td style="color: var(--accent);">Takashi Tateishi</td><td>Mega Man 2 &mdash; Dr. Wily Stage 1 (1988)</td><td>(game) the greatest 8-bit groove. Rhythm IS the melody.</td></tr>
+        <tr><td style="color: var(--accent);">Hirokazu Tanaka</td><td>Metroid: Brinstar (1986)</td><td>(game) rhythm from noise channels. Atmosphere as groove.</td></tr>
+        <tr><td style="color: var(--accent);">Takashi Tateishi</td><td>Mega Man 2: Dr. Wily Stage 1 (1988)</td><td>(game) C&#x266f;m, 180bpm. The bass IS the rhythm.</td></tr>
         <tr><td>The Winstons</td><td>Amen, Brother (1969)</td><td>(breakbeat) the 7-second break that built jungle and DnB</td></tr>
         <tr><td>Shy FX &amp; UK Apache</td><td>Original Nuttah (1994)</td><td>(jungle) chopped amen + dancehall, crossover jungle</td></tr>
         <tr><td>Roni Size / Reprazent</td><td>Brown Paper Bag (1997)</td><td>(DnB) live bass over programmed breaks</td></tr>
