@@ -1080,16 +1080,11 @@ stack(
     </strudel-editor>
 </div>
 
-<p>The bass still starts on each chord&rsquo;s root. But now it moves between hits. C bar gets C and Eb. Ab bar gets Ab and C. The roots anchor. The other notes create motion inside each bar. The 808 went from a kick to a melody.</p>
+<p>The bass still starts on each chord&rsquo;s root. But now it moves between hits. C bar gets C and Eb. Ab bar gets Ab and C. The roots anchor. The other notes create motion inside each bar.</p>
 
-<div class="try-this">
-    <span class="label">tweak it</span>
-    <p>Strip it back to <code>note("&lt;c2 ab2 bb2 g2&gt;")</code> and hear the difference. Then try adding a fifth to the Cm bar: <code>[c2 ~ g2 ~ c2 ~ eb2 ~]</code>.</p>
-</div>
+<h3>Adding the fifth</h3>
 
-<h3>Beyond roots</h3>
-
-<p>The bass plays C for the C minor chord. That&rsquo;s the root &mdash; the bottom of the chord. But the chord has three notes:</p>
+<p>The chord has three notes. The bass has been playing the bottom one (the root). The top one is the <em>fifth</em>:</p>
 
 <svg viewBox="0 0 120 100" style="width: 100px; display: block; margin: 0.5rem 0;">
     <rect x="10" y="10" width="100" height="24" rx="4" fill="none" stroke="#4fc3f7" stroke-width="1.5"/>
@@ -1172,9 +1167,33 @@ stack(
     <p><strong>Root</strong> = the chord&rsquo;s anchor note. <strong>Fifth</strong> = the top note of the triad, reinforces the root. <strong>Approach note</strong> = one note below the next root, creates forward motion into the next bar. Root for stability. Fifth for width. Approach for momentum.</p>
 </div>
 
+<p>Approach from above instead of below:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>approach from above</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3f">
+    <!--
+setcpm(35)
+stack(
+  note("<[c2 ~ g2 ~ c2 ~ eb2 a2] [ab2 ~ eb2 ~ ab2 ~ c2 b2] [bb2 ~ f2 ~ bb2 ~ d2 ab2] [g2 ~ d2 ~ g2 ~ b2 db2]>")
+    .s("sine").decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth")
+    .lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8)
+    .gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The last note of each bar sits one step ABOVE the next root and slides down into it. Different pull. Compare to the previous editor where it slides up.</p>
+
 <div class="try-this">
     <span class="label">tweak it</span>
-    <p>Change the approach notes to come from ABOVE instead of below: try <code>a2</code> before <code>ab2</code> (one note above, sliding down). Different tension. Or try TWO approach notes: <code>[bb2 ~ f2 ~ bb2 d2 c2 a2]</code> &mdash; the bass walks down into the next root.</p>
+    <p>Try two approach notes in a row: <code>[bb2 ~ f2 ~ bb2 d2 c2 a2]</code>. The bass walks down through two steps into the next root.</p>
 </div>
 
 <details class="rabbit-hole">
