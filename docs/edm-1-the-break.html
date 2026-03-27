@@ -507,11 +507,11 @@ s("bd ~ sd ~")
     Slots subdivide the bar. That&rsquo;s enough to build a DnB break.</p>
 </div>
 
-<h3>Repertoire: hear rhythm in the wild</h3>
+<h3>Less hits harder</h3>
 
-<p>Before we build ours, listen to how two NES composers solved the same problem: making rhythm feel alive on hardware that barely had drums.</p>
+<p>Every great rhythm tradition figured out the same thing: where you <em>don&rsquo;t</em> put a hit matters as much as where you do. Four examples. Same principle.</p>
 
-<p><strong>Metroid &mdash; Brinstar</strong> (Hirokazu Tanaka, 1986). The NES noise channel is the only thing resembling percussion. Tanaka builds the groove from pitched noise bursts and bass note rhythm. The pulse IS the bassline. Play this approximation:</p>
+<p><strong>1. Metroid &mdash; Brinstar</strong> (Hirokazu Tanaka, 1986). The NES noise channel is the only thing resembling percussion. Tanaka builds the groove from pitched noise bursts and bass note rhythm. The pulse IS the bassline:</p>
 
 <div class="strudel-block">
     <div class="strudel-label"><span>brinstar (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
@@ -527,7 +527,7 @@ stack(
     </strudel-editor>
 </div>
 
-<p><strong>Mega Man 2 &mdash; Dr. Wily Stage 1</strong> (Takashi Tateishi, 1988). The rhythm is inseparable from the melody. The driving pulse comes from the triangle channel bass and the noise channel hi-hats. Listen to how the bass rhythm carries the whole groove:</p>
+<p><strong>2. Mega Man 2 &mdash; Dr. Wily Stage 1</strong> (Takashi Tateishi, 1988). Same hardware. Different solution. The rhythm is inseparable from the melody. The bass carries the whole groove:</p>
 
 <div class="strudel-block">
     <div class="strudel-label"><span>wily stage 1 (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
@@ -543,14 +543,7 @@ stack(
     </strudel-editor>
 </div>
 
-<div class="concept warm">
-    <span class="c-label">the constraint</span>
-    <p>Both composers had 5 channels. No sampled drums. No effects. Tanaka and Tateishi made rhythm from noise and pitch. That&rsquo;s what you&rsquo;re learning: rhythm isn&rsquo;t about having a drum kit. It&rsquo;s about where you put the weight.</p>
-</div>
-
-<h3>Japanese rhythm: the spaces between</h3>
-
-<p>Japanese traditional music treats silence differently. In <em>ma</em> (&#38291;), the space between notes is as important as the notes themselves. A taiko pattern breathes. A koto arpeggio floats. Compare this with the driving DnB groove you&rsquo;re about to build:</p>
+<p><strong>3. Taiko</strong>. A tradition 2000 years older than the NES. A taiko ensemble might use 3 drums. The player who hits less isn&rsquo;t playing less. They&rsquo;re composing with air:</p>
 
 <div class="strudel-block">
     <div class="strudel-label"><span>taiko-inspired pulse</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
@@ -565,7 +558,95 @@ stack(
     </strudel-editor>
 </div>
 
-<p>Slower. Sparser. The rests do the work. This is the other end of rhythm from DnB, and it&rsquo;s what your &ETH;ir&eth;ug composition is drawing from. Both traditions understand that where you <em>don&rsquo;t</em> put a hit matters as much as where you do.</p>
+<p><strong>4. Your composition</strong>. Three notes, a delay line, and mostly silence. The seed from L0:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>the north atlantic (from L0)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-dirdug-recall">
+    <!--
+note("e4 ~ ~ b3 ~ ~ g4 ~")
+  .sound("gm_koto").gain(0.35)
+  .room(0.8).delay(0.5).delaytime(0.375).delayfeedback(0.4)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="concept warm">
+    <span class="c-label">the thread</span>
+    <p>Tanaka had 5 channels. A taiko ensemble has 3 drums. You have 3 notes and a delay line. Constraint isn&rsquo;t a limitation. It&rsquo;s what makes you choose. Choosing is composing.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: ma (&#38291;) and the art of negative space</summary>
+    <div class="rh-body">
+        <h4>Not just music</h4>
+        <p><em>Ma</em> (&#38291;) is a Japanese concept of negative space. It appears in architecture (the empty room is the room), calligraphy (the space between strokes defines the character), theater (the pause in Noh drama that holds more tension than the action), and garden design (the rocks are placed to shape the emptiness between them).</p>
+
+        <h4>In music</h4>
+        <p>A taiko player who hits less is not playing less. The silence between strikes has rhythmic weight. A shakuhachi player breathes audibly between phrases. The breath is part of the piece. Compare this to Western classical music, where rests are often treated as absence. In <em>ma</em>, silence is presence.</p>
+
+        <h4>The Western connection: Debussy</h4>
+        <p>Claude Debussy attended the 1889 Paris Exposition and heard a Javanese gamelan ensemble. He came back and started writing music full of space, unresolved harmonics, and suspended time. <em>Pr&eacute;lude &agrave; l&rsquo;Apr&egrave;s-midi d&rsquo;un Faune</em> (1894) sounds nothing like the German Romantic tradition he was trained in. It sounds like someone who learned that silence has shape.</p>
+
+        <h4>In your composition</h4>
+        <p>The <code>~</code> rests in your koto pattern aren&rsquo;t gaps. They&rsquo;re structural. The delay and room effects extend each note into the silence around it. The space IS the piece. That&rsquo;s <em>ma</em>.</p>
+    </div>
+</details>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: taiko &mdash; 2000 years of hitting things with purpose</summary>
+    <div class="rh-body">
+        <h4>Origins</h4>
+        <p>Taiko drumming is at least 2000 years old. The earliest references are Shinto and Buddhist: temple drums marking time, calling communities, driving away evil spirits. The <em>wadaiko</em> (Japanese drum) is a ritual object before it&rsquo;s a musical instrument. The physical stance matters. The body posture, the breathing, the way you hold the <em>bachi</em> (sticks). Taiko is martial as much as musical.</p>
+
+        <h4>The modern reinvention</h4>
+        <p>In 1951, Daihachi Oguchi, a jazz drummer from Nagano, arranged traditional taiko patterns for a group ensemble. Before Oguchi, taiko was typically a solo instrument in ceremonial contexts. He invented <em>kumi-daiko</em>: the ensemble form. A jazz drummer reinvented a 2000-year-old tradition. One person bridging two worlds.</p>
+
+        <h4>The ensemble</h4>
+        <p>A kumi-daiko group might include: the <em>odaiko</em> (the massive barrel drum, felt in the chest), the <em>shime-daiko</em> (the small, high, tight one that keeps time), and the <em>nagado-daiko</em> (the mid-range workhorse). Three drums. The entire dynamic range of an orchestra. The players rotate, shout (<em>kakegoe</em>), and move. A taiko performance is visual, physical, and sonic simultaneously.</p>
+
+        <h4>Why this matters for you</h4>
+        <p>Taiko teaches something that grid-based electronic music forgets: a drum hit has weight based on the body behind it. When you program <code>.gain(".9 0 0 .6 0 0 1 0")</code>, you&rsquo;re approximating what a taiko player does with their arms. The dynamic pattern IS the rhythm, not just the timing.</p>
+    </div>
+</details>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: the NES sound chip &mdash; 5 voices that built a generation</summary>
+    <div class="rh-body">
+        <h4>The Ricoh 2A03</h4>
+        <p>Every sound in every NES game came from 5 channels:</p>
+        <table>
+            <thead><tr><th>channel</th><th>type</th><th>what it does</th></tr></thead>
+            <tbody>
+            <tr><td>Pulse 1</td><td>square wave</td><td>melody, lead, harmony. Variable duty cycle (12.5%, 25%, 50%, 75%) changes the timbre.</td></tr>
+            <tr><td>Pulse 2</td><td>square wave</td><td>same as Pulse 1. Two melody voices total. That&rsquo;s your polyphony budget.</td></tr>
+            <tr><td>Triangle</td><td>triangle wave</td><td>bass and soft leads. No volume control. It&rsquo;s either on or off. Kondo used it for Mario&rsquo;s bass.</td></tr>
+            <tr><td>Noise</td><td>pseudo-random noise</td><td>percussion, sound effects, atmosphere. Short bursts = hi-hats. Long bursts = snares. Tanaka used it for Brinstar&rsquo;s entire mood.</td></tr>
+            <tr><td>DPCM</td><td>1-bit sample</td><td>low-quality sampled audio. Used sparingly. The &ldquo;voice&rdquo; samples in some late NES games. Mostly for kicks and vocal shouts.</td></tr>
+            </tbody>
+        </table>
+
+        <h4>Two composers, same chip, different worlds</h4>
+        <p><strong>Koji Kondo</strong> (Mario, Zelda) used the noise channel as percussion. Clear beats. The triangle carries the bass. The two pulse channels handle melody and harmony. His music sounds like a band playing.</p>
+        <p><strong>Hirokazu Tanaka</strong> (Metroid) used the noise channel as atmosphere. Long noise sweeps, hissing, environmental texture. The percussion is minimal or absent. The triangle and pulse channels create drones and slow melodies. His music sounds like a place.</p>
+        <p>Same 5 channels. Kondo made you want to move. Tanaka made you afraid to.</p>
+
+        <h4>The hardware lineage</h4>
+        <table>
+            <thead><tr><th>system</th><th>year</th><th>channels</th><th>what changed</th></tr></thead>
+            <tbody>
+            <tr><td>NES</td><td>1983</td><td>5</td><td>the constraint era. Everything composed within 5 voices.</td></tr>
+            <tr><td>SNES</td><td>1990</td><td>8 (sampled)</td><td>the Sony SPC700 chip. Real instrument samples. Uematsu&rsquo;s FF6 sounds orchestral.</td></tr>
+            <tr><td>PS1</td><td>1994</td><td>24 (CD audio)</td><td>the constraint disappears. Uematsu records a real choir for FF7. Game music becomes indistinguishable from film scores.</td></tr>
+            <tr><td>Modern</td><td>2000+</td><td>unlimited</td><td>full orchestras, live recording, spatial audio. The constraint is now budget, not hardware.</td></tr>
+            </tbody>
+        </table>
+        <p>Every step up in hardware meant more voices. More voices meant less forced creativity per channel. The NES era produced some of the most inventive composition in gaming history because there was nowhere to hide. Every voice had to earn its place.</p>
+
+        <h4>The Strudel connection</h4>
+        <p>When you write <code>stack()</code> with 3 layers, you&rsquo;re working closer to Tanaka and Kondo than to a modern DAW producer with 100 tracks. That&rsquo;s not a limitation. That&rsquo;s the sweet spot.</p>
+    </div>
+</details>
 
 </section>
 
