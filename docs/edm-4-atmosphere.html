@@ -668,6 +668,200 @@ note("[c3,e3]").s("sawtooth")
     <p>Try <code>[c3,f3]</code>, <code>[c3,ab3]</code>, <code>[c3,b3]</code>. Some pairs sit still. Some pull.</p>
 </div>
 
+<details class="rabbit-hole">
+    <summary>rabbit hole: why some pairs pull and others sit still</summary>
+    <div class="rh-body">
+        <h4>Click a note. Hear it with C. See what happens.</h4>
+        <div style="margin: 1rem 0;">
+            <!-- Keyboard -->
+            <div id="pair-keyboard" style="display:flex; gap:2px; margin-bottom:1rem; flex-wrap:wrap;"></div>
+            <!-- Waveform canvas -->
+            <canvas id="pair-canvas" width="700" height="200" style="width:100%; background:var(--surface); border-radius:4px; margin-bottom:0.5rem;"></canvas>
+            <div id="pair-label" style="font-family:'SF Mono',monospace; font-size:0.65rem; color:var(--text-dim); margin-bottom:0.5rem;">Click a note above.</div>
+        </div>
+        <script>
+        (function() {
+            const notes = [
+                { name: 'C', freq: 261.63, color: '#ff6b35' },
+                { name: 'Db', freq: 277.18, color: '#e8e6e3' },
+                { name: 'D', freq: 293.66, color: '#e8e6e3' },
+                { name: 'Eb', freq: 311.13, color: '#e8e6e3' },
+                { name: 'E', freq: 329.63, color: '#e8e6e3' },
+                { name: 'F', freq: 349.23, color: '#e8e6e3' },
+                { name: 'Gb', freq: 369.99, color: '#e8e6e3' },
+                { name: 'G', freq: 392.00, color: '#e8e6e3' },
+                { name: 'Ab', freq: 415.30, color: '#e8e6e3' },
+                { name: 'A', freq: 440.00, color: '#e8e6e3' },
+                { name: 'Bb', freq: 466.16, color: '#e8e6e3' },
+                { name: 'B', freq: 493.88, color: '#e8e6e3' },
+                { name: 'C\u2032', freq: 523.25, color: '#ff6b35' }
+            ];
+            const cFreq = 261.63;
+            const kb = document.getElementById('pair-keyboard');
+            const canvas = document.getElementById('pair-canvas');
+            const ctx = canvas.getContext('2d');
+            const label = document.getElementById('pair-label');
+            let activeBtn = null;
+            let audioCtx = null;
+            let oscC = null, oscN = null, gainC = null, gainN = null;
+
+            // Build keyboard
+            notes.forEach(function(n, i) {
+                const btn = document.createElement('button');
+                btn.textContent = n.name;
+                btn.style.cssText = 'font-family:"SF Mono",monospace; font-size:0.7rem; padding:0.4rem 0.6rem; border-radius:3px; cursor:pointer; border:1px solid #1e1e24; background:#141418; color:' + (i===0||i===12 ? '#ff6b35' : '#8a8780') + '; transition:all 0.15s; min-width:2.2rem;';
+                btn.onmouseenter = function() { btn.style.borderColor = '#4fc3f744'; };
+                btn.onmouseleave = function() { if (btn !== activeBtn) btn.style.borderColor = '#1e1e24'; };
+                btn.onclick = function() {
+                    if (activeBtn) {
+                        activeBtn.style.borderColor = '#1e1e24';
+                        activeBtn.style.background = '#141418';
+                        activeBtn.style.color = (activeBtn.dataset.idx==='0'||activeBtn.dataset.idx==='12') ? '#ff6b35' : '#8a8780';
+                    }
+                    activeBtn = btn;
+                    btn.style.borderColor = '#4fc3f7';
+                    btn.style.background = '#4fc3f722';
+                    btn.style.color = '#4fc3f7';
+                    playPair(n.freq, n.name);
+                    drawWaves(n.freq, n.name);
+                };
+                btn.dataset.idx = i;
+                kb.appendChild(btn);
+            });
+
+            function playPair(freq, name) {
+                stopSound();
+                audioCtx = new (window._OrigAC || window.AudioContext)();
+                // C
+                oscC = audioCtx.createOscillator();
+                gainC = audioCtx.createGain();
+                oscC.frequency.value = cFreq;
+                oscC.type = 'sine';
+                gainC.gain.value = 0.15;
+                oscC.connect(gainC);
+                gainC.connect(audioCtx.destination);
+                oscC.start();
+                // Note
+                oscN = audioCtx.createOscillator();
+                gainN = audioCtx.createGain();
+                oscN.frequency.value = freq;
+                oscN.type = 'sine';
+                gainN.gain.value = 0.15;
+                oscN.connect(gainN);
+                gainN.connect(audioCtx.destination);
+                oscN.start();
+                // Stop after 2 seconds
+                gainC.gain.setValueAtTime(0.15, audioCtx.currentTime + 1.5);
+                gainC.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
+                gainN.gain.setValueAtTime(0.15, audioCtx.currentTime + 1.5);
+                gainN.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2);
+                oscC.stop(audioCtx.currentTime + 2.1);
+                oscN.stop(audioCtx.currentTime + 2.1);
+            }
+
+            function stopSound() {
+                try { if (oscC) oscC.stop(); } catch(e) {}
+                try { if (oscN) oscN.stop(); } catch(e) {}
+                try { if (audioCtx) audioCtx.close(); } catch(e) {}
+            }
+
+            function drawWaves(freq, name) {
+                var w = canvas.width, h = canvas.height;
+                var mid = h / 2;
+                var amp = h * 0.22;
+                var cycles = 8;
+                ctx.clearRect(0, 0, w, h);
+
+                // Grid center line
+                ctx.strokeStyle = '#1e1e24';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, mid);
+                ctx.lineTo(w, mid);
+                ctx.stroke();
+
+                // C wave (dim)
+                ctx.strokeStyle = '#ff6b3544';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (var x = 0; x < w; x++) {
+                    var t = (x / w) * cycles * Math.PI * 2;
+                    var y = mid - Math.sin(t) * amp;
+                    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                // Note wave (dim)
+                var ratio = freq / cFreq;
+                ctx.strokeStyle = '#4fc3f744';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                for (var x = 0; x < w; x++) {
+                    var t = (x / w) * cycles * Math.PI * 2;
+                    var y = mid - Math.sin(t * ratio) * amp;
+                    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                // Composite (bright)
+                ctx.strokeStyle = '#66bb6a';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (var x = 0; x < w; x++) {
+                    var t = (x / w) * cycles * Math.PI * 2;
+                    var y = mid - (Math.sin(t) + Math.sin(t * ratio)) * amp * 0.5;
+                    if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                // Label
+                var ratioSimple = simplifyRatio(freq, cFreq);
+                label.innerHTML = '<span style="color:#ff6b35">C</span> + <span style="color:#4fc3f7">' + name + '</span> &rarr; <span style="color:#66bb6a">combined</span>. Frequency ratio: ' + ratioSimple;
+            }
+
+            function simplifyRatio(a, b) {
+                var ratios = [
+                    [1, 1, 'unison'],
+                    [16, 15, '16:15'],
+                    [9, 8, '9:8'],
+                    [6, 5, '6:5'],
+                    [5, 4, '5:4'],
+                    [4, 3, '4:3'],
+                    [45, 32, '45:32'],
+                    [3, 2, '3:2'],
+                    [8, 5, '8:5'],
+                    [5, 3, '5:3'],
+                    [9, 5, '9:5'],
+                    [15, 8, '15:8'],
+                    [2, 1, 'octave']
+                ];
+                var r = a / b;
+                var closest = ratios[0];
+                var minDiff = 999;
+                for (var i = 0; i < ratios.length; i++) {
+                    var diff = Math.abs(r - ratios[i][0] / ratios[i][1]);
+                    if (diff < minDiff) { minDiff = diff; closest = ratios[i]; }
+                }
+                return closest[2] + ' (' + closest[0] + ':' + closest[1] + ')';
+            }
+
+            // Draw initial state (just C)
+            ctx.strokeStyle = '#1e1e24';
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height/2);
+            ctx.lineTo(canvas.width, canvas.height/2);
+            ctx.stroke();
+        })();
+        </script>
+
+        <h4>What the shapes tell you</h4>
+        <p>The <span style="color:#ff6b35">orange</span> wave is C. The <span style="color:#4fc3f7">blue</span> wave is whatever you clicked. The <span style="color:#66bb6a">green</span> wave is both added together.</p>
+        <p>Click C+G. The green composite repeats cleanly. Click C+Gb. The composite writhes. The simpler the frequency ratio between two notes, the more regular the composite wave. 3:2 (the fifth) repeats every 2 cycles of C and 3 cycles of G. 45:32 (the tritone) takes far longer to repeat, if it visually repeats at all.</p>
+        <p>Your ear tracks this. Regular composites register as stable. Irregular composites register as tension. Click through all 13 notes and watch the green line. You can see the spectrum from consonance to dissonance.</p>
+    </div>
+</details>
+
 <h3>One holds, one moves</h3>
 
 <p>Hold C in the bass. Let another voice move over it:</p>
