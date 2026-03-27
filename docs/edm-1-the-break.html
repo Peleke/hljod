@@ -1056,6 +1056,46 @@ stack(
     </ol>
 </div>
 
+<h3>Option A: koto over the break</h3>
+
+<p>The koto from your &ETH;ir&eth;ug sketch, layered on top of the DnB break. The dense groove underneath, the sparse melody floating above it. Listen to what happens when two different rhythmic philosophies play at the same time:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>the break + koto</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap-koto-over">
+    <!--
+setcpm(42.5)
+stack(
+  s("bd ~ ~ ~ ~ ~ [~ bd] ~"),
+  s("~ ~ ~ ~ sd ~ ~ ~"),
+  s("hh*16").gain(".4 .7 .4 .9 .4 .7 .4 1"),
+  s("~ ~ ~ ~ ~ ~ ~ oh").gain(.5),
+  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<h3>Option B: the breath after the punch</h3>
+
+<p>The break stops. The koto continues alone. The lesson ends quiet:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>the north atlantic: pulse + koto (no break)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap-koto-alone">
+    <!--
+setcpm(15)
+stack(
+  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8),
+  note("e2 ~ ~ ~ ~ ~ e2 ~")
+    .s("sawtooth").lpf(200).decay(.4).sustain(0).gain(0.5)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Play both. Decide which ending is yours. The dense one teaches you that koto can live inside a groove. The quiet one teaches you that the groove was always optional.</p>
+
 <details class="earned">
     <summary>what you earned</summary>
     <div class="earned-body">
