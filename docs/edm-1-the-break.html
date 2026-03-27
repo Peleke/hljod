@@ -871,7 +871,7 @@ s("bd ~ ~ bd ~ ~ bd ~").gain(".9 0 0 .6 0 0 1 0")
 setcpm(25)
 stack(
   s("bd ~ ~ bd ~ ~ bd ~").gain(".9 0 0 .6 0 0 1 0"),
-  note("e4 ~ ~ ~ b3 ~ ~ ~").sound("gm_koto").gain(.35)
+  note("e4 ~ ~ ~ b3 ~ ~ ~").sound("gm_koto").gain(.8)
 )
     -->
     </strudel-editor>
@@ -1009,7 +1009,7 @@ stack(
 setcpm(15)
 stack(
   // koto from L0
-  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.35),
+  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8),
   // the pulse: a low, filtered thud
   note("e2 ~ ~ ~ ~ ~ e2 ~")
     .s("sawtooth").lpf(200).decay(.4).sustain(0).gain(0.5)
