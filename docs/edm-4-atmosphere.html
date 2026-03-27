@@ -858,7 +858,45 @@ note("[c3,e3]").s("sawtooth")
         <h4>What the shapes tell you</h4>
         <p>The <span style="color:#ff6b35">orange</span> wave is C. The <span style="color:#4fc3f7">blue</span> wave is whatever you clicked. The <span style="color:#66bb6a">green</span> wave is both added together.</p>
         <p>Click C+G. The green composite repeats cleanly. Click C+Gb. The composite writhes. The simpler the frequency ratio between two notes, the more regular the composite wave. 3:2 (the fifth) repeats every 2 cycles of C and 3 cycles of G. 45:32 (the tritone) takes far longer to repeat, if it visually repeats at all.</p>
-        <p>Your ear tracks this. Regular composites register as stable. Irregular composites register as tension. Click through all 13 notes and watch the green line. You can see the spectrum from consonance to dissonance.</p>
+        <p>Your ear tracks this. Regular composites register as stable. Irregular composites register as tension. Click through all 13 notes and watch the green line.</p>
+
+        <h4>In context: same melody, different roots</h4>
+        <p>The keyboard shows isolated pairs. This editor puts them in motion. The melody stays the same. The bass note changes every cycle:</p>
+
+        <div class="strudel-block">
+            <div class="strudel-label"><span>cycling roots under one melody</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-roots">
+            <!--
+setcpm(35)
+stack(
+  note("<c2 eb2 g2 ab2 e2 gb2>").s("sine")
+    .sustain(0.8).gain(0.6),
+  note("eb3 g3 f3 eb3").s("sawtooth")
+    .lpf(1200).decay(0.1).sustain(0.2).gain(0.35)
+)
+            -->
+            </strudel-editor>
+        </div>
+        <p>Six cycles, six bass notes, one melody. Each root recolors the same four notes above it.</p>
+
+        <h4>Stack the roots: a chord appears</h4>
+        <p>Three of those bass notes at once:</p>
+
+        <div class="strudel-block">
+            <div class="strudel-label"><span>three roots stacked = chord</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-stack">
+            <!--
+setcpm(35)
+stack(
+  note("[c2,eb2,g2]").s("sine")
+    .sustain(0.8).gain(0.5),
+  note("eb3 g3 f3 eb3").s("sawtooth")
+    .lpf(1200).decay(0.1).sustain(0.2).gain(0.35)
+)
+            -->
+            </strudel-editor>
+        </div>
+        <p>The chord is all the pairs at once. One root gave you a relationship. Three roots give you a context.</p>
     </div>
 </details>
 
@@ -984,9 +1022,41 @@ note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
     <p>A sequence of chords that creates harmonic movement. This one is i&ndash;VI&ndash;VII&ndash;V in C minor. Roman numerals show the relationship to the key. Uppercase&thinsp;=&thinsp;major chord. Lowercase&thinsp;=&thinsp;minor. The V (G major) creates tension. The i (Cm) resolves it.</p>
 </div>
 
-<h3>Bass follows harmony</h3>
+<h3>The bass has a job</h3>
 
-<p>The 808 should match the chords. Root note of each chord, with melodic movement inside each bar:</p>
+<p>The progression has four chords. The 808 from Section 01 plays one note at a time. What note should it play?</p>
+
+<p>Go back to the drone idea. When C was underneath the melody, it felt like home. When Ab was underneath, the ground shifted. The bass note decided the mood. In a progression, the bass note needs to shift WITH the chords or the ground stays in the wrong place.</p>
+
+<p>Simplest version: the bass plays the root of whatever chord is happening. Cm chord = C in the bass. Ab chord = Ab in the bass.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>bass roots matching chords</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3-bassroots">
+    <!--
+setcpm(35)
+stack(
+  // bass: one root per chord
+  note("<c2 ab2 bb2 g2>").s("sine")
+    .decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  // pad
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth")
+    .lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8)
+    .gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The bass and the chords agree. Each bar has the same root in both layers. That alignment is what makes it sound like one piece of music instead of two things happening at the same time.</p>
+
+<h3>Bass as melody</h3>
+
+<p>One root per bar works. But the 808 can do more. It can move WITHIN each bar while still anchoring to the chord:</p>
 
 <div class="strudel-block">
     <div class="strudel-label"><span>808 + pad</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
@@ -1010,11 +1080,11 @@ stack(
     </strudel-editor>
 </div>
 
-<p>When the pad plays Ab, the bass plays Ab. When it moves to G, the bass hits G. The harmony is aligned. The 808 is tracking the chords now.</p>
+<p>The bass still starts on each chord&rsquo;s root. But now it moves between hits. C bar gets C and Eb. Ab bar gets Ab and C. The roots anchor. The other notes create motion inside each bar. The 808 went from a kick to a melody.</p>
 
 <div class="try-this">
     <span class="label">tweak it</span>
-    <p>Simplify the bass: try <code>note("&lt;c2 ab2 bb2 g2&gt;")</code> for straight roots, one per bar. Or add a fifth to the Cm bar: <code>[c2 ~ g2 ~ c2 ~ eb2 ~]</code>. The fifth reinforces the chord from below.</p>
+    <p>Strip it back to <code>note("&lt;c2 ab2 bb2 g2&gt;")</code> and hear the difference. Then try adding a fifth to the Cm bar: <code>[c2 ~ g2 ~ c2 ~ eb2 ~]</code>.</p>
 </div>
 
 <h3>Beyond roots</h3>
