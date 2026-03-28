@@ -260,6 +260,7 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
     <a href="#polyrhythm">Polyrhythm</a>
     <a href="#ghosts">Ghosts</a>
     <a href="#width">Width</a>
+    <a href="#score">Score</a>
     <a href="#capstone">Capstone</a>
 </div></nav>
 
@@ -274,19 +275,18 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 <!-- ============ HERO ============ -->
 <section id="hero">
 <h1><span class="accent">Layers</span></h1>
-<div class="subtitle">EDM.3: polyrhythm, ghost notes, and stereo width</div>
+<div class="subtitle">EDM.3: polyrhythm, ghost notes, stereo, and three voices breathing together</div>
 
 <p>Your EDM.2 capstone has six layers. Sounds like a track. But it&rsquo;s flat: no ghosts, no width, no cross-rhythm. This lesson adds what turns a pattern into a groove.</p>
 
-<div class="concept warm">
-    <span class="c-label">what you already know</span>
-    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm()</code>,
-    mini-notation (<code>[] * ~ () &lt;&gt;</code>), <code>.gain()</code>,
-    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
-    <code>.sustain()</code>, <code>.release()</code>, <code>.add(note())</code>,
-    <code>sine.range()</code>, <code>.slow()</code>,
-    and the drums + filtered reese from EDM.1&ndash;2.</p>
-</div>
+<details class="earned">
+    <summary>about this lesson</summary>
+    <div class="earned-body">
+    <p><strong>Repertoire:</strong> <em>Wind Scene</em> (Yasunori Mitsuda, Chrono Trigger, 1995) and <em>Spring</em> (ConcernedApe, Stardew Valley, 2016). Both are three voices breathing together: melody, accompaniment, bass. Same architecture, different aesthetics.</p>
+    <p><strong>Parallel composition:</strong> Adding a second melodic voice to the &ETH;ir&eth;ug piece. The shakuhachi ghost. Four layers now.</p>
+    <p><strong>What you already know:</strong> <code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm()</code>, mini-notation, <code>.gain()</code>, <code>.lpf()</code>, ADSR, <code>.add(note())</code>, <code>sine.range()</code>, and the drums + filtered reese from EDM.1&ndash;2.</p>
+    </div>
+</details>
 </section>
 
 <!-- ============ SECTION 0: POLYRHYTHM ============ -->
@@ -421,6 +421,62 @@ stack(
         <p style="font-size: 0.8rem; color: var(--text-faint); margin-bottom: 0;">For more on West African polyrhythm: Novotney, &ldquo;The 3:2 Relationship as the Foundation of Timelines in West African Musics&rdquo; (1998).</p>
     </div>
 </details>
+
+<h3>Repertoire: three voices, one piece</h3>
+
+<p>Polyrhythm is one kind of layering. Another kind: independent melodic voices playing simultaneously. Listen to how Yasunori Mitsuda layers three voices in the Chrono Trigger Wind Scene:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>wind scene (approximation, Chrono Trigger, 1995)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-wind">
+    <!--
+setcpm(30)
+stack(
+  // melody (music box)
+  note("e5 ~ d5 ~ c5 ~ b4 ~ a4 ~ ~ ~")
+    .s("gm_music_box").gain(0.6),
+  // arpeggiated accompaniment
+  note("[c4 e4 g4] [c4 e4 g4] [a3 c4 e4] [a3 c4 e4]")
+    .s("gm_music_box").gain(0.3),
+  // bass
+  note("c3 ~ ~ ~ a2 ~ ~ ~")
+    .s("triangle").gain(0.5)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Three layers. Each one has a different rhythm. The melody moves in steps. The accompaniment arpeggiates chords. The bass holds the foundation. They breathe together because each has space the others don&rsquo;t fill.</p>
+
+<p>Now the same architecture, simpler. <strong>Stardew Valley &mdash; Spring</strong> (ConcernedApe, 2016):</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>spring (approximation, Stardew Valley, 2016)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-stardew">
+    <!--
+setcpm(35)
+stack(
+  // melody
+  note("g4 a4 b4 d5 b4 a4 g4 ~")
+    .s("triangle").gain(0.5),
+  // chords
+  note("[g3,b3,d4] ~ [c4,e4,g4] ~")
+    .s("triangle").gain(0.3),
+  // bass
+  note("g2 ~ c3 ~")
+    .s("sawtooth").lpf(300).gain(0.4)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Same three-voice structure. Melody on top, chords in the middle, bass on the bottom. Mitsuda makes it shimmer. ConcernedApe makes it cozy. The architecture is identical.</p>
+
+<div class="concept warm">
+    <span class="c-label">the principle</span>
+    <p>Three voices is enough. Melody, accompaniment, bass. If each voice has its own register (high, mid, low) and its own rhythm, they won&rsquo;t collide. That&rsquo;s what <code>stack()</code> is for. Not just playing things at the same time. Giving each voice room.</p>
+</div>
+
 </section>
 
 <!-- ============ SECTION 1: GHOST NOTES ============ -->
@@ -609,8 +665,48 @@ stack(
 </section>
 
 <!-- ============ SECTION 3: CAPSTONE ============ -->
+<!-- ============ THE SCORE CONTINUES ============ -->
+<section id="score">
+<h2><span class="num">03</span>The Score Continues</h2>
+
+<p>Your &ETH;ir&eth;ug piece has three layers: koto, pulse, bass drone. Now add a second voice. Something that breathes in the spaces the koto leaves. A shakuhachi ghost:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>the north atlantic: four voices</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-dirdug-3">
+    <!--
+setcpm(15)
+stack(
+  // koto (L0)
+  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8),
+  // shakuhachi ghost (NEW)
+  note("~ ~ b4 ~ ~ ~ e4 ~")
+    .sound("gm_shakuhachi").gain(0.5)
+    .lpf(2000),
+  // pulse (L1)
+  note("e2 ~ ~ ~ ~ ~ e2 ~")
+    .s("sawtooth").lpf(200).decay(.4).sustain(0).gain(0.4),
+  // bass drone (L2)
+  note("e2").s("sawtooth")
+    .lpf(200).lpq(1)
+    .attack(1).decay(0.5).sustain(0.6).release(1)
+    .gain(0.4)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Four voices. The koto and shakuhachi interleave. Where the koto plays, the shakuhachi rests. Where the koto rests, the shakuhachi enters. Same principle as the Wind Scene: each voice has room because the other voices leave space for it.</p>
+
+<div class="try-this">
+    <span class="label">Your turn</span>
+    <p>Change the shakuhachi notes. Try <code>note("~ ~ a4 ~ ~ ~ d5 ~")</code>. The relationship between the two melodies is the composition. Pan the shakuhachi: add <code>.pan(0.7)</code> to spread it right while the koto stays centered.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 4: CAPSTONE ============ -->
 <section id="capstone">
-<h2><span class="num">03</span>The Arrangement</h2>
+<h2><span class="num">04</span>The Arrangement</h2>
 
 <div class="punchline">
     <p><strong>Everything combined.</strong> Kick, snare, ghost snares, stereo hats, open hat, an alternating reese, and a melodic stab. Ten layers. One track.</p>
@@ -691,6 +787,8 @@ stack(
     <table>
         <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
         <tbody>
+        <tr><td style="color: var(--accent);">Yasunori Mitsuda</td><td>Chrono Trigger: Wind Scene (1995)</td><td>(game) three voices breathing together. Melody, arpeggio, bass.</td></tr>
+        <tr><td style="color: var(--accent);">ConcernedApe</td><td>Stardew Valley: Spring (2016)</td><td>(game) same three-voice architecture. Folk simplicity.</td></tr>
         <tr><td>Photek</td><td>Ni-Ten-Ichi-Ryu (1997)</td><td>(DnB) drum programming so intricate it seemed inhuman</td></tr>
         <tr><td>Goldie</td><td>Timeless (1995)</td><td>(DnB) 21 minutes of impossibly layered production</td></tr>
         <tr><td>Noisia</td><td>Stigma (2007)</td><td>(neurofunk) polyrhythmic interplay reframes the groove</td></tr>
