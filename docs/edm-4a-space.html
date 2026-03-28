@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.4a: Space</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+/* Reduce internal padding/space in the strudel component */
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Harmonic toggle buttons --- */
+.harmonic-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s;
+}
+.harmonic-btn.active {
+    border-color: var(--cool); color: var(--cool); background: var(--cool-dim);
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</style>
+</head><body>
+
+<canvas id="hydra-canvas"></canvas>
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#reverb">Reverb</a>
+    <a href="#delay">Delay</a>
+    <a href="#repertoire">Repertoire</a>
+    <a href="#pads">Pads</a>
+    <a href="#score">Your Piece</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1><span class="accent">Space</span></h1>
+<div class="subtitle">EDM.4a: reverb, delay, and the sound of a room</div>
+
+<p>Every sound so far is dry. No reflections, no echoes. No room. This lesson adds the room.</p>
+
+<details class="earned">
+    <summary>about this lesson</summary>
+    <div class="earned-body">
+    <p><strong>Repertoire:</strong> <em>Firelink Shrine</em> (Motoi Sakuraba, Dark Souls, 2011), <em>Temple of Time</em> (Manaka Kataoka, Zelda: BotW, 2017), <em>Temple of Time</em> (Koji Kondo, Zelda: OoT, 1998). Three approaches to making space the instrument.</p>
+    <p><strong>Also:</strong> <em>Fujimusume</em> (traditional Nagauta/Kabuki). The shamisen and the spaces between its strikes.</p>
+    <p><strong>Parallel composition:</strong> Your ambient piece gets reverb and delay. The koto starts living in a room.</p>
+    <p><strong>What you already know:</strong> Everything from EDM.0-3. Patterns, drums, bass, waveforms, ADSR, filtering, layering, panning.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 0: REVERB ============ -->
+<section id="reverb">
+<h2><span class="num">00</span>The Room</h2>
+
+<p>A clap, raw:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>dry clap</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+s("~ ~ ~ ~ cp ~ ~ ~")
+    -->
+    </strudel-editor>
+</div>
+
+<p>The same clap in a room:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>reverbed clap</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+s("~ ~ ~ ~ cp ~ ~ ~")
+  .room(0.5).size(0.8)
+    -->
+    </strudel-editor>
+</div>
+
+<p><code>.room()</code> is how much reverb. <code>.size()</code> is how big the space. Listen to the tail after the transient.</p>
+
+<div class="concept">
+    <span class="c-label">reverb</span>
+    <p>Simulated reflections of sound in a space. <code>.room(amount)</code> sets how much signal enters the reverb. <code>.size(dimension)</code> sets the room size.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.room(0.9).size(0.95)</code> for a cathedral. Try <code>.room(0.3).size(0.2)</code> for a bathroom. The size changes the character of the reflections.</p>
+</div>
+
+<p>Now put the koto in a room:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>koto: dry vs. wet</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0c">
+    <!--
+note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
+  .room(0.8).size(0.9)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Play it without the <code>.room()</code> line first. Then add it back. The notes are the same. The space changes everything.</p>
+</section>
+
+<!-- ============ SECTION 1: DELAY ============ -->
+<section id="delay">
+<h2><span class="num">01</span>The Echo</h2>
+
+<p>Reverb is many reflections blurred. Delay is distinct echoes:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>delayed koto</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+note("e4 ~ ~ ~ ~ ~ ~ ~").sound("gm_koto").gain(0.8)
+  .delay(0.5).delaytime(0.375).delayfeedback(0.4)
+    -->
+    </strudel-editor>
+</div>
+
+<p>One note. The delay repeats it, each echo quieter. <code>.delay()</code> sets the echo level. <code>.delaytime()</code> sets the gap. <code>.delayfeedback()</code> controls how many times it repeats.</p>
+
+<div class="concept">
+    <span class="c-label">delay</span>
+    <p><code>.delay(amount)</code> = wet level. <code>.delaytime(seconds)</code> = gap between echoes. <code>.delayfeedback(amount)</code> = how many echoes. Above 0.8, the echoes can run away.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.delaytime(0.5)</code> for slower echoes. <code>.delayfeedback(0.7)</code> for a longer tail. Now combine both: add <code>.room(0.6).size(0.8)</code> to the delayed koto. Reverb on the echoes.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: signal flow</summary>
+    <div class="rh-body">
+        <h4>Wet and dry</h4>
+        <svg viewBox="0 0 400 140" style="width: 100%; background: var(--surface); border-radius: 4px; margin: 0.5rem 0 1rem;">
+            <rect x="10" y="55" width="60" height="30" rx="4" fill="none" stroke="#8a8780" stroke-width="1"/>
+            <text x="40" y="74" fill="#e8e6e3" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">input</text>
+            <line x1="70" y1="70" x2="120" y2="70" stroke="#8a8780" stroke-width="1"/>
+            <circle cx="120" cy="70" r="3" fill="#8a8780"/>
+            <line x1="120" y1="70" x2="120" y2="35" stroke="#4fc3f7" stroke-width="1"/>
+            <line x1="120" y1="35" x2="290" y2="35" stroke="#4fc3f7" stroke-width="1"/>
+            <text x="205" y="28" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">dry</text>
+            <line x1="120" y1="70" x2="120" y2="105" stroke="#ff6b35" stroke-width="1"/>
+            <line x1="120" y1="105" x2="160" y2="105" stroke="#ff6b35" stroke-width="1"/>
+            <rect x="160" y="90" width="70" height="30" rx="4" fill="none" stroke="#ff6b35" stroke-width="1"/>
+            <text x="195" y="109" fill="#ff6b35" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">effect</text>
+            <line x1="230" y1="105" x2="290" y2="105" stroke="#ff6b35" stroke-width="1"/>
+            <text x="260" y="120" fill="#ff6b35" font-family="SF Mono, monospace" font-size="8" text-anchor="middle">wet</text>
+            <line x1="290" y1="35" x2="290" y2="60" stroke="#4fc3f7" stroke-width="1"/>
+            <line x1="290" y1="105" x2="290" y2="80" stroke="#ff6b35" stroke-width="1"/>
+            <circle cx="290" cy="70" r="10" fill="none" stroke="#66bb6a" stroke-width="1.5"/>
+            <text x="290" y="74" fill="#66bb6a" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">+</text>
+            <line x1="300" y1="70" x2="340" y2="70" stroke="#8a8780" stroke-width="1"/>
+            <rect x="340" y="55" width="55" height="30" rx="4" fill="none" stroke="#8a8780" stroke-width="1"/>
+            <text x="367" y="74" fill="#e8e6e3" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">output</text>
+        </svg>
+        <p>The signal splits. Dry = original. Wet = effected. <code>.room(0.5)</code> means 50% wet. <code>.delay(0.3)</code> means 30% delay mixed in.</p>
+        <h4>Delay feedback</h4>
+        <p>Delay has a feedback loop: output feeds back into input. Each pass is quieter. At <code>0.5</code>, each echo is half the volume. At <code>0.9</code>, echoes barely die. Above <code>1.0</code>, runaway feedback.</p>
+    </div>
+</details>
+</section>
+
+
+<!-- ============ SECTION 2: REPERTOIRE ============ -->
+<section id="repertoire">
+<h2><span class="num">02</span>Space as Instrument</h2>
+
+<p>You now have reverb and delay. Listen to what happens when composers make space the primary compositional tool.</p>
+
+<p><strong>Dark Souls: Firelink Shrine</strong> (Motoi Sakuraba, 2011). A handful of notes in a massive acoustic space. The melody is almost nothing. The room does the rest:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>firelink shrine (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-firelink">
+    <!--
+setcpm(20)
+note("d4 ~ ~ a3 ~ ~ f4 ~ ~ d4 ~ ~")
+  .s("gm_acoustic_guitar_nylon").gain(0.6)
+  .room(0.8).size(0.9)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Remove <code>.room(0.8).size(0.9)</code> and play it again. Without the space, it&rsquo;s just notes. With it, it&rsquo;s a place.</p>
+
+<p><strong>Zelda: Breath of the Wild: Temple of Time</strong> (Manaka Kataoka, 2017). Piano notes floating in silence with long delay tails:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>botw temple of time (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-botw">
+    <!--
+setcpm(15)
+note("a4 ~ ~ ~ ~ e4 ~ ~ ~ ~ ~ ~ c5 ~ ~ ~")
+  .s("gm_acoustic_grand_piano").gain(0.5)
+  .room(0.7).size(0.9)
+  .delay(0.4).delaytime(0.5).delayfeedback(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p><strong>Zelda: Ocarina of Time: Temple of Time</strong> (Koji Kondo, 1998). Choir pad, bells, sustained harmonic wash:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>oot temple of time (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-oot">
+    <!--
+setcpm(18)
+stack(
+  note("[d3,a3,d4]").s("sawtooth")
+    .lpf(800).lpq(1)
+    .attack(1.5).decay(0.5).sustain(0.7).release(2)
+    .room(0.9).size(0.95).gain(0.3),
+  note("d5 ~ ~ a4 ~ ~ d5 ~ ~ f5 ~ ~")
+    .s("gm_music_box").gain(0.4)
+    .room(0.6).delay(0.3).delaytime(0.375).delayfeedback(0.2)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="concept warm">
+    <span class="c-label">three approaches</span>
+    <p>Sakuraba: reverb on sparse guitar. Kataoka: delay on sparse piano. Kondo: sustained pad with reverb, bells with delay above it. Same tools. Three worlds.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: the BotW sound design decision</summary>
+    <div class="rh-body">
+        <h4>The deliberate absence</h4>
+        <p>For 30 years, Zelda games had melodic, hummable soundtracks. Every area had a song. Then Breath of the Wild shipped with almost nothing. Sparse piano notes. Long silences. Environmental sound.</p>
+        <p>Hajime Wakai (sound director): the world was the music. Wind, rain, footsteps, birds. The piano notes weren&rsquo;t a soundtrack. They were punctuation. The silence between them was the composition.</p>
+        <p>The player was supposed to feel alone in a huge landscape. A full orchestral score would have broken that.</p>
+        <h4>The contrast with Ocarina</h4>
+        <p>Kondo&rsquo;s OoT Temple of Time fills every moment with sound. BotW&rsquo;s fills it with the absence of sound. Both use <code>.room()</code>. The aesthetic decision is what differs.</p>
+    </div>
+</details>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: shamisen, Kabuki, and the space between strikes</summary>
+    <div class="rh-body">
+        <h4>Fujimusume</h4>
+        <p>In the Kabuki dance <em>Fujimusume</em> (The Wisteria Maiden), the shamisen plays sparse, percussive strikes with long silences between them. The strikes are sharp and bright. The silences are structural. The dancer moves in the spaces the music leaves.</p>
+        <p>Same principle as Firelink Shrine and BotW: the sound event matters, but the space around it matters more.</p>
+        <h4>Nagauta form</h4>
+        <p>Nagauta (&ldquo;long song&rdquo;) is the musical form behind Kabuki dance. It combines shamisen, voice, and percussion ensemble. The percussion uses <em>kakegoe</em> (rhythmic shouts) between beats. The shouts aren&rsquo;t decoration. They&rsquo;re timing cues that live in the rests, shaping the negative space.</p>
+        <h4>The connection</h4>
+        <p>Your koto plays sparse notes with rests between them. Your shakuhachi breathes in the gaps. When you add <code>.room()</code> and <code>.delay()</code>, you&rsquo;re doing what the Kabuki theater does acoustically: letting the space between events become part of the composition.</p>
+    </div>
+</details>
+</section>
+
+
+<!-- ============ SECTION 3: PADS ============ -->
+<section id="pads">
+<h2><span class="num">03</span>Pads</h2>
+
+<p>A pad is a sustained sound that fills the harmonic space. Long attack, long release. It fades in and fades out. The OoT Temple of Time used one. Here&rsquo;s how to build it.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>a simple pad</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3a">
+    <!--
+note("[e3,b3,e4]").s("sawtooth")
+  .lpf(600).lpq(1)
+  .attack(2).decay(0.5).sustain(0.6).release(2)
+  .room(0.8).size(0.9)
+  .gain(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Three notes stacked: E3, B3, E4. A sawtooth filtered down to warmth. The <code>.attack(2)</code> means it takes 2 seconds to fade in. The <code>.release(2)</code> means it lingers after the note ends. That slow breathing is what makes a pad a pad.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Change the chord: try <code>[a3,c4,e4]</code> for A minor. Try <code>[d3,f3,a3]</code> for D minor. Adjust <code>.lpf()</code> between 300 (dark, buried) and 1200 (bright, present). The filter is the pad&rsquo;s personality.</p>
+</div>
+
+<p>Now layer it under a melody:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>pad + melody</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-3b">
+    <!--
+setcpm(18)
+stack(
+  // pad
+  note("[e3,b3,e4]").s("sawtooth")
+    .lpf(600).lpq(1)
+    .attack(2).decay(0.5).sustain(0.6).release(2)
+    .room(0.8).size(0.9).gain(0.25),
+  // melody
+  note("e5 ~ ~ b4 ~ ~ g4 ~ ~ e5 ~ ~")
+    .s("gm_music_box").gain(0.4)
+    .room(0.5).delay(0.3).delaytime(0.375).delayfeedback(0.2)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The pad holds the harmony. The melody floats above it. This is the OoT Temple of Time architecture: wash + detail.</p>
+
+<div class="concept">
+    <span class="c-label">pad recipe</span>
+    <p>Sawtooth (or square) wave. Filter it low (<code>.lpf(400-800)</code>). Long attack (<code>.attack(1-3)</code>). High sustain. Long release. Add <code>.room()</code> for space. Stack 2-3 notes for a chord. That&rsquo;s a pad.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 4: YOUR COMPOSITION ============ -->
+<section id="score">
+<h2><span class="num">04</span>Your Composition</h2>
+
+<p>This is the transformation. Same notes from L0-L3. But now they live in a space.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>your ambient piece: adding space</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-ambient-4a">
+    <!--
+setcpm(15)
+stack(
+  // koto with reverb and delay
+  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
+    .room(0.8).size(0.9)
+    .delay(0.4).delaytime(0.5).delayfeedback(0.3),
+  // shakuhachi with room
+  note("~ ~ b4 ~ ~ ~ e4 ~")
+    .sound("gm_shakuhachi").gain(0.5)
+    .room(0.7).size(0.8)
+    .lpf(2000),
+  // pulse
+  note("e2 ~ ~ ~ ~ ~ e2 ~")
+    .s("sawtooth").lpf(200).decay(.4).sustain(0).gain(0.3),
+  // bass drone
+  note("e2").s("sawtooth")
+    .lpf(200).lpq(1)
+    .attack(1).decay(0.5).sustain(0.6).release(1)
+    .gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Five layers. The koto decays into reverb and delay trails. The shakuhachi breathes in the spaces. Compare this to the L0 version. Same notes. Different piece. The effects are the transformation.</p>
+
+<div class="try-this">
+    <span class="label">Your turn</span>
+    <p>Add a pad underneath: replace the bass drone with <code>note("[e2,b2,e3]").s("sawtooth").lpf(400).attack(2).sustain(0.5).release(2).room(0.9).gain(0.2)</code>. Different foundation. Different feeling. Try removing the pulse entirely. Does the pad hold the piece on its own?</p>
+</div>
+</section>
+
+<!-- ============ SECTION 5: CAPSTONE ============ -->
+<section id="capstone">
+<h2><span class="num">05</span>Atmosphere</h2>
+
+<div class="punchline">
+    <p><strong>Two versions.</strong> The first: your ambient piece with everything from L0-L4a. The second: a beat underneath it. Play both. Decide which is yours.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>capstone A: ambient only</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-capstone-a">
+    <!--
+setcpm(15)
+stack(
+  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
+    .room(0.8).size(0.9)
+    .delay(0.4).delaytime(0.5).delayfeedback(0.3),
+  note("~ ~ b4 ~ ~ ~ e4 ~")
+    .sound("gm_shakuhachi").gain(0.5)
+    .room(0.7).size(0.8).lpf(2000),
+  note("[e2,b2,e3]").s("sawtooth")
+    .lpf(400).attack(2).sustain(0.5).release(2)
+    .room(0.9).gain(0.2)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>capstone B: ambient + beat</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-capstone-b">
+    <!--
+setcpm(15)
+stack(
+  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
+    .room(0.8).size(0.9)
+    .delay(0.4).delaytime(0.5).delayfeedback(0.3),
+  note("~ ~ b4 ~ ~ ~ e4 ~")
+    .sound("gm_shakuhachi").gain(0.5)
+    .room(0.7).size(0.8).lpf(2000),
+  note("[e2,b2,e3]").s("sawtooth")
+    .lpf(400).attack(2).sustain(0.5).release(2)
+    .room(0.9).gain(0.2),
+  s("bd ~ ~ ~ ~ ~ bd ~").gain(0.4),
+  s("~ ~ ~ ~ [~ cp] ~ ~ ~").gain(0.3).room(0.4)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="exercises">
+    <span class="ex-label">before you go</span>
+    <ol>
+        <li>Take capstone A. Change the pad chord from E minor to A minor: <code>[a2,c3,e3]</code>. How does the mood shift?</li>
+        <li>Increase <code>.delayfeedback()</code> on the koto to <code>0.6</code>. The echoes last longer. Does it feel more spacious or more cluttered?</li>
+        <li>Remove everything except the koto + reverb. One voice in a room. Is that enough?</li>
+        <li>Share whichever version you prefer. Hit the share button.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>.room()</td><td>reverb amount (0-1)</td><td><code>.room(0.5)</code></td></tr>
+        <tr><td>.size()</td><td>room size (0-1)</td><td><code>.size(0.8)</code></td></tr>
+        <tr><td>.delay()</td><td>delay wet level (0-1)</td><td><code>.delay(0.4)</code></td></tr>
+        <tr><td>.delaytime()</td><td>gap between echoes (seconds)</td><td><code>.delaytime(0.5)</code></td></tr>
+        <tr><td>.delayfeedback()</td><td>echo decay (0-1, above 0.8 = danger)</td><td><code>.delayfeedback(0.3)</code></td></tr>
+        <tr><td>pad</td><td>sustained chord with long ADSR + filter</td><td>sawtooth + lpf + slow attack/release</td></tr>
+        </tbody>
+    </table>
+    <p class="earned-next">Next: <em>Chords</em>. Intervals, triads, and dark progressions.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td style="color: var(--accent);">Motoi Sakuraba</td><td>Dark Souls: Firelink Shrine (2011)</td><td>(game) sparse guitar in massive reverb</td></tr>
+        <tr><td style="color: var(--accent);">Manaka Kataoka</td><td>Zelda BotW: Temple of Time (2017)</td><td>(game) piano notes in silence, delay as composition</td></tr>
+        <tr><td style="color: var(--accent);">Koji Kondo</td><td>Zelda OoT: Temple of Time (1998)</td><td>(game) choir pad + bells, the original atmospheric Zelda</td></tr>
+        <tr><td>Brian Eno</td><td>Music for Airports 1/1 (1978)</td><td>(ambient) the genre definition: tape loops at different lengths creating slowly shifting patterns</td></tr>
+        <tr><td>Boards of Canada</td><td>Music Has the Right to Children (1998)</td><td>(electronic) filtered, degraded, nostalgic textures</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+</section>
+
+</div><!-- /container -->
+
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(6, 0.08, 1.2)
+            .color(0.5, 0.15, 0.8)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.3)
+            .modulateScale(
+                h.osc(3, 0.12).rotate(0.5),
+                () => 0.1 + window._audioData.fft[1] * 0.6
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.4)
+            .saturate(() => 0.8 + window._audioData.fft[2] * 1.5)
+            .kaleid(() => 2 + Math.floor(window._audioData.fft[3] * 2))
+            .contrast(1.3)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>

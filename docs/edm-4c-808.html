@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EDM.4c: The 808</title>
+<style>
+:root {
+    --bg: #0a0a0c; --surface: #141418; --surface2: #1a1a1f;
+    --text: #e8e6e3; --text-dim: #8a8780; --text-faint: #5a584f;
+    --accent: #ff6b35; --accent-dim: #ff6b3533;
+    --cool: #4fc3f7; --cool-dim: #4fc3f722;
+    --purple: #ab47bc; --purple-dim: #ab47bc33;
+    --green: #66bb6a; --green-dim: #66bb6a22;
+    --divider: #1e1e24; --table-row: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Georgia', 'Times New Roman', serif;
+    line-height: 1.8; font-size: 1.1rem;
+    min-height: 100vh; -webkit-font-smoothing: antialiased;
+}
+
+/* --- Hydra background --- */
+#hydra-canvas {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: -1; opacity: 0; transition: opacity 1.5s ease;
+}
+#hydra-canvas.active { opacity: 0.3; }
+
+/* --- Navigation --- */
+.top-nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    background: linear-gradient(to bottom, var(--bg) 80%, transparent);
+    padding: 0.8rem 1rem 1.5rem;
+}
+.top-nav-inner {
+    max-width: 900px; margin: 0 auto;
+    display: flex; align-items: center; gap: 0.8rem;
+    overflow-x: auto; scrollbar-width: none;
+}
+.top-nav-inner::-webkit-scrollbar { display: none; }
+.top-nav a {
+    color: var(--text-dim); text-decoration: none;
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    white-space: nowrap; padding: 0.3rem 0.6rem;
+    border: 1px solid transparent; border-radius: 3px; transition: all 0.2s;
+}
+.top-nav a:hover, .top-nav a.active {
+    color: var(--accent); border-color: var(--accent-dim); background: var(--accent-dim);
+}
+.progress-bar {
+    position: fixed; top: 0; left: 0; height: 2px;
+    background: var(--accent); z-index: 200; transition: width 0.1s ease-out;
+    box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+}
+
+/* --- Layout --- */
+.container { max-width: 800px; margin: 0 auto; padding: 5rem 2rem 6rem; }
+section { padding: 3rem 0; border-bottom: 1px solid var(--divider); }
+section:last-of-type { border-bottom: none; }
+
+/* --- Typography --- */
+h1 { font-size: 2.2rem; font-weight: 300; letter-spacing: 0.03em; margin-bottom: 0.3rem; }
+h1 .accent { color: var(--accent); }
+.subtitle {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.7rem;
+    color: var(--text-dim); letter-spacing: 0.15em; text-transform: uppercase; margin-bottom: 2rem;
+}
+h2 { font-size: 1.4rem; font-weight: 400; margin-bottom: 1rem; letter-spacing: 0.02em; }
+h2 .num { font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);
+    letter-spacing: 0.1em; display: block; margin-bottom: 0.3rem; }
+h3 { font-size: 1.1rem; font-weight: 700; margin: 2rem 0 0.5rem; color: var(--accent); }
+p { margin-bottom: 1.2rem; }
+strong { color: var(--text); font-weight: 600; }
+em { color: var(--accent); font-style: normal; }
+code {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.9em;
+    background: var(--surface); padding: 0.15em 0.4em; border-radius: 3px; color: var(--cool);
+}
+
+/* --- Concept / callout boxes --- */
+.concept {
+    background: var(--surface); border-left: 3px solid var(--cool);
+    padding: 1.2rem 1.5rem; margin: 1.5rem 0; border-radius: 0 6px 6px 0;
+}
+.concept .c-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--cool); letter-spacing: 0.12em; text-transform: uppercase;
+    display: block; margin-bottom: 0.5rem;
+}
+.concept p { margin-bottom: 0.8rem; font-size: 1rem; }
+.concept p:last-child { margin-bottom: 0; }
+.concept.warm { border-left-color: var(--accent); }
+.concept.warm .c-label { color: var(--accent); }
+
+/* --- Try-this prompts --- */
+.try-this {
+    background: var(--surface2); border: 1px solid var(--divider);
+    padding: 1rem 1.5rem; margin: 1.5rem 0; border-radius: 6px;
+}
+.try-this .label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.3rem;
+}
+.try-this p { font-size: 0.95rem; margin-bottom: 0.5rem; }
+.try-this p:last-child { margin-bottom: 0; }
+
+/* --- Exercises --- */
+.exercises {
+    background: var(--green-dim); border: 1px solid #66bb6a33;
+    border-radius: 8px; padding: 1.5rem; margin: 2rem 0;
+}
+.exercises .ex-label {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    color: var(--green); letter-spacing: 0.1em; text-transform: uppercase;
+    display: block; margin-bottom: 0.8rem;
+}
+.exercises ol { padding-left: 1.4rem; }
+.exercises li { margin-bottom: 0.8rem; font-size: 0.95rem; line-height: 1.6; }
+
+/* --- Strudel editor containers --- */
+.strudel-block {
+    margin: 1.5rem 0;
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+.strudel-block strudel-editor {
+    display: block;
+    width: 100%;
+}
+/* Reduce internal padding/space in the strudel component */
+.strudel-block strudel-editor::part(editor) { padding: 0; }
+.strudel-block .cm-editor { min-height: auto !important; }
+.strudel-block .cm-scroller { min-height: auto !important; }
+.strudel-label {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem;
+    color: var(--text-faint); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.5rem 1rem;
+    background: var(--surface);
+    border-bottom: 1px solid var(--divider);
+    display: flex; justify-content: space-between; align-items: center;
+}
+.strudel-controls { display: flex; gap: 0.4rem; }
+.strudel-play, .strudel-stop, .strudel-share {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.strudel-play:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.strudel-stop:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+.strudel-share:hover { border-color: var(--cool); color: var(--cool); background: var(--cool-dim); }
+.strudel-play.playing { border-color: var(--green); color: var(--bg); background: var(--green); }
+.strudel-share.copied { border-color: var(--green); color: var(--bg); background: var(--green); }
+
+/* --- Earned / collapsible index --- */
+details.earned {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; padding: 0; margin: 2rem 0; overflow: hidden;
+}
+details.earned summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.earned summary::-webkit-details-marker { display: none; }
+details.earned summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.earned[open] summary::before { transform: rotate(90deg); }
+details.earned[open] summary { border-bottom: 1px solid var(--divider); }
+details.earned .earned-body { padding: 1rem 1.5rem; }
+details.earned table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0; }
+details.earned th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.earned td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.earned tr:nth-child(even) td { background: var(--table-row); }
+details.earned td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+details.earned .earned-next {
+    margin-top: 1rem; padding-top: 0.8rem; border-top: 1px solid var(--divider);
+    font-size: 0.95rem;
+}
+
+/* --- Harmonic toggle buttons --- */
+.harmonic-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.2rem 0.6rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s;
+}
+.harmonic-btn.active {
+    border-color: var(--cool); color: var(--cool); background: var(--cool-dim);
+}
+
+/* --- Rabbit hole collapsibles --- */
+details.rabbit-hole {
+    background: var(--surface); border: 1px solid var(--divider);
+    border-radius: 6px; margin: 1.5rem 0; overflow: hidden;
+}
+details.rabbit-hole summary {
+    font-family: 'SF Mono', monospace; font-size: 0.7rem;
+    color: var(--purple); letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 1rem 1.5rem; cursor: pointer; list-style: none;
+    display: flex; align-items: center; gap: 0.5rem;
+}
+details.rabbit-hole summary::-webkit-details-marker { display: none; }
+details.rabbit-hole summary::before { content: '\25B6'; font-size: 0.5rem; transition: transform 0.2s; }
+details.rabbit-hole[open] summary::before { transform: rotate(90deg); }
+details.rabbit-hole[open] summary { border-bottom: 1px solid var(--divider); }
+details.rabbit-hole .rh-body { padding: 1.5rem; }
+details.rabbit-hole .rh-body h4 { font-size: 1rem; font-weight: 600; color: var(--purple); margin: 1.5rem 0 0.5rem; }
+details.rabbit-hole .rh-body h4:first-child { margin-top: 0; }
+details.rabbit-hole .rh-body p { font-size: 0.95rem; margin-bottom: 1rem; }
+details.rabbit-hole table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 0 0 1rem; }
+details.rabbit-hole th {
+    font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim);
+    letter-spacing: 0.08em; text-transform: uppercase; text-align: left;
+    padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--divider);
+}
+details.rabbit-hole td { padding: 0.4rem 0.6rem; border-bottom: 1px solid #111115; }
+details.rabbit-hole tr:nth-child(even) td { background: var(--table-row); }
+details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: var(--cool); font-weight: 600; }
+
+/* --- Punchline / capstone highlight --- */
+.punchline {
+    background: linear-gradient(135deg, var(--accent-dim), var(--cool-dim));
+    border: 1px solid var(--divider); border-radius: 8px; padding: 2rem; margin: 2rem 0;
+}
+.punchline p { margin-bottom: 0.8rem; }
+.punchline p:last-child { margin-bottom: 0; }
+
+/* --- Floating controls --- */
+.float-controls {
+    position: fixed; bottom: 1rem; right: 1rem; z-index: 50;
+    display: flex; gap: 0.5rem; align-items: center;
+    background: rgba(20, 20, 24, 0.92); padding: 0.5rem 0.8rem;
+    border-radius: 6px; border: 1px solid var(--divider); backdrop-filter: blur(8px);
+}
+.ctrl-btn {
+    font-family: 'SF Mono', monospace; font-size: 0.65rem;
+    padding: 0.3rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ctrl-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+/* --- Responsive --- */
+@media (max-width: 640px) {
+    .container { padding: 4.5rem 1.2rem 4rem; }
+    body { font-size: 1rem; }
+    h1 { font-size: 1.6rem; }
+    .float-controls { bottom: 0.5rem; right: 0.5rem; }
+}
+</style>
+</style>
+</head><body>
+
+<canvas id="hydra-canvas"></canvas>
+<div class="progress-bar" id="progress"></div>
+<nav class="top-nav"><div class="top-nav-inner">
+    <a href="index.html" class="back">&larr;</a>
+    <a href="#ground">Ground</a>
+    <a href="#the808">808</a>
+    <a href="#capstone">Capstone</a>
+</div></nav>
+
+<div class="float-controls">
+    <button class="ctrl-btn" id="hydra-btn" onclick="toggleHydra()">&#x25C8; hydra</button>
+    <button class="ctrl-btn" id="hush-btn" onclick="hushAll()">&#x23F9; hush</button>
+</div>
+
+<div class="container">
+
+<!-- ============ HERO ============ -->
+<section id="hero">
+<h1>The <span class="accent">808</span></h1>
+<div class="subtitle">EDM.4c: the drum machine, distortion, and phonk</div>
+
+<p>A genre detour. The Roland TR-808 drum machine changed music. This lesson explores it.</p>
+
+<details class="earned">
+    <summary>about this lesson</summary>
+    <div class="earned-body">
+    <p><strong>Genre:</strong> Phonk, trap, Memphis rap. 140bpm, 808 bass, distortion, cowbell.</p>
+    <p><strong>Optional:</strong> This lesson is a sidebar. The main thread continues in L5 (Movement). Come here when you want to explore a different genre with the same tools.</p>
+    <p><strong>What you already know:</strong> Everything from L0-L4b.</p>
+    </div>
+</details>
+</section>
+
+<!-- ============ SECTION 0: NEW GROUND ============ -->
+<section id="ground">
+<h2><span class="num">00</span>New Ground</h2>
+
+<p>140bpm instead of 170. Four beats per cycle: 140&thinsp;/&thinsp;4&thinsp;=&thinsp;35 cycles per minute.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>140bpm kick</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0a">
+    <!--
+setcpm(35)
+s("bd ~ ~ ~ bd ~ [~ bd] ~")
+    -->
+    </strudel-editor>
+</div>
+
+<p>At this tempo, each kick has more silence around it. Listen to the gap between hits.</p>
+
+<p>Add a clap on beat 3 and hi-hats:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>phonk drums</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0b">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~"),
+  s("~ ~ ~ ~ cp ~ ~ ~").gain(0.9),
+  s("hh*16").gain("0.3 0.5 0.3 0.8")
+)
+    -->
+    </strudel-editor>
+</div>
+
+<h3>The cowbell</h3>
+
+<p>One sound that defines this genre:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>+ cowbell</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-0c">
+    <!--
+setcpm(35)
+stack(
+  s("bd ~ ~ ~ bd ~ [~ bd] ~"),
+  s("~ ~ ~ ~ cp ~ ~ ~").gain(0.9),
+  s("hh*16").gain("0.3 0.5 0.3 0.8"),
+  s("~ cb ~ cb ~ cb cb ~").gain(0.5)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The cowbell sits in a higher frequency range than anything else in the pattern. That contrast is why you hear it first.</p>
+
+<div class="concept">
+    <span class="c-label">phonk</span>
+    <p>Hip-hop subgenre rooted in Memphis rap. Heavy 808 bass, cowbell, dark atmosphere. 130&ndash;145 BPM. What you just heard is the skeleton.</p>
+</div>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>s("cb(5,8)")</code> for a euclidean cowbell. Or <code>s("cb*8").gain("0 0.5 0 0.7 0 0.5 0 0.9")</code> for accented eighth notes.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 1: THE 808 ============ -->
+<section id="the808">
+<h2><span class="num">01</span>The 808</h2>
+
+<p>The DnB reese used two detuned sawtooths. Phonk bass is simpler: a sine wave with a long tail.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>sine with decay</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1a">
+    <!--
+setcpm(35)
+note("c2").s("sine")
+  .decay(0.5).sustain(0)
+    -->
+    </strudel-editor>
+</div>
+
+<p>The Roland TR-808 drum machine used this exact circuit for its kick: an oscillator that decays. Producers started pitching it down and holding it longer. The kick became the bass.</p>
+
+<p>Give it a pattern. Two notes from C minor:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>808 in c minor</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1b">
+    <!--
+setcpm(35)
+note("c2 ~ c2 ~ eb2 ~ c2 ~").s("sine")
+  .decay(0.3).sustain(0.2).release(0.1)
+  .gain(0.8)
+    -->
+    </strudel-editor>
+</div>
+
+<p>C, then E-flat. Root and minor third. Two pitches give the bass a melodic shape.</p>
+
+<div class="concept">
+    <span class="c-label">808 bass</span>
+    <p>A sine oscillator shaped by a decay envelope. Long tail, low pitch. The pitch gives it melody; the decay length determines whether it sounds like a kick or a bass note. Named after the Roland TR-808.</p>
+</div>
+
+<h3>Distortion</h3>
+
+<p>Clean 808s work. Distorted 808s bite:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>distorted 808</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-1c">
+    <!--
+setcpm(35)
+note("c2 ~ c2 ~ eb2 ~ c2 ~").s("sine")
+  .decay(0.3).sustain(0.2).release(0.1)
+  .distort(0.4)
+  .gain(0.7)
+    -->
+    </strudel-editor>
+</div>
+
+<p><code>.distort()</code> clips the sine wave, adding harmonics above the fundamental. A clean sine is a sub. A distorted sine is a phonk 808.</p>
+
+<div class="try-this">
+    <span class="label">tweak it</span>
+    <p>Try <code>.distort(0.1)</code> for subtle warmth. <code>.distort(0.8)</code> for aggressive clipping. Add <code>.crush(8)</code> after distort for bit-crushing.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: the TR-808 circuit</summary>
+    <div class="rh-body">
+        <h4>The drum machine nobody wanted</h4>
+        <p>Roland released the TR-808 in 1980. It was supposed to sound like real drums. It didn&rsquo;t. The kick was a sine wave that decayed exponentially, generated by a bridged-T oscillator circuit. Real kick drums don&rsquo;t sound like that. Roland discontinued it in 1983.</p>
+
+        <h4>The waveform</h4>
+        <p>The 808 kick produces a decaying sine:</p>
+        <canvas id="can-808" width="400" height="100" style="width: 100%; background: var(--surface); border-radius: 4px; margin: 0.5rem 0 1rem;"></canvas>
+        <script>
+        (function() {
+            const c = document.getElementById('can-808');
+            const ctx = c.getContext('2d');
+            const w = c.width, h = c.height;
+            ctx.strokeStyle = '#ff6b35';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for (let x = 0; x < w; x++) {
+                const t = x / w;
+                const env = Math.exp(-t * 4);
+                const wave = Math.sin(t * Math.PI * 2 * 5);
+                const y = h/2 - env * wave * (h/2 - 10);
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.strokeStyle = '#ff6b3544';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([4, 4]);
+            ctx.beginPath();
+            for (let x = 0; x < w; x++) {
+                const t = x / w;
+                const env = Math.exp(-t * 4);
+                const y = h/2 - env * (h/2 - 10);
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.beginPath();
+            for (let x = 0; x < w; x++) {
+                const t = x / w;
+                const env = Math.exp(-t * 4);
+                const y = h/2 + env * (h/2 - 10);
+                if (x === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+            ctx.setLineDash([]);
+            ctx.font = '9px monospace';
+            ctx.fillStyle = '#8a8780';
+            ctx.fillText('time \u2192', w - 55, h - 5);
+            ctx.fillText('amplitude', 5, 12);
+        })();
+        </script>
+        <p>Orange: the actual waveform. Dashed: the exponential envelope. Same shape as <code>note("c2").s("sine").decay(0.5).sustain(0)</code>. Same math, not an approximation.</p>
+
+        <h4>Memphis</h4>
+        <p>In the early 1990s, Memphis producers (DJ Paul, Juicy J, Three 6 Mafia) started using the 808 kick as a melodic bass instrument. They tuned it, pitched it, ran patterns with it. Trap and phonk both descend from this technique.</p>
+
+        <h4>Different decays</h4>
+        <div class="strudel-block">
+            <div class="strudel-label"><span>short, medium, long decay</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+            <strudel-editor id="ed-rh-decay">
+            <!--
+setcpm(35)
+stack(
+  note("c2 ~ ~ ~").s("sine")
+    .decay(0.08).sustain(0).gain(0.7),
+  note("~ ~ c2 ~").s("sine")
+    .decay(0.3).sustain(0).gain(0.7),
+  note("~ ~ ~ c2").s("sine")
+    .decay(0.6).sustain(0.1).gain(0.7)
+)
+            -->
+            </strudel-editor>
+        </div>
+        <p>Short decay: a kick. Medium: a bass hit. Long: a sub note. Same oscillator, different envelope. The decay knob decides what instrument this is.</p>
+    </div>
+</details>
+</section>
+
+<section id="capstone">
+<h2><span class="num">05</span>Atmosphere</h2>
+
+<div class="punchline">
+    <p><strong>The full track.</strong> Drums, cowbell, 808, pad. Put your bass approach from the exercises above into the capstone, or use the one here as a starting point.</p>
+</div>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>// TITLE: atmosphere</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-cap">
+    <!--
+setcpm(35)
+stack(
+  // kick
+  s("bd ~ ~ ~ bd ~ [~ bd] ~").gain(0.9),
+  // clap
+  s("~ ~ ~ ~ cp ~ ~ ~")
+    .room(0.3).size(0.5).gain(0.85),
+  // hats
+  s("hh*16").gain("0.3 0.5 0.3 0.8").pan(0.35),
+  // cowbell
+  s("~ cb ~ cb ~ cb cb ~").gain(0.4)
+    .delay(0.2).delaytime(0.125).delayfeedback(0.3)
+    .pan(0.6),
+  // 808 bass
+  note("<[c2 ~ c2 ~ ~ ~ eb2 ~] [ab2 ~ ab2 ~ ~ ~ c2 ~] [bb2 ~ bb2 ~ ~ ~ d2 ~] [g2 ~ g2 ~ ~ ~ b2 ~]>")
+    .s("sine").decay(0.3).sustain(0.2).release(0.1)
+    .distort(0.3).gain(0.8),
+  // dark pad
+  note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
+    .s("sawtooth")
+    .lpf(sine.range(400, 1000).slow(16)).lpq(2)
+    .attack(0.2).sustain(0.6).release(0.5)
+    .room(0.5).size(0.8)
+    .gain(0.25)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="exercises">
+    <span class="ex-label">compose</span>
+    <ol>
+        <li>Swap the progression: try <code>note("&lt;[c3,eb3,g3] [f3,ab3,c4] [ab2,c3,eb3] [bb2,d3,f3]&gt;")</code> for i&ndash;iv&ndash;VI&ndash;VII. Update the 808 roots to match: <code>&lt;[c2 ~ c2 ~ eb2 ~ c2 ~] [f2 ~ f2 ~ ab2 ~ f2 ~] [ab2 ~ ab2 ~ c2 ~ ab2 ~] [bb2 ~ bb2 ~ d2 ~ bb2 ~]&gt;</code>.</li>
+        <li>Add ghost snares from EDM.3: <code>s("sd(3,16)").gain(0.2).pan(0.4)</code>.</li>
+        <li>Layer a melodic stab:<br><code style="font-size:0.8em;">note("~ &lt;eb4 g4&gt; ~ &lt;c4 eb4&gt;").s("square")<br>&nbsp;&nbsp;.lpf(2000).decay(0.06).sustain(0)<br>&nbsp;&nbsp;.gain(0.3).pan(0.65)<br>&nbsp;&nbsp;.delay(0.15).delaytime(0.125).delayfeedback(0.2)</code></li>
+        <li>Hit <em>share</em>. Phonk track, coded.</li>
+    </ol>
+</div>
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>.room()</td><td>reverb amount (0&ndash;1)</td><td><code>.room(0.5)</code></td></tr>
+        <tr><td>.size()</td><td>reverb room size</td><td><code>.size(0.8)</code></td></tr>
+        <tr><td>.delay()</td><td>delay wet level (0&ndash;1)</td><td><code>.delay(0.3)</code></td></tr>
+        <tr><td>.delaytime()</td><td>gap between echoes</td><td><code>.delaytime(0.125)</code></td></tr>
+        <tr><td>.delayfeedback()</td><td>echo repeats (0&ndash;1)</td><td><code>.delayfeedback(0.4)</code></td></tr>
+        <tr><td>.distort()</td><td>waveshaping distortion</td><td><code>.distort(0.4)</code></td></tr>
+        <tr><td>[a,b,c]</td><td>play notes simultaneously (chord)</td><td><code>note("[c3,eb3,g3]")</code></td></tr>
+        <tr><td>&lt;&gt; with chords</td><td>chord progression (one per cycle)</td><td><code>note("&lt;[c3,eb3,g3] [ab2,c3,eb3]&gt;")</code></td></tr>
+        <tr><td>setcpm(35)</td><td>140 BPM (phonk tempo)</td><td><code>setcpm(35)</code></td></tr>
+        </tbody>
+    </table>
+    <div class="concept" style="margin: 1rem 0 0; border-radius: 6px;">
+        <span class="c-label">phonk checklist</span>
+        <p>808 bass: sine, decayed, distorted, following chord roots. Drums: kick, clap (reverbed), hats, cowbell (delayed). Pad: sawtooth chord progression, filtered, reverbed. Everything in C minor.</p>
+    </div>
+    <p class="earned-next">Next: <em>Movement</em>. Transforms that make a track evolve.</p>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td style="color: var(--accent);">Motoi Sakuraba</td><td>Dark Souls: Firelink Shrine (2011)</td><td>(game) sparse guitar in massive reverb. The room is the instrument.</td></tr>
+        <tr><td style="color: var(--accent);">Manaka Kataoka</td><td>Zelda BotW: Temple of Time (2017)</td><td>(game) piano notes in silence. Delay trails as composition.</td></tr>
+        <tr><td style="color: var(--accent);">Koji Kondo</td><td>Zelda OoT: Temple of Time (1998)</td><td>(game) choir pad + bells. The original atmospheric Zelda.</td></tr>
+        <tr><td>Three 6 Mafia</td><td>Tear Da Club Up (1995)</td><td>(Memphis rap) foundational Memphis phonk</td></tr>
+        <tr><td>Tommy Wright III</td><td>Ashes 2 Ashes, Dust 2 Dust (1994)</td><td>(Memphis rap) bedroom lo-fi Memphis</td></tr>
+        <tr><td>DJ Smokey</td><td>Evil Wayz (2013)</td><td>(phonk) bridged classic Memphis with modern phonk</td></tr>
+        <tr><td>Kaito Shoma</td><td>Scary Garry (2016)</td><td>(drift phonk) first drift phonk, blown-out cowbell</td></tr>
+        <tr><td>DJ Paul</td><td>Wanna Go to War (1994)</td><td>(Memphis rap) solo production, the 808 as melodic instrument</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The 808 was a commercial failure. Memphis rap turned it into the most important instrument in modern music.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Roland TR-808 (1980&ndash;1983)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Ikutaro Kakehashi founded Roland in 1972. The TR-808 used analog synthesis (not samples) to generate drum sounds, a design choice driven by cost, not aesthetics. It couldn&rsquo;t sound like real drums. Musicians hated it. Roland made about 12,000 units and discontinued production. Then Marvin Gaye used it on &ldquo;Sexual Healing&rdquo; (1982), Afrika Bambaataa used it on &ldquo;Planet Rock&rdquo; (1982), and it became the backbone of electro, freestyle, and early hip-hop.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Memphis rap (1991&ndash;1997)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">DJ Paul (Paul Beauregard) and Juicy J (Jordan Houston) started making beats in North Memphis as teenagers, dubbing tapes and selling them out of car trunks. Equipment was whatever they could afford, often an 808 or SP-1200. The lo-fi quality wasn&rsquo;t a choice. They used the 808 kick as a tuned bass instrument, running melodic patterns that carried the entire low end. Three 6 Mafia&rsquo;s <em style="color: var(--text-dim); font-style: italic;">Mystic Stylez</em> (1995) codified the sound: dark samples (horror movies, soul records), heavy 808, reverb-drenched vocals. Tommy Wright III, Gangsta Pat, and Koopsta Knicca operated in the same ecosystem.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Phonk revival (2013&ndash;present)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">DJ Smokey and SpaceGhostPurrp began sampling Three 6 Mafia vocals over new production in the early 2010s, calling it &ldquo;phonk.&rdquo; Kaito Shoma&rsquo;s &ldquo;Scary Garry&rdquo; (2016) added the signature blown-out cowbell, launching &ldquo;drift phonk.&rdquo; By 2021, phonk had crossed into mainstream TikTok culture. The aesthetic is deliberately lo-fi&mdash;an homage to the Memphis tapes&rsquo; constraints.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Reid, &ldquo;History of Roland&rdquo; (2004); Miller, &ldquo;Memphis Rap&rdquo; in <em style="color: var(--text-faint); font-style: italic;">Oxford Handbook of Hip-Hop Music</em> (2022); Bein, &ldquo;How Phonk Went From Memphis Rap Underground to Global Phenomenon,&rdquo; <em style="color: var(--text-faint); font-style: italic;">Billboard</em> (2022).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>
+
+</div><!-- /container -->
+
+</div><!-- /container -->
+<!-- ============ SCRIPTS ============ -->
+
+<!-- Hydra (loaded first, before strudel, to set up audio tap) -->
+<script src="https://unpkg.com/hydra-synth@1.3.29/dist/hydra-synth.js"></script>
+
+<!-- Audio routing: intercept AudioContext so we can tap strudel's audio for hydra -->
+<script>
+(function() {
+    const _AC = window.AudioContext || window.webkitAudioContext;
+    window._OrigAC = _AC;
+    let capturedCtx = null;
+    let audioAnalyser = null;
+    const dataArray = new Uint8Array(128);
+
+    window._audioData = {
+        fft: [0, 0, 0, 0],
+        vol: 0,
+        tick() {
+            if (!audioAnalyser) return;
+            audioAnalyser.getByteFrequencyData(dataArray);
+            const binSize = Math.floor(dataArray.length / 4);
+            for (let i = 0; i < 4; i++) {
+                let sum = 0;
+                for (let j = i * binSize; j < (i + 1) * binSize; j++) sum += dataArray[j];
+                this.fft[i] = sum / (binSize * 255);
+            }
+            this.vol = this.fft.reduce((a, b) => a + b, 0) / 4;
+        },
+        setBins() {}, setSmooth() {}, setCutoff() {}, setScale() {},
+        show() {}, hide() {}
+    };
+
+    const _connect = AudioNode.prototype.connect;
+    AudioNode.prototype.connect = function(dest, ...args) {
+        const result = _connect.call(this, dest, ...args);
+        try {
+            if (capturedCtx && dest === capturedCtx.destination && audioAnalyser) {
+                _connect.call(this, audioAnalyser);
+            }
+        } catch(e) {}
+        return result;
+    };
+
+    class InstrumentedAC extends _AC {
+        constructor(...args) {
+            super(...args);
+            if (!capturedCtx) {
+                capturedCtx = this;
+                audioAnalyser = this.createAnalyser();
+                audioAnalyser.fftSize = 256;
+            }
+        }
+    }
+    window.AudioContext = InstrumentedAC;
+    if (window.webkitAudioContext) window.webkitAudioContext = InstrumentedAC;
+})();
+</script>
+
+<!-- Strudel REPL web component -->
+<script src="https://unpkg.com/@strudel/repl@1.3.0"></script>
+
+<!-- Page logic -->
+<script>
+// --- Hydra setup ---
+let hydra = null;
+let hydraActive = false;
+
+function initHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    try {
+        hydra = new Hydra({
+            canvas: canvas,
+            detectAudio: false,
+            makeGlobal: false,
+            autoLoop: true,
+            width: window.innerWidth,
+            height: window.innerHeight,
+            precision: 'mediump'
+        });
+        const h = hydra.synth;
+        h.a = window._audioData;
+        h.update = () => { window._audioData.tick(); };
+
+        h.osc(6, 0.08, 1.2)
+            .color(0.5, 0.15, 0.8)
+            .rotate(() => window._audioData.fft[0] * Math.PI * 0.3)
+            .modulateScale(
+                h.osc(3, 0.12).rotate(0.5),
+                () => 0.1 + window._audioData.fft[1] * 0.6
+            )
+            .scale(() => 1.0 + window._audioData.vol * 0.4)
+            .saturate(() => 0.8 + window._audioData.fft[2] * 1.5)
+            .kaleid(() => 2 + Math.floor(window._audioData.fft[3] * 2))
+            .contrast(1.3)
+            .out();
+    } catch(e) {
+        console.warn('[hydra] init failed:', e);
+    }
+}
+
+function toggleHydra() {
+    const canvas = document.getElementById('hydra-canvas');
+    const btn = document.getElementById('hydra-btn');
+    if (!hydra) initHydra();
+    hydraActive = !hydraActive;
+    canvas.classList.toggle('active', hydraActive);
+    btn.classList.toggle('active', hydraActive);
+}
+
+// --- Editor helpers ---
+function getEditorFromBtn(btn) {
+    const block = btn.closest('.strudel-block');
+    return block ? block.querySelector('strudel-editor') : null;
+}
+
+function getEditorCode(el) {
+    if (!el || !el.editor) return '';
+    if (typeof el.editor.getCode === 'function') return el.editor.getCode();
+    if (el.editor.code) return el.editor.code;
+    if (el.editor.view && el.editor.view.state) return el.editor.view.state.doc.toString();
+    if (el.getAttribute('code')) return el.getAttribute('code');
+    const html = el.innerHTML;
+    const m = html.match(/<!--([\s\S]*?)-->/);
+    return m ? m[1].trim() : '';
+}
+
+function strudelPlay(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+    document.querySelectorAll('strudel-editor').forEach(other => {
+        if (other !== el && other.editor && other.editor.stop) {
+            try { other.editor.stop(); } catch(e) {}
+        }
+    });
+    if (el.editor) {
+        try {
+            el.editor.evaluate();
+            el.editor.start();
+            btn.classList.add('playing');
+        } catch(e) {
+            try { el.editor.evaluate(); btn.classList.add('playing'); } catch(e2) {}
+        }
+    }
+}
+
+function strudelStop(btn) {
+    const el = getEditorFromBtn(btn);
+    if (!el) return;
+    if (el.editor && el.editor.stop) {
+        try { el.editor.stop(); } catch(e) {}
+    }
+    const playBtn = btn.closest('.strudel-controls').querySelector('.strudel-play');
+    if (playBtn) playBtn.classList.remove('playing');
+}
+
+function strudelShare(btn) {
+    const el = getEditorFromBtn(btn);
+    const code = getEditorCode(el);
+    if (!code) return;
+    const url = 'https://strudel.cc/#' + encodeURIComponent(btoa(unescape(encodeURIComponent(code))));
+    navigator.clipboard.writeText(url).then(() => {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '&#10003; copied';
+        setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = orig; }, 2000);
+    }).catch(() => {
+        window.open(url, '_blank');
+    });
+}
+
+function hushAll() {
+    document.querySelectorAll('strudel-editor').forEach(el => {
+        if (el.editor && el.editor.stop) {
+            try { el.editor.stop(); } catch(e) {}
+        }
+    });
+    document.querySelectorAll('.strudel-play.playing').forEach(b => b.classList.remove('playing'));
+}
+
+// --- Ctrl+Enter / Cmd+Enter ---
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const active = document.activeElement;
+        const block = active ? active.closest('.strudel-block') : null;
+        if (block) {
+            e.preventDefault();
+            e.stopPropagation();
+            const playBtn = block.querySelector('.strudel-play');
+            if (playBtn) strudelPlay(playBtn);
+        }
+    }
+}, true);
+
+// --- Scroll progress ---
+window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = h > 0 ? (window.scrollY / h) * 100 : 0;
+    document.getElementById('progress').style.width = pct + '%';
+});
+
+// --- Nav highlight ---
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('.top-nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            navLinks.forEach(a => a.classList.remove('active'));
+            const link = document.querySelector(`.top-nav a[href="#${entry.target.id}"]`);
+            if (link) link.classList.add('active');
+        }
+    });
+}, { rootMargin: '-40% 0px -55% 0px' });
+sections.forEach(s => observer.observe(s));
+
+// --- Resize hydra ---
+window.addEventListener('resize', () => {
+    if (hydra) hydra.setResolution(window.innerWidth, window.innerHeight);
+});
+</script>
+
+</body></html>
