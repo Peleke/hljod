@@ -259,8 +259,6 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
     <a href="#silence">Silence</a>
     <a href="#build">The Build</a>
     <a href="#sections">Sections</a>
-    <a href="#repertoire">Repertoire</a>
-    <a href="#score">Your Piece</a>
     <a href="#capstone">Capstone</a>
 </div></nav>
 
@@ -274,19 +272,24 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 
 <!-- ============ HERO ============ -->
 <section id="hero">
-<h1>The <span class="accent">Drop</span></h1>
-<div class="subtitle">EDM.6: arrangement, silence, tension, and the shape of a piece</div>
+<h1><span class="accent">The Drop</span></h1>
+<div class="subtitle">EDM.6: arrangement, silence, and the weight of absence</div>
 
-<p>Your L5 capstone breathes. Patterns transform. But every cycle has everything. A real piece has shape: sections where elements disappear and return. The moment they return is the drop.</p>
+<p>Your EDM.5 capstone is a phonk track that breathes. Kicks double, hats split, the cowbell reverses. But every cycle has everything. A real track has shape&mdash;sections where elements disappear and return. The moment they return is the drop.</p>
 
-<details class="earned">
-    <summary>about this lesson</summary>
-    <div class="earned-body">
-    <p><strong>Repertoire:</strong> <em>One Winged Angel</em> (Nobuo Uematsu, FF7, 1997) &mdash; the most famous build-to-drop in game music. <em>Sealed Vessel</em> (Christopher Larkin, Hollow Knight, 2017) &mdash; restraint, then devastation. <em>Weight of the World</em> (Keiichi Okabe, NieR: Automata, 2017) &mdash; arrangement as narrative.</p>
-    <p><strong>Parallel composition:</strong> Your ambient piece gets structure. Jo-ha-ky&umacr; realized: introduction, development, climax, silence.</p>
-    <p><strong>What you already know:</strong> Everything from L0-L5. Patterns, layers, space, chords, transforms.</p>
-    </div>
-</details>
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm(35)</code>,
+    mini-notation, <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>,
+    <code>.every()</code>, <code>.sometimes()</code>, <code>.jux()</code>, <code>.off()</code>,
+    and the phonk palette from EDM.4&ndash;5.</p>
+</div>
 </section>
 
 <!-- ============ SECTION 0: SILENCE ============ -->
@@ -589,175 +592,8 @@ note("c3@3 eb3")
 </section>
 
 <!-- ============ SECTION 3: CAPSTONE ============ -->
-<!-- ============ SECTION 3: REPERTOIRE ============ -->
-<section id="repertoire">
-<h2><span class="num">03</span>The Build and the Drop</h2>
-
-<p>Three composers. Three approaches to the same structural question: how do you make the loud part hit?</p>
-
-<p><strong>FF7: One Winged Angel</strong> (Nobuo Uematsu, 1997). The build is everything. Strings layer. Choir enters. Percussion intensifies. Filter opens. Then the full orchestra + choir + rhythm section hits simultaneously. The first fully orchestral piece in a Final Fantasy game:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>one winged angel: the build (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-owa">
-    <!--
-setcpm(35)
-cat(
-  // intro: strings alone (4 cycles)
-  note("[e3,b3,e4]").s("sawtooth")
-    .lpf(600).attack(1).sustain(0.5).release(1)
-    .room(0.5).gain(0.3),
-  // build: add rhythm (4 cycles)
-  stack(
-    note("[e3,b3,e4]").s("sawtooth")
-      .lpf(1200).attack(0.5).sustain(0.6).release(1)
-      .room(0.5).gain(0.35),
-    s("bd ~ ~ ~ sd ~ bd sd").gain(0.4)
-  ),
-  // drop: everything (4 cycles)
-  stack(
-    note("[e3,b3,e4,g4]").s("sawtooth")
-      .lpf(3000).attack(0.1).sustain(0.8).release(0.5)
-      .room(0.6).gain(0.4),
-    s("bd ~ bd ~ sd ~ bd sd").gain(0.6),
-    s("hh*16").gain(".3 .5 .3 .7 .3 .5 .3 .9"),
-    note("e5 d5 e5 b4 e5 d5 b4 g4").s("square")
-      .lpf(2500).gain(0.35)
-  )
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p>Three sections via <code>cat()</code>. Strings alone. Strings + drums. Everything. The filter opens from 600 to 3000. The gain rises. The note density increases. That&rsquo;s the build.</p>
-
-<p><strong>Hollow Knight: Sealed Vessel</strong> (Christopher Larkin, 2017). The opposite. Restraint, restraint, restraint. Quiet piano. Then the full orchestra crashes in and it&rsquo;s devastating specifically because nothing prepared you for it:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>sealed vessel: restraint then devastation</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-sealed">
-    <!--
-setcpm(25)
-cat(
-  // quiet (8 cycles)
-  note("c4 ~ ~ e4 ~ ~ g4 ~ ~ ~ ~ ~ ~ ~ ~ ~")
-    .s("gm_acoustic_grand_piano").gain(0.3)
-    .room(0.8).size(0.9),
-  note("c4 ~ ~ e4 ~ ~ g4 ~ ~ ~ ~ ~ ~ ~ ~ ~")
-    .s("gm_acoustic_grand_piano").gain(0.3)
-    .room(0.8).size(0.9),
-  // devastation (4 cycles)
-  stack(
-    note("[c3,g3,c4,e4]").s("sawtooth")
-      .lpf(2000).attack(0.1).sustain(0.9).release(0.5)
-      .room(0.7).gain(0.5),
-    s("bd bd sd bd bd bd sd bd").gain(0.6),
-    note("c5 b4 g4 e4 c5 b4 g4 e4").s("square")
-      .lpf(3000).gain(0.4)
-  )
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p>8 cycles of quiet piano. Then everything. The silence before the drop IS the arrangement.</p>
-
-<div class="concept warm">
-    <span class="c-label">two strategies</span>
-    <p>Uematsu builds gradually: layers add, filter opens, density increases. Larkin holds back: almost nothing, then everything at once. Both work because the drop is defined by what came before it. No build, no drop. No silence, no impact.</p>
-</div>
-
-<details class="rabbit-hole">
-    <summary>rabbit hole: jo-ha-ky&umacr; realized</summary>
-    <div class="rh-body">
-        <h4>Your piece, structured</h4>
-        <p>In L5 you learned that jo-ha-ky&umacr; is slow introduction &rarr; breaking apart &rarr; rapid conclusion. Now you can build it:</p>
-        <p><strong>Jo:</strong> koto alone, sparse, with reverb. 4-8 cycles.</p>
-        <p><strong>Ha:</strong> shakuhachi enters. Pad builds. Transforms activate. Density increases. 4-8 cycles.</p>
-        <p><strong>Ky&umacr;:</strong> everything at once. Full layers. The piece peaks. 2-4 cycles.</p>
-        <p><strong>After:</strong> everything drops out. Koto alone again. Reverb tail. Silence.</p>
-        <p>That&rsquo;s <code>cat()</code> with four sections. The same structure Zeami codified 600 years ago, implemented in code.</p>
-
-        <h4>Uematsu&rsquo;s orchestral ambitions</h4>
-        <p>Nobuo Uematsu wanted to write film scores. He ended up at Square. One Winged Angel was him finally getting an orchestra: the first fully orchestral piece in a Final Fantasy game. He recorded it with real players in a real studio. The constraint of game hardware was gone. He filled every second. That&rsquo;s ky&umacr; as a career.</p>
-    </div>
-</details>
-
-<details class="rabbit-hole">
-    <summary>rabbit hole: the silence before the drop</summary>
-    <div class="rh-body">
-        <h4>Psychoacoustics</h4>
-        <p>Your brain predicts. When a pattern is established and then disappears, the auditory cortex keeps expecting the next event. The silence isn&rsquo;t empty. It&rsquo;s full of anticipation. The longer the silence, the more tension accumulates. The drop resolves that tension all at once.</p>
-        <p>This is why Larkin&rsquo;s approach works: 8 cycles of quiet piano trains your brain to expect quiet. When the full orchestra hits, the prediction error is enormous. Your brain goes &ldquo;THAT WAS NOT WHAT I EXPECTED&rdquo; and floods you with dopamine. The emotion isn&rsquo;t in the loud part. It&rsquo;s in the gap between expectation and reality.</p>
-    </div>
-</details>
-</section>
-
-<!-- ============ SECTION 4: YOUR COMPOSITION ============ -->
-<section id="score">
-<h2><span class="num">04</span>Your Composition: Arranged</h2>
-
-<p>The piece you&rsquo;ve been building since L0, now with structure. Jo-ha-ky&umacr;:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>your ambient piece: arranged</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-ambient-6">
-    <!--
-setcpm(15)
-cat(
-  // jo: koto alone (4 cycles)
-  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
-    .room(0.8).size(0.9)
-    .delay(0.4).delaytime(0.5).delayfeedback(0.3),
-  // ha: layers enter (4 cycles)
-  stack(
-    note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
-      .room(0.8).size(0.9)
-      .delay(0.4).delaytime(0.5).delayfeedback(0.3)
-      .every(4, rev),
-    note("~ ~ b4 ~ ~ ~ e4 ~")
-      .sound("gm_shakuhachi").gain(0.5)
-      .room(0.7).size(0.8).lpf(2000),
-    note("[e2,b2,e3]").s("sawtooth")
-      .lpf(400).attack(2).sustain(0.5).release(2)
-      .room(0.9).gain(0.2)
-  ),
-  // kyu: everything (4 cycles)
-  stack(
-    note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
-      .room(0.8).size(0.9)
-      .delay(0.4).delaytime(0.5).delayfeedback(0.3)
-      .every(4, rev)
-      .sometimes(x => x.add(note(5))),
-    note("~ ~ b4 ~ ~ ~ e4 ~")
-      .sound("gm_shakuhachi").gain(0.6)
-      .room(0.7).size(0.8).lpf(3000),
-    note("[e2,b2,e3]").s("sawtooth")
-      .lpf(800).attack(1).sustain(0.7).release(1)
-      .room(0.9).gain(0.3),
-    note("e2 ~ ~ ~ ~ ~ e2 ~")
-      .s("sawtooth").lpf(300).decay(.4).sustain(0).gain(0.4)
-  ),
-  // silence: koto alone, fading (2 cycles)
-  note("e4 ~ ~ ~ ~ ~ ~ ~").sound("gm_koto").gain(0.5)
-    .room(0.9).size(0.95)
-    .delay(0.5).delaytime(0.5).delayfeedback(0.5)
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p>Four sections. Koto alone. Layers enter. Everything peaks. Koto alone again, fading into reverb. The piece you started in L0 is finished.</p>
-
-<div class="try-this">
-    <span class="label">Your turn</span>
-    <p>Change the section lengths. Make <em>jo</em> longer (copy-paste the first section in <code>cat()</code>). Make <em>ky&umacr;</em> shorter. Add a beat to the peak section. Remove the final section entirely and let it end at full intensity. The arrangement is yours now.</p>
-</div>
-</section>
-
-<!-- ============ SECTION 5: CAPSTONE ============ -->
 <section id="capstone">
-<h2><span class="num">05</span>The Drop</h2>
+<h2><span class="num">03</span>The Drop</h2>
 
 <div class="punchline">
     <p><strong>A phonk track with shape.</strong> Not a loop&mdash;a piece. Intro fades in with pad and muffled hats. The build opens the filter, rolls the snare, brings in the clap. Then the drop: kick, bass, cowbell, full hats, pad. Eight cycles of structure from simple gain patterns.</p>
@@ -839,9 +675,6 @@ stack(
     <table>
         <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
         <tbody>
-        <tr><td style="color: var(--accent);">Nobuo Uematsu</td><td>FF7: One Winged Angel (1997)</td><td>(game) the build. Layers add. Filter opens. Choir hits.</td></tr>
-        <tr><td style="color: var(--accent);">Christopher Larkin</td><td>Hollow Knight: Sealed Vessel (2017)</td><td>(game) restraint then devastation. Silence as arrangement.</td></tr>
-        <tr><td style="color: var(--accent);">Keiichi Okabe</td><td>NieR: Automata: Weight of the World (2017)</td><td>(game) the same melody in different languages as the story shifts</td></tr>
         <tr><td>The Prodigy</td><td>Firestarter (1996)</td><td>(rave) filter sweep build into vocal explosion</td></tr>
         <tr><td>Chase &amp; Status</td><td>Blind Faith (2011)</td><td>(DnB) textbook DnB buildup and drop</td></tr>
         <tr><td>DVRST</td><td>Close Eyes (2021)</td><td>(drift phonk) drift phonk build-drop gone mass</td></tr>

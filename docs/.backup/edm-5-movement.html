@@ -259,8 +259,6 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
     <a href="#every">Every</a>
     <a href="#sometimes">Sometimes</a>
     <a href="#splits">Splits</a>
-    <a href="#repertoire">Repertoire</a>
-    <a href="#score">Your Piece</a>
     <a href="#capstone">Capstone</a>
 </div></nav>
 
@@ -275,18 +273,21 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 <!-- ============ HERO ============ -->
 <section id="hero">
 <h1><span class="accent">Movement</span></h1>
-<div class="subtitle">EDM.5: transforms, probability, and making patterns breathe</div>
+<div class="subtitle">EDM.5: transforms, probability, and stereo splits</div>
 
-<p>Play your L4a capstone twice. You hear the seam. Every cycle is identical. Real music shifts. Strudel has tools for that.</p>
+<p>Your EDM.4 capstone is a phonk track. Play it twice and you hear the seam. Every cycle is identical. Real tracks shift. Strudel has tools for that.</p>
 
-<details class="earned">
-    <summary>about this lesson</summary>
-    <div class="earned-body">
-    <p><strong>Repertoire:</strong> <em>Lost Woods / Saria&rsquo;s Song</em> (Koji Kondo, Zelda: OoT, 1998) &mdash; the melody that changes meaning without changing notes. <em>Megalovania</em> (Toby Fox, Undertale, 2015) &mdash; rhythmic persistence with everything shifting around it. <em>Fez</em> (Disasterpeace, 2012) &mdash; patterns that evolve over minutes through subtle parameter shifts.</p>
-    <p><strong>Parallel composition:</strong> Your ambient piece starts moving. The koto pattern transforms. The piece breathes.</p>
-    <p><strong>What you already know:</strong> Everything from L0-L4b. Patterns, drums, bass, layers, space, chords.</p>
-    </div>
-</details>
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm(35)</code>,
+    mini-notation, <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>, and the phonk palette from EDM.4.</p>
+</div>
 </section>
 
 <!-- ============ SECTION 0: EVERY ============ -->
@@ -529,134 +530,9 @@ note("<[c3,eb3,g3] [ab2,c3,eb3] [bb2,d3,f3] [g2,b2,d3]>")
 </div>
 </section>
 
-<!-- ============ SECTION 3: REPERTOIRE ============ -->
-<section id="repertoire">
-<h2><span class="num">03</span>Hear Movement in the Wild</h2>
-
-<p>Three composers, three approaches to making patterns evolve.</p>
-
-<p><strong>Zelda: Lost Woods / Saria&rsquo;s Song</strong> (Koji Kondo, 1998). The same 8-bar melody appears in five Zelda games. In OoT, it&rsquo;s playful. In Twilight Princess, it&rsquo;s haunted. In BotW, it&rsquo;s barely there. Same notes. Different transforms. That&rsquo;s <code>.every()</code> as game design:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>lost woods: the theme + transforms</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-lost">
-    <!--
-setcpm(35)
-note("f4 a4 b4 f4 a4 b4 f4 a4 b4 e5 d5 b4 c5 b4 g4 e4")
-  .s("gm_ocarina").gain(0.5)
-  .room(0.3)
-  .every(4, rev)
-  .sometimes(x => x.add(note(7)))
-    -->
-    </strudel-editor>
-</div>
-
-<p>Remove the <code>.every(4, rev)</code> and <code>.sometimes()</code> lines. Play it again. Static. Add them back. Movement.</p>
-
-<p><strong>Undertale: Megalovania</strong> (Toby Fox, 2015). The melody barely changes. Everything around it does. The bass shifts, the rhythm stutters, the intensity builds. That&rsquo;s <code>.off()</code> creating shadows:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>megalovania: persistence + offset</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-mega">
-    <!--
-setcpm(30)
-stack(
-  note("d4 d4 d5 a4 ~ ab4 g4 f4 d4 f4 g4")
-    .s("square").lpf(2000).gain(0.4)
-    .off(1/8, x => x.add(note(12)).gain(0.2).pan(0.7)),
-  s("bd ~ bd ~ sd ~ bd sd").gain(0.5)
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p><strong>Fez</strong> (Disasterpeace, 2012). Patterns that evolve so slowly you don&rsquo;t notice until you&rsquo;ve been listening for three minutes. That&rsquo;s <code>.sometimes()</code> with low probability and <code>.degrade()</code> thinning events out:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>fez-style glacial evolution</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-fez">
-    <!--
-setcpm(18)
-note("c4 e4 g4 b4 c5 b4 g4 e4")
-  .s("gm_music_box").gain(0.5)
-  .room(0.7).size(0.8)
-  .sometimes(x => x.add(note(5)))
-  .degrade(0.3)
-    -->
-    </strudel-editor>
-</div>
-
-<p>Let it run for 30 seconds. It&rsquo;s never the same twice. The <code>.degrade(0.3)</code> randomly drops 30% of events. The <code>.sometimes()</code> shifts some notes up. The piece drifts.</p>
-
-<details class="rabbit-hole">
-    <summary>rabbit hole: jo-ha-ky&umacr; and the shape of everything</summary>
-    <div class="rh-body">
-        <h4>Three parts</h4>
-        <p><em>Jo</em> (&#24207;): introduction. Slow, sparse, establishing. <em>Ha</em> (&#30772;): breaking apart. Acceleration, intensification, development. <em>Ky&umacr;</em> (&#24613;): rapid conclusion. Everything at once, then done.</p>
-        <p>Zeami Motokiyo codified this for Noh theater in the 1400s. But it shows up everywhere in Japanese art: tea ceremony (slow preparation &rarr; the pour &rarr; the drink), calligraphy (the approach &rarr; the stroke &rarr; the lift), martial arts (the stance &rarr; the exchange &rarr; the cut).</p>
-
-        <h4>In music</h4>
-        <p>Gagaku (Japanese court music) uses jo-ha-ky&umacr; as formal structure. The piece begins slowly, accelerates through a middle section, and arrives at a rapid conclusion. The tempo literally increases.</p>
-        <p>In your Strudel code: <code>.fast()</code> IS ky&umacr;. <code>.slow()</code> IS jo. The transforms you just learned (<code>.every()</code>, <code>.sometimes()</code>) create the ha: the middle section where things start breaking apart and recombining.</p>
-
-        <h4>In your composition</h4>
-        <p>Your ambient piece has been in <em>jo</em> since L0. Sparse, slow, establishing. L5 is where it enters <em>ha</em>: the patterns start transforming, the piece starts moving. L6 will bring <em>ky&umacr;</em>: the full arrangement, the build, the peak.</p>
-    </div>
-</details>
-
-<details class="rabbit-hole">
-    <summary>rabbit hole: the Ma Engine &mdash; silence as probability</summary>
-    <div class="rh-body">
-        <h4>Algorithmic breathing</h4>
-        <p>Traditional Japanese music breathes. Notes happen, then silence, then notes. The spacing isn&rsquo;t metronomic. It fluctuates. You can model this in Strudel with probability:</p>
-        <p><code>.degrade(0.3)</code> randomly removes 30% of events. Each cycle, different events disappear. The pattern thins and thickens like breath.</p>
-        <p><code>.sometimes(x =&gt; x)</code> applies a transform with ~50% probability. Combine it with <code>.degrade()</code> and your pattern is never the same twice, but it&rsquo;s always recognizable. The motif survives. The details shift.</p>
-
-        <h4>Density modulation</h4>
-        <p>Want the piece to breathe slowly? Use <code>.degradeBy(sine.range(0.1, 0.5).slow(8))</code>. The sine wave oscillates the degradation amount over 8 cycles: dense, then sparse, then dense again. The piece inhales and exhales.</p>
-        <p>This is <em>ma</em> as code. The silence isn&rsquo;t fixed. It&rsquo;s alive.</p>
-    </div>
-</details>
-</section>
-
-<!-- ============ SECTION 4: YOUR COMPOSITION ============ -->
-<section id="score">
-<h2><span class="num">04</span>Your Composition</h2>
-
-<p>The koto pattern starts transforming. The shakuhachi drifts. The piece enters <em>ha</em>:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>your ambient piece: movement</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-ambient-5">
-    <!--
-setcpm(15)
-stack(
-  // koto: transforms every 4 cycles
-  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
-    .room(0.8).size(0.9)
-    .delay(0.4).delaytime(0.5).delayfeedback(0.3)
-    .every(4, rev)
-    .sometimes(x => x.add(note(5))),
-  // shakuhachi: breathing
-  note("~ ~ b4 ~ ~ ~ e4 ~")
-    .sound("gm_shakuhachi").gain(0.5)
-    .room(0.7).size(0.8).lpf(2000)
-    .degrade(0.2),
-  // pad
-  note("[e2,b2,e3]").s("sawtooth")
-    .lpf(400).attack(2).sustain(0.5).release(2)
-    .room(0.9).gain(0.2)
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p>The koto reverses every 4 cycles. Sometimes a note shifts up a fourth. The shakuhachi randomly drops notes, breathing. The pad holds everything. Let it run. It&rsquo;s never the same twice.</p>
-</section>
-
-<!-- ============ SECTION 5: CAPSTONE ============ -->
+<!-- ============ SECTION 3: CAPSTONE ============ -->
 <section id="capstone">
-<h2><span class="num">05</span>Movement</h2>
+<h2><span class="num">03</span>Movement</h2>
 
 <div class="punchline">
     <p><strong>The EDM.4 track, alive.</strong> Kicks that double, hats that split, a clap that drifts between dry and drenched, a cowbell that reverses, and a pad echoing itself an octave up. Same chords, same key. Transforms make it breathe.</p>
@@ -743,9 +619,6 @@ stack(
     <table>
         <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
         <tbody>
-        <tr><td style="color: var(--accent);">Koji Kondo</td><td>Zelda OoT: Lost Woods (1998)</td><td>(game) the melody that changes meaning across 5 games without changing notes</td></tr>
-        <tr><td style="color: var(--accent);">Toby Fox</td><td>Undertale: Megalovania (2015)</td><td>(game) rhythmic persistence, everything shifts except the melody</td></tr>
-        <tr><td style="color: var(--accent);">Disasterpeace</td><td>Fez (2012)</td><td>(game) glacial evolution, patterns shifting over minutes</td></tr>
         <tr><td>DJ Rashad</td><td>Feelin (2012)</td><td>(footwork) constant rhythmic instability, scattered samples</td></tr>
         <tr><td>Burial</td><td>Archangel (2007)</td><td>(garage) constantly shifting chopped vocals, ghostly evolution</td></tr>
         <tr><td>Aphex Twin</td><td>Xtal (1992)</td><td>(ambient) subtle timbral shifts, generative ambient</td></tr>
