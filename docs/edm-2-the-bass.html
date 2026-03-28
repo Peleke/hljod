@@ -313,22 +313,22 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
     <div class="strudel-label"><span>sub bass</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
     <strudel-editor id="ed-0-sub">
     <!--
-note("c1").s("sine")
+note("c2").s("sine")
     -->
     </strudel-editor>
 </div>
 
-<p>If your speakers are small, you might barely hear it. That&rsquo;s normal. C1 is 32.7Hz. Most laptop speakers roll off around 80Hz. Headphones or a subwoofer help.</p>
+<p>C2 is 65Hz. Low enough to feel. Most laptop speakers can handle it. Headphones help.</p>
 
 <div class="try-this">
     <span class="label">tweak it</span>
-    <p>Change <code>c1</code> to <code>c2</code>. Then <code>c3</code>. Each octave doubles the frequency.
-    C2 is 65Hz. C3 is 131Hz. Notice how the higher you go, the less you feel it and the more you hear it.</p>
+    <p>Change <code>c2</code> to <code>c3</code>. Then <code>c4</code>. Each octave doubles the frequency.
+    C3 is 131Hz. C4 is 262Hz. The higher you go, the less you feel it and the more you hear it. Try <code>c1</code> if you have headphones or a sub. That&rsquo;s 33Hz. Pure floor.</p>
 </div>
 
 <div class="concept">
     <span class="c-label">octaves</span>
-    <p>An octave is a doubling of frequency. <code>c1</code> = 32.7Hz. <code>c2</code> = 65.4Hz. <code>c3</code> = 130.8Hz. Same note name, different register. DnB sub bass typically lives around C1&ndash;C2.</p>
+    <p>An octave is a doubling of frequency. <code>c2</code> = 65Hz. <code>c3</code> = 131Hz. <code>c4</code> = 262Hz. Same note name, different register. DnB sub bass typically lives around C2&ndash;C3.</p>
 </div>
 
 <h3>Hold it longer: attack, decay, sustain</h3>
@@ -339,7 +339,7 @@ note("c1").s("sine")
     <div class="strudel-label"><span>sustained sub</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
     <strudel-editor id="ed-0-sustain">
     <!--
-note("c1").s("sine")
+note("c2").s("sine")
   .attack(0.01).decay(0.1)
   .sustain(1).release(0.1)
     -->
@@ -362,7 +362,7 @@ note("c1").s("sine")
     <strudel-editor id="ed-0-pattern">
     <!--
 setcpm(42.5)
-note("c1 ~ eb1 ~").s("sine")
+note("c2 ~ eb2 ~").s("sine")
   .attack(0.01).decay(0.1)
   .sustain(0.8).release(0.1)
     -->
@@ -399,7 +399,7 @@ note("d2").s("sawtooth")
     <div class="strudel-label"><span>subwoofer lullaby bass (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
     <strudel-editor id="ed-rep-minecraft">
     <!--
-note("a1 ~ ~ e2 ~ ~ a1 ~").s("sine")
+note("a2 ~ ~ e3 ~ ~ a2 ~").s("sine")
   .lpf(300)
   .attack(0.3).decay(0.5)
   .sustain(0.4).release(0.8)
@@ -1170,8 +1170,8 @@ stack(
     <ol>
         <li>Replace the hi-hat pattern with <code>s("[hh hh hh oh]*2")</code>: open hat on every fourth hit. Adjust <code>.gain()</code> so the open hat is louder.</li>
         <li>Add a second bass note: change <code>"c2 ~ eb2 ~"</code> to <code>"c2 c2 eb2 ~"</code>. The double C2 gives the bassline more urgency.</li>
-        <li>Drop the bass an octave. Change <code>c2</code> to <code>c1</code> and <code>eb2</code> to <code>eb1</code>. Notice how it gets muddier? That&rsquo;s why most DnB bass sits at C2, not C1.</li>
-        <li>Add a sub layer: put <code>note("c1 ~ eb1 ~").s("sine").gain(0.5).sustain(0.8)</code> as another line in the stack. Sub sine underneath the reese. Two frequency ranges, one bass.</li>
+        <li>Drop the bass an octave. Change <code>c2</code> to <code>c1</code> and <code>eb2</code> to <code>eb1</code> (headphones help). Notice how it gets muddier? That&rsquo;s the sub-bass territory. Powerful in a club, invisible on laptop speakers.</li>
+        <li>Add a sub layer: put <code>note("c2 ~ eb2 ~").s("sine").gain(0.5).sustain(0.8)</code> as another line in the stack. Sub sine underneath the reese. Two frequency ranges, one bass.</li>
     </ol>
 </div>
 
@@ -1182,7 +1182,7 @@ stack(
     <table>
         <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
         <tbody>
-        <tr><td>.s("sine")</td><td>sine wave synth, pure sub bass</td><td><code>note("c1").s("sine")</code></td></tr>
+        <tr><td>.s("sine")</td><td>sine wave synth, pure sub bass</td><td><code>note("c2").s("sine")</code></td></tr>
         <tr><td>.s("sawtooth")</td><td>sawtooth wave, bright, all harmonics</td><td><code>note("c2").s("sawtooth")</code></td></tr>
         <tr><td>.s("square")</td><td>square wave, hollow, odd harmonics</td><td><code>note("c2").s("square")</code></td></tr>
         <tr><td>.s("triangle")</td><td>triangle wave, soft, muted</td><td><code>note("c2").s("triangle")</code></td></tr>
