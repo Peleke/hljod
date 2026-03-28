@@ -272,6 +272,7 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
     <a href="#wave-shape">Waves</a>
     <a href="#the-reese">Reese</a>
     <a href="#filtering">Filters</a>
+    <a href="#score">Score</a>
     <a href="#capstone">Capstone</a>
 </div></nav>
 
@@ -286,19 +287,18 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 <!-- ============ HERO ============ -->
 <section id="hero">
 <h1>The <span class="accent">Bass</span></h1>
-<div class="subtitle">EDM.2: sub bass, reese, and filtering</div>
+<div class="subtitle">EDM.2: waveforms, ADSR, filtering, and the low end</div>
 
-<p>DnB has two load-bearing walls: drums and bass. You built the drums. Now the other half.</p>
+<p>DnB has two load-bearing walls: drums and bass. You built the drums. Now the other half. You&rsquo;ll start with a single low note and end with a filtered reese sitting under your breakbeat.</p>
 
-<p>Bass in DnB lives below 200Hz. It&rsquo;s physical. You feel it in your chest before you hear it in your ears. You&rsquo;ll start with a single low note and end with a filtered reese sitting under your EDM.1 breakbeat.</p>
-
-<div class="concept warm">
-    <span class="c-label">what you already know</span>
-    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm()</code>,
-    mini-notation (<code>[] * ~ () &lt;&gt;</code>), <code>.gain()</code>,
-    <code>.lpf()</code>, <code>.decay()</code>, <code>.sustain()</code>,
-    and the DnB breakbeat from EDM.1.</p>
-</div>
+<details class="earned">
+    <summary>about this lesson</summary>
+    <div class="earned-body">
+    <p><strong>Repertoire:</strong> <em>Dragonborn</em> (Jeremy Soule, Skyrim, 2011) and <em>Subwoofer Lullaby</em> (C418, Minecraft, 2011). Two ends of the bass spectrum: one is power. The other is warmth.</p>
+    <p><strong>Parallel composition:</strong> Adding a filtered bass drone under the koto. The ocean underneath the North Atlantic.</p>
+    <p><strong>What you already know:</strong> <code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm()</code>, mini-notation, <code>.gain()</code>, and the DnB breakbeat from EDM.1.</p>
+    </div>
+</details>
 </section>
 
 <!-- ============ SECTION 0: THE LOW END ============ -->
@@ -375,6 +375,41 @@ note("c1 ~ eb1 ~").s("sine")
     <span class="c-label">sub bass</span>
     <p>A sine wave below ~100Hz. Pure fundamental, no harmonics. Felt more than heard. Everything else sits on top of it. In a club, this is what makes your ribcage vibrate.</p>
 </div>
+
+<h3>Repertoire: two ends of the bass spectrum</h3>
+
+<p><strong>Skyrim &mdash; Dragonborn</strong> (Jeremy Soule, 2011). The bass in the Dragonborn theme is a choir singing low. Sustained, powerful, the floor of an orchestral mix. That&rsquo;s the same principle as your sub bass: one low voice holding everything up.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>dragonborn bass drone (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-skyrim">
+    <!--
+note("d2").s("sawtooth")
+  .lpf(150).lpq(1)
+  .attack(0.5).decay(0.2)
+  .sustain(0.8).release(0.5)
+  .gain(0.6)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Now the opposite. <strong>Minecraft &mdash; Subwoofer Lullaby</strong> (C418, 2011). Soft, warm, filtered. The bass isn&rsquo;t asserting power. It&rsquo;s sitting underneath you like a cushion. Same waveform, different envelope, different filter:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>subwoofer lullaby bass (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-minecraft">
+    <!--
+note("a1 ~ ~ e2 ~ ~ a1 ~").s("sine")
+  .lpf(300)
+  .attack(0.3).decay(0.5)
+  .sustain(0.4).release(0.8)
+  .gain(0.5)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Same tools. <code>.s()</code>, <code>.lpf()</code>, <code>.attack()</code>, <code>.sustain()</code>. Soule makes a cathedral. C418 makes a bedroom. The difference is envelope shape and filter cutoff. That&rsquo;s what you&rsquo;re learning in this lesson.</p>
+
 </section>
 
 <!-- ============ SECTION 1: WAVE SHAPE ============ -->
@@ -1047,8 +1082,44 @@ note("c2").s("sawtooth")
 </section>
 
 <!-- ============ SECTION 4: CAPSTONE ============ -->
+<!-- ============ THE SCORE CONTINUES ============ -->
+<section id="score">
+<h2><span class="num">04</span>The Score Continues</h2>
+
+<p>The koto floats. The pulse sits underneath from L1. Now add a bass drone. Filtered sawtooth, low and slow. The ocean under the North Atlantic:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>the north atlantic: adding the ocean</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-dirdug-2">
+    <!--
+setcpm(15)
+stack(
+  // koto from L0
+  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8),
+  // pulse from L1
+  note("e2 ~ ~ ~ ~ ~ e2 ~")
+    .s("sawtooth").lpf(200).decay(.4).sustain(0).gain(0.4),
+  // NEW: bass drone
+  note("e1").s("sawtooth")
+    .lpf(120).lpq(1)
+    .attack(1).decay(0.5).sustain(0.6).release(1)
+    .gain(0.5)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Three layers. Koto on top. Pulse in the middle. Bass drone on the bottom. The <code>.attack(1)</code> makes the drone fade in slowly. The <code>.lpf(120)</code> keeps it dark. This is starting to sound like the piece.</p>
+
+<div class="try-this">
+    <span class="label">Your turn</span>
+    <p>Change the drone note. Try <code>b0</code> for darker. Try <code>a1</code> for warmer. Adjust <code>.lpf()</code> between 80 and 300. Lower = more felt than heard. Higher = more audible presence.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 5: CAPSTONE ============ -->
 <section id="capstone">
-<h2><span class="num">04</span>Drums + Bass</h2>
+<h2><span class="num">05</span>Drums + Bass</h2>
 
 <p>Your EDM.1 breakbeat on top, the filtered reese underneath. The skeleton of every DnB track.</p>
 
@@ -1161,6 +1232,8 @@ stack(
     <table>
         <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
         <tbody>
+        <tr><td style="color: var(--accent);">Jeremy Soule</td><td>Skyrim: Dragonborn (2011)</td><td>(game) orchestral bass as power. The floor of a cathedral.</td></tr>
+        <tr><td style="color: var(--accent);">C418</td><td>Minecraft: Subwoofer Lullaby (2011)</td><td>(game) filtered sine bass as warmth. The floor of a bedroom.</td></tr>
         <tr><td>Reese (Kevin Saunderson)</td><td>Just Want Another Chance (1988)</td><td>(techno) the literal origin of the Reese bass</td></tr>
         <tr><td>Renegade (Ray Keith)</td><td>Terrorist (1994)</td><td>(jungle) sampled Reese + amen = instant jungle</td></tr>
         <tr><td>Ed Rush &amp; Optical</td><td>Wormhole (1998)</td><td>(neurofunk) first neurofunk, filter sweeps + resampled bass</td></tr>
