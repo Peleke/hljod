@@ -259,8 +259,6 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
     <a href="#speed">Speed</a>
     <a href="#chop">Chop</a>
     <a href="#slice">Slice</a>
-    <a href="#repertoire">Repertoire</a>
-    <a href="#score">Your Piece</a>
     <a href="#capstone">Capstone</a>
 </div></nav>
 
@@ -275,18 +273,23 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 <!-- ============ HERO ============ -->
 <section id="hero">
 <h1><span class="accent">Chopping</span></h1>
-<div class="subtitle">EDM.7: sample slicing, pitch, texture, and the final polish</div>
+<div class="subtitle">EDM.7: sample slicing, pitch, and the most sampled break in history</div>
 
-<p>Samples are recordings. Fixed length, fixed pitch, fixed order. Three methods turn them into something else: speed changes pitch, chop cuts them into pieces, slice rearranges those pieces. Old audio becomes new material.</p>
+<p>Samples are recordings. Fixed length, fixed pitch, fixed order. Three methods turn them into something else: speed changes pitch, chop cuts them into pieces, slice rearranges those pieces. Old audio becomes new rhythm.</p>
 
-<details class="earned">
-    <summary>about this lesson</summary>
-    <div class="earned-body">
-    <p><strong>Repertoire:</strong> <em>The Amen Break</em> (The Winstons, 1969) &mdash; the 6-second drum solo that built half of electronic music. <em>Dark World Theme</em> (Koji Kondo, Zelda: A Link to the Past, 1991) &mdash; the moment game music moved from synthesis to samples. <em>Corridors of Time</em> (Yasunori Mitsuda, Chrono Trigger, 1995) &mdash; one of the most remixed game tracks ever.</p>
-    <p><strong>Parallel composition:</strong> Your ambient piece gets texture. The clean synthesized koto becomes chopped, grained, material. The finished piece becomes <em>more</em> finished.</p>
-    <p><strong>This is the last lesson of Phase 1.</strong> The piece ships.</p>
-    </div>
-</details>
+<div class="concept warm">
+    <span class="c-label">what you already know</span>
+    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm(35)</code>,
+    mini-notation, <code>.gain()</code>, <code>.pan()</code>,
+    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
+    <code>.sustain()</code>, <code>.release()</code>,
+    <code>.room()</code>, <code>.size()</code>,
+    <code>.delay()</code>, <code>.delaytime()</code>, <code>.delayfeedback()</code>,
+    <code>.distort()</code>, chord notation <code>[c3,eb3,g3]</code>,
+    progressions with <code>&lt;&gt;</code>,
+    <code>.every()</code>, <code>.sometimes()</code>, <code>.jux()</code>, <code>.off()</code>,
+    and the phonk palette from EDM.4&ndash;6.</p>
+</div>
 </section>
 
 <!-- ============ SECTION 0: SPEED ============ -->
@@ -562,159 +565,9 @@ s("break:1").loopAt(1)
 </details>
 </section>
 
-<!-- ============ SECTION 3: REPERTOIRE ============ -->
-<section id="repertoire">
-<h2><span class="num">03</span>From Synthesis to Samples</h2>
-
-<p>Everything you played in L0-L6 was synthesized. Waveforms generated in code. Now listen to what happened when game composers got access to recordings.</p>
-
-<p><strong>Zelda: A Link to the Past &mdash; Dark World Theme</strong> (Koji Kondo, 1991). The SNES replaced the NES&rsquo;s 5 synthesis channels with 8 sampled channels on the Sony SPC700 chip. Kondo went from triangle waves to sampled brass and choir. Same composer. Different material. Listen to how much richer it sounds:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>synthesis (NES-style)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-nes">
-    <!--
-setcpm(35)
-note("f3 ~ f3 ~ ab3 ~ bb3 c4").s("square")
-  .lpf(1500).gain(0.4)
-    -->
-    </strudel-editor>
-</div>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>sampled (SNES-style)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-snes">
-    <!--
-setcpm(35)
-note("f3 ~ f3 ~ ab3 ~ bb3 c4").s("gm_trumpet")
-  .gain(0.5).room(0.3)
-    -->
-    </strudel-editor>
-</div>
-
-<p>Same notes. Different source material. The square wave is abstract. The trumpet sample is physical. That transition from synthesis to samples is what this lesson is about.</p>
-
-<p><strong>Chrono Trigger &mdash; Corridors of Time</strong> (Mitsuda, 1995). One of the most remixed tracks in game music history. People chop it, loop it, layer it. The SPC700 samples have a specific lo-fi quality that modern producers chase on purpose:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>corridors of time feel (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-rep-corridors">
-    <!--
-setcpm(28)
-stack(
-  note("d5 e5 fs5 a5 fs5 e5 d5 ~")
-    .s("gm_music_box").gain(0.5)
-    .room(0.4).delay(0.2).delaytime(0.25).delayfeedback(0.3),
-  note("[d3,a3,fs4]").s("gm_pad_warm")
-    .lpf(1200).gain(0.25)
-    .attack(1).sustain(0.6).release(1).room(0.5)
-)
-    -->
-    </strudel-editor>
-</div>
-
-<details class="rabbit-hole">
-    <summary>rabbit hole: the SNES SPC700 and the sample revolution</summary>
-    <div class="rh-body">
-        <h4>The shift</h4>
-        <p>NES (1983): 5 channels of synthesis. SNES (1990): 8 channels of sampled audio on the Sony SPC700 chip. The chip could play back recordings, not just generate waveforms. Composers could record a trumpet, a violin, a choir, and play them back pitched to different notes.</p>
-
-        <h4>The constraint changed</h4>
-        <p>NES composers were limited by <em>what sounds they could make</em>. SNES composers were limited by <em>how much sample memory they had</em>. The SPC700 had 64KB of audio RAM. A single second of CD-quality audio is 176KB. So every sample had to be tiny: short, looped, compressed. That compression gave SNES music its distinctive character. The lo-fi quality wasn&rsquo;t a failure. It was the sound of fitting an orchestra into 64 kilobytes.</p>
-
-        <table>
-            <thead><tr><th>system</th><th>audio</th><th>constraint</th><th>result</th></tr></thead>
-            <tbody>
-            <tr><td>NES</td><td>5 synth channels</td><td>what sounds you can make</td><td>inventive synthesis (Tanaka, Kondo)</td></tr>
-            <tr><td>SNES</td><td>8 sample channels, 64KB RAM</td><td>how much memory you have</td><td>compressed samples, lo-fi warmth (Mitsuda, Uematsu)</td></tr>
-            <tr><td>PS1</td><td>24 channels, CD audio</td><td>almost none</td><td>full orchestral scores (Uematsu FF7)</td></tr>
-            </tbody>
-        </table>
-
-        <p>The lo-fi hip hop aesthetic that dominates YouTube streams in 2024? That&rsquo;s people chasing the SPC700 sound on purpose. The constraint became the goal.</p>
-    </div>
-</details>
-
-<details class="rabbit-hole">
-    <summary>rabbit hole: sample culture &mdash; from jungle to lo-fi</summary>
-    <div class="rh-body">
-        <h4>The lineage</h4>
-        <p><strong>1986-91:</strong> UK producers discover <em>Ultimate Breaks and Beats</em> compilations. They sample drum breaks (especially the Amen) on Akai S950 samplers with 8 seconds of memory. Chop, pitch, loop. Jungle is born.</p>
-        <p><strong>1994-97:</strong> J Dilla buys an Akai MPC3000. Instead of quantizing his samples to the grid, he leaves them slightly off. The timing is imperfect. It feels human. &ldquo;Dilla time&rdquo; becomes a production philosophy: the machine breathes like a person.</p>
-        <p><strong>2000s:</strong> Nujabes (Japanese producer Seba Jun) blends jazz samples with Dilla&rsquo;s timing, adds anime aesthetics. The proto-lo-fi hip hop sound. His soundtracks for <em>Samurai Champloo</em> bring Japanese and American sample culture together.</p>
-        <p><strong>2010s-now:</strong> Lo-fi hip hop YouTube streams. The &ldquo;study girl&rdquo; aesthetic. The sound descends directly from SNES sample compression + Dilla timing + Nujabes jazz. Game music, chopped breaks, and Japanese production philosophy, all in one lineage.</p>
-
-        <h4>Nujabes and the bridge</h4>
-        <p>Nujabes (1974-2010) is the connection between everything in this course. Japanese producer. Sampled American jazz. Used Dilla&rsquo;s timing. Scored anime. His work on <em>Samurai Champloo</em> soundtracks fused traditional Japanese aesthetics with hip-hop production in a way nobody had done before. The lo-fi hip hop genre is essentially &ldquo;what if we all tried to sound like Nujabes.&rdquo;</p>
-    </div>
-</details>
-</section>
-
-<!-- ============ SECTION 4: YOUR COMPOSITION ============ -->
-<section id="score">
-<h2><span class="num">04</span>Your Composition: Texture</h2>
-
-<p>Your piece is structurally complete from L6. Now add texture. The clean synthesized koto gets replaced with chopped, grained material. Same notes, different feel:</p>
-
-<div class="strudel-block">
-    <div class="strudel-label"><span>your ambient piece: textured</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
-    <strudel-editor id="ed-ambient-7">
-    <!--
-setcpm(15)
-cat(
-  // jo: koto alone, chopped + grained
-  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
-    .chop(4).every(3, rev)
-    .room(0.8).size(0.9)
-    .delay(0.4).delaytime(0.5).delayfeedback(0.3),
-  // ha: layers enter with texture
-  stack(
-    note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
-      .chop(4).every(4, rev)
-      .room(0.8).size(0.9)
-      .delay(0.4).delaytime(0.5).delayfeedback(0.3)
-      .sometimes(x => x.add(note(5))),
-    note("~ ~ b4 ~ ~ ~ e4 ~")
-      .sound("gm_shakuhachi").gain(0.5)
-      .room(0.7).size(0.8).lpf(2000)
-      .degrade(0.2),
-    note("[e2,b2,e3]").s("sawtooth")
-      .lpf(400).attack(2).sustain(0.5).release(2)
-      .room(0.9).gain(0.2)
-  ),
-  // kyu: everything, dense
-  stack(
-    note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
-      .chop(8).slice(8, "7 5 3 1 6 4 2 0")
-      .room(0.8).size(0.9)
-      .delay(0.4).delaytime(0.5).delayfeedback(0.4),
-    note("~ ~ b4 ~ ~ ~ e4 ~")
-      .sound("gm_shakuhachi").gain(0.6)
-      .room(0.7).size(0.8).lpf(3000),
-    note("[e2,b2,e3]").s("sawtooth")
-      .lpf(800).attack(1).sustain(0.7).release(1)
-      .room(0.9).gain(0.3),
-    note("e2 ~ ~ ~ ~ ~ e2 ~")
-      .s("sawtooth").lpf(300).decay(.4).sustain(0).gain(0.4)
-  ),
-  // silence: chopped koto fragments fading
-  note("e4 ~ ~ ~ ~ ~ ~ ~").sound("gm_koto").gain(0.4)
-    .chop(4).degrade(0.5)
-    .room(0.95).size(0.95)
-    .delay(0.6).delaytime(0.5).delayfeedback(0.5)
-)
-    -->
-    </strudel-editor>
-</div>
-
-<p>The koto is chopped into fragments. In the <em>ky&umacr;</em> section, <code>.slice(8, "7 5 3 1 6 4 2 0")</code> rearranges the fragments in reverse order. The final section degrades the chopped koto until only fragments remain, dissolving into reverb.</p>
-
-<p><strong>This is the piece.</strong> Seven lessons. From three notes in silence to a structured, evolving, textured ambient composition. Press share.</p>
-</section>
-
-<!-- ============ SECTION 5: CAPSTONE ============ -->
+<!-- ============ SECTION 3: CAPSTONE ============ -->
 <section id="capstone">
-<h2><span class="num">05</span>Chopping</h2>
+<h2><span class="num">03</span>Chopping</h2>
 
 <div class="punchline">
     <p><strong>A phonk track with a chopped break at its center.</strong> Sliced, rearranged, pitched down, reverbed. The break alternates two different slice orders across cycles. Around it: 808 kick, clap, degraded hats, cowbell with delay, sub bass, and a filtered pad. Old recordings turned into new music.</p>
@@ -801,11 +654,8 @@ stack(
     <table>
         <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
         <tbody>
-        <tr><td style="color: var(--accent);">Koji Kondo</td><td>Zelda LttP: Dark World (1991)</td><td>(game) the SNES sample revolution. Synthesis → recordings.</td></tr>
-        <tr><td style="color: var(--accent);">Yasunori Mitsuda</td><td>Chrono Trigger: Corridors of Time (1995)</td><td>(game) the most remixed game track. SPC700 lo-fi warmth.</td></tr>
-        <tr><td style="color: var(--accent);">Nujabes</td><td>Samurai Champloo: Battlecry (2004)</td><td>(anime/hip-hop) Japanese production + jazz samples + Dilla timing</td></tr>
-        <tr><td>DJ Shadow</td><td>Building Steam with a Grain of Salt (1996)</td><td>(hip-hop) first album made entirely from samples</td></tr>
-        <tr><td>J Dilla</td><td>Workinonit (2006)</td><td>(instrumental hip-hop) king of chopping, SP-303, &ldquo;Dilla time&rdquo;</td></tr>
+        <tr><td>DJ Shadow</td><td>Building Steam with a Grain of Salt (1996)</td><td>(hip-hop) first album from samples</td></tr>
+        <tr><td>J Dilla</td><td>Workinonit (2006)</td><td>(instrumental hip-hop) king of chopping, SP-303</td></tr>
         <tr><td>Madvillain</td><td>Accordion (2004)</td><td>(hip-hop) pitched-down chop creates new identity</td></tr>
         <tr><td>Pierre Schaeffer</td><td>&Eacute;tude aux chemins de fer (1948)</td><td>(hip-hop) train recordings cut and rearranged: the first sample-based composition</td></tr>
         </tbody>
