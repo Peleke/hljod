@@ -180,7 +180,7 @@
       "blocks": [
         {
           "type": "text",
-          "content": "<p>Every lesson in this course builds a piece of music for <a href=\"https://grymoire.peleke.me\" style=\"color: var(--accent)\">Ðirðug: The Long Road North</a>. A documentary expedition. Rome to Atlanta. Germanic migrations, traced in reverse.</p><p>Your first composition: three or four koto-like notes placed in silence. The beginning of <em>The North Atlantic</em>. The crossing between Norway and Iceland, the passage Guðríður made a thousand years ago in an open ship.</p>"
+          "content": "<p>Every lesson in this course builds a piece of music for <a href=\"https://grymoire.peleke.me\" style=\"color: var(--accent)\">Ðirðug: The Long Road North</a>. A documentary expedition. Rome to Atlanta. Germanic migrations, traced in reverse.</p><p>Your first composition uses a <strong>koto</strong>, a 13-string Japanese instrument plucked with fingerpicks. It sounds like a harp with edges. <code>.sound(\"gm_koto\")</code> loads it from Strudel's General MIDI bank. Three or four notes placed in silence. The beginning of <em>The North Atlantic</em>. The crossing between Norway and Iceland, the passage Guðríður made a thousand years ago in an open ship.</p>"
         },
         {
           "type": "strudel",
