@@ -1100,8 +1100,8 @@ stack(
   note("e2 ~ ~ ~ ~ ~ e2 ~")
     .s("sawtooth").lpf(200).decay(.4).sustain(0).gain(0.4),
   // NEW: bass drone
-  note("e1").s("sawtooth")
-    .lpf(120).lpq(1)
+  note("e2").s("sawtooth")
+    .lpf(200).lpq(1)
     .attack(1).decay(0.5).sustain(0.6).release(1)
     .gain(0.5)
 )
@@ -1113,7 +1113,7 @@ stack(
 
 <div class="try-this">
     <span class="label">Your turn</span>
-    <p>Change the drone note. Try <code>b0</code> for darker. Try <code>a1</code> for warmer. Adjust <code>.lpf()</code> between 80 and 300. Lower = more felt than heard. Higher = more audible presence.</p>
+    <p>Change the drone note. Try <code>b1</code> for darker. Try <code>a2</code> for warmer. Adjust <code>.lpf()</code> between 80 and 300. Lower = more felt than heard. Higher = more audible presence.</p>
 </div>
 </section>
 
