@@ -272,6 +272,7 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
     <a href="#the808">The 808</a>
     <a href="#space">Space</a>
     <a href="#chord">The Chord</a>
+    <a href="#score">Your Piece</a>
     <a href="#capstone">Capstone</a>
 </div></nav>
 
@@ -286,19 +287,19 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
 <!-- ============ HERO ============ -->
 <section id="hero">
 <h1><span class="accent">Atmosphere</span></h1>
-<div class="subtitle">EDM.4: the 808, dark chords, and space</div>
+<div class="subtitle">EDM.4: reverb, delay, chords, and the sound of space itself</div>
 
-<p>Your EDM.3 capstone was ten layers of DnB at 170bpm. We&rsquo;re dropping the tempo. Different speed, different genre, same tools. The target is phonk.</p>
+<p>Your EDM.3 capstone was ten layers of DnB at 170bpm. We&rsquo;re dropping the tempo. Different speed, different genre, same tools.</p>
 
-<div class="concept warm">
-    <span class="c-label">what you already know</span>
-    <p><code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm()</code>,
-    mini-notation (<code>[] * ~ () &lt;&gt;</code>), <code>.gain()</code>,
-    <code>.lpf()</code>, <code>.lpq()</code>, <code>.attack()</code>, <code>.decay()</code>,
-    <code>.sustain()</code>, <code>.release()</code>, <code>.add(note())</code>,
-    <code>sine.range()</code>, <code>.slow()</code>, <code>.pan()</code>,
-    euclidean patterns, and ghost layers from EDM.0&ndash;3.</p>
-</div>
+<details class="earned">
+    <summary>about this lesson</summary>
+    <div class="earned-body">
+    <p><strong>Repertoire:</strong> <em>Firelink Shrine</em> (Motoi Sakuraba, Dark Souls, 2011), <em>Temple of Time</em> (Manaka Kataoka, Zelda: Breath of the Wild, 2017), and <em>Temple of Time</em> (Koji Kondo, Zelda: Ocarina of Time, 1998). Three approaches to making space the instrument.</p>
+    <p><strong>Also:</strong> <em>Fujimusume</em> (traditional Nagauta/Kabuki). The shamisen and the spaces between its strikes. Traditional Japanese performance as atmospheric composition.</p>
+    <p><strong>Parallel composition:</strong> Your ambient piece gets reverb and delay. The koto starts living in a room. The piece transforms.</p>
+    <p><strong>What you already know:</strong> <code>s()</code>, <code>note()</code>, <code>stack()</code>, <code>setcpm()</code>, mini-notation, <code>.gain()</code>, <code>.lpf()</code>, ADSR, <code>.add(note())</code>, <code>sine.range()</code>, <code>.pan()</code>, euclidean patterns, and ghost layers from EDM.0&ndash;3.</p>
+    </div>
+</details>
 </section>
 
 <!-- ============ SECTION 0: NEW GROUND ============ -->
@@ -620,6 +621,97 @@ s("~ cb ~ cb ~ cb cb ~").gain(0.5)
         <p>Same physics as why bass stays centered. Low frequencies create muddy, indistinct reverb tails. Reverb on a 50Hz sine just sounds like rumble. Keep the 808 dry. Put reverb on claps, cowbells, pads. Sounds with high-frequency content that reverb can shape.</p>
     </div>
 </details>
+
+<h3>Repertoire: space as instrument</h3>
+
+<p>You now have reverb and delay. Listen to what happens when composers make space the primary compositional tool.</p>
+
+<p><strong>Dark Souls &mdash; Firelink Shrine</strong> (Motoi Sakuraba, 2011). A handful of notes in a massive acoustic space. The melody is almost nothing. The room does the rest:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>firelink shrine (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-firelink">
+    <!--
+setcpm(20)
+note("d4 ~ ~ a3 ~ ~ f4 ~ ~ d4 ~ ~")
+  .s("gm_acoustic_guitar_nylon").gain(0.6)
+  .room(0.8).size(0.9)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Remove <code>.room(0.8).size(0.9)</code> and play it again. Hear the difference? Without the space, it&rsquo;s just notes. With it, it&rsquo;s a place.</p>
+
+<p><strong>Zelda: Breath of the Wild &mdash; Temple of Time</strong> (Manaka Kataoka, 2017). Nintendo stripped the Zelda soundtrack to almost nothing after decades of melodic soundtracks. Piano notes floating in silence with long delay tails:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>botw temple of time (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-botw">
+    <!--
+setcpm(15)
+note("a4 ~ ~ ~ ~ e4 ~ ~ ~ ~ ~ ~ c5 ~ ~ ~")
+  .s("gm_acoustic_grand_piano").gain(0.5)
+  .room(0.7).size(0.9)
+  .delay(0.4).delaytime(0.5).delayfeedback(0.3)
+    -->
+    </strudel-editor>
+</div>
+
+<p><strong>Zelda: Ocarina of Time &mdash; Temple of Time</strong> (Koji Kondo, 1998). The original. Choir pads, bells, sustained harmonic wash. This is what a pad sounds like in context:</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>oot temple of time (approximation)</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-rep-oot">
+    <!--
+setcpm(18)
+stack(
+  // choir pad
+  note("[d3,a3,d4]").s("sawtooth")
+    .lpf(800).lpq(1)
+    .attack(1.5).decay(0.5).sustain(0.7).release(2)
+    .room(0.9).size(0.95).gain(0.3),
+  // bell melody
+  note("d5 ~ ~ a4 ~ ~ d5 ~ ~ f5 ~ ~")
+    .s("gm_music_box").gain(0.4)
+    .room(0.6).delay(0.3).delaytime(0.375).delayfeedback(0.2)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<div class="concept warm">
+    <span class="c-label">three approaches to atmosphere</span>
+    <p>Sakuraba used reverb on sparse guitar. Kataoka used delay on sparse piano. Kondo used a sustained pad with reverb on bells above it. Same tools: <code>.room()</code>, <code>.delay()</code>, long ADSR envelopes. Three different worlds.</p>
+</div>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: the BotW sound design decision</summary>
+    <div class="rh-body">
+        <h4>The deliberate absence</h4>
+        <p>For 30 years, Zelda games had melodic, hummable soundtracks. Overworld themes. Dungeon themes. Every area had a song. Then Breath of the Wild shipped with almost nothing. Sparse piano notes. Long silences. Environmental sound.</p>
+        <p>Hajime Wakai (sound director) explained: the world was the music. Wind, rain, footsteps, birds. The piano notes weren&rsquo;t a soundtrack. They were punctuation. The silence between them was the composition.</p>
+        <p>The player was supposed to feel alone in a huge landscape. A full orchestral score would have broken that. The emptiness was a design choice, not a limitation.</p>
+
+        <h4>The contrast with Ocarina</h4>
+        <p>Kondo&rsquo;s OoT Temple of Time is the opposite approach: full harmonic wash, every moment filled with sound. Both work. One fills the space with music. The other fills it with the absence of music. The tools are the same (<code>.room()</code> in both cases). The aesthetic decision is what differs.</p>
+    </div>
+</details>
+
+<details class="rabbit-hole">
+    <summary>rabbit hole: shamisen, Kabuki, and the space between strikes</summary>
+    <div class="rh-body">
+        <h4>Fujimusume</h4>
+        <p>In the Kabuki dance <em>Fujimusume</em> (The Wisteria Maiden), the shamisen plays sparse, percussive strikes with long silences between them. The strikes are sharp and bright. The silences are structural. The dancer moves in the spaces the music leaves.</p>
+        <p>This is the same principle as Firelink Shrine and BotW&rsquo;s Temple of Time: the sound event matters, but the space around it matters more. The shamisen is a plucked string instrument. Like the koto in your ambient piece, each strike decays naturally into silence. The reverb is the room the performance happens in. The delay is memory.</p>
+
+        <h4>Nagauta form</h4>
+        <p>Nagauta (&ldquo;long song&rdquo;) is the musical form behind Kabuki dance. It combines shamisen, voice, and percussion ensemble. The percussion uses <em>kakegoe</em> (rhythmic shouts) between beats. The shouts aren&rsquo;t decoration. They&rsquo;re timing cues that live in the rests, shaping the negative space the same way <em>ma</em> does. The performance is as much about what happens between the notes as what happens on them.</p>
+
+        <h4>The connection to your piece</h4>
+        <p>Your koto plays sparse notes with rests between them. Your shakuhachi breathes in the gaps. When you add <code>.room()</code> and <code>.delay()</code> to these instruments, you&rsquo;re doing what the Kabuki theater does acoustically: letting the space between events become part of the composition.</p>
+    </div>
+</details>
+
 </section>
 
 <!-- ============ SECTION 3: THE CHORD ============ -->
@@ -2046,8 +2138,51 @@ stack(
 <p>Apply what you learned: roots, leading notes, fifths, movement. The pad stays. The bass is yours.</p>
 
 <!-- ============ SECTION 4: CAPSTONE ============ -->
+<!-- ============ YOUR COMPOSITION ============ -->
+<section id="score">
+<h2><span class="num">04</span>Your Composition</h2>
+
+<p>This is the transformation. Same notes from L0-L3. But now they live in a space.</p>
+
+<div class="strudel-block">
+    <div class="strudel-label"><span>your ambient piece: adding space</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
+    <strudel-editor id="ed-ambient-4">
+    <!--
+setcpm(15)
+stack(
+  // koto with reverb and delay
+  note("e4 ~ ~ b3 ~ ~ g4 ~").sound("gm_koto").gain(0.8)
+    .room(0.8).size(0.9)
+    .delay(0.4).delaytime(0.5).delayfeedback(0.3),
+  // shakuhachi with room
+  note("~ ~ b4 ~ ~ ~ e4 ~")
+    .sound("gm_shakuhachi").gain(0.5)
+    .room(0.7).size(0.8)
+    .lpf(2000),
+  // pulse
+  note("e2 ~ ~ ~ ~ ~ e2 ~")
+    .s("sawtooth").lpf(200).decay(.4).sustain(0).gain(0.3),
+  // bass drone
+  note("e2").s("sawtooth")
+    .lpf(200).lpq(1)
+    .attack(1).decay(0.5).sustain(0.6).release(1)
+    .gain(0.3)
+)
+    -->
+    </strudel-editor>
+</div>
+
+<p>Five layers. The koto decays into reverb and delay trails. The shakuhachi breathes in the spaces. The pulse and drone hold the bottom. Compare this to the L0 version — same notes, completely different piece. The effects are the transformation.</p>
+
+<div class="try-this">
+    <span class="label">Your turn</span>
+    <p>Remove the pulse and drone. Just koto + shakuhachi + space. Does it hold? Add a pad underneath: <code>note("[e3,b3]").s("sawtooth").lpf(400).attack(2).sustain(0.5).release(2).room(0.9).gain(0.2)</code>. Different foundation. Different feeling.</p>
+</div>
+</section>
+
+<!-- ============ SECTION 5: CAPSTONE ============ -->
 <section id="capstone">
-<h2><span class="num">04</span>Atmosphere</h2>
+<h2><span class="num">05</span>Atmosphere</h2>
 
 <div class="punchline">
     <p><strong>The full track.</strong> Drums, cowbell, 808, pad. Put your bass approach from the exercises above into the capstone, or use the one here as a starting point.</p>
@@ -2128,6 +2263,9 @@ stack(
     <table>
         <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
         <tbody>
+        <tr><td style="color: var(--accent);">Motoi Sakuraba</td><td>Dark Souls: Firelink Shrine (2011)</td><td>(game) sparse guitar in massive reverb. The room is the instrument.</td></tr>
+        <tr><td style="color: var(--accent);">Manaka Kataoka</td><td>Zelda BotW: Temple of Time (2017)</td><td>(game) piano notes in silence. Delay trails as composition.</td></tr>
+        <tr><td style="color: var(--accent);">Koji Kondo</td><td>Zelda OoT: Temple of Time (1998)</td><td>(game) choir pad + bells. The original atmospheric Zelda.</td></tr>
         <tr><td>Three 6 Mafia</td><td>Tear Da Club Up (1995)</td><td>(Memphis rap) foundational Memphis phonk</td></tr>
         <tr><td>Tommy Wright III</td><td>Ashes 2 Ashes, Dust 2 Dust (1994)</td><td>(Memphis rap) bedroom lo-fi Memphis</td></tr>
         <tr><td>DJ Smokey</td><td>Evil Wayz (2013)</td><td>(phonk) bridged classic Memphis with modern phonk</td></tr>
