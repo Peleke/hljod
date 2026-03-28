@@ -15,6 +15,7 @@ const path = require('path')
 const LESSONS_DIR = path.join(__dirname, 'lessons')
 const DOCS_DIR = path.join(__dirname, 'docs')
 const TEMPLATE_PATH = path.join(__dirname, 'template.html')
+const RABBIT_HOLES_DIR = path.join(__dirname, 'rabbit-holes')
 
 // ============================================================================
 // Load template (extracted from existing lesson — CSS + chrome + scripts)
@@ -84,6 +85,27 @@ ${block.code}
     <span class="c-label">repertoire — ${block.piece}</span>
     ${block.content}
 </div>`
+
+    case 'rabbit-hole': {
+      const partialPath = path.join(RABBIT_HOLES_DIR, `${block.ref}.html`)
+      if (!fs.existsSync(partialPath)) {
+        console.warn(`  ⚠ rabbit hole not found: ${block.ref}`)
+        return `<!-- rabbit hole missing: ${block.ref} -->`
+      }
+      return fs.readFileSync(partialPath, 'utf8')
+    }
+
+    case 'include': {
+      const inclPath = path.join(RABBIT_HOLES_DIR, `${block.ref}.html`)
+      if (!fs.existsSync(inclPath)) {
+        console.warn(`  ⚠ include not found: ${block.ref}`)
+        return `<!-- include missing: ${block.ref} -->`
+      }
+      return fs.readFileSync(inclPath, 'utf8')
+    }
+
+    case 'raw-html':
+      return block.content
 
     default:
       return `<!-- unknown block type: ${block.type} -->`

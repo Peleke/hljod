@@ -138,6 +138,41 @@
           "type": "try-this",
           "label": "Try this",
           "content": "<p>Swap <code>sd</code> for <code>cp</code> (clap). Try <code>\"bd bd sd bd\"</code>. Try <code>\"bd hh sd hh bd hh sd oh\"</code>. Eight events now. Double-time. The pattern language is the same. Only the density changes.</p>"
+        },
+        {
+          "type": "text",
+          "content": "<h3>Euclidean: let math place the hits</h3><p><code>(3,8)</code> distributes three kicks as evenly as possible across eight slots. The math picks the spacing. Even distribution tends to sound good.</p>"
+        },
+        {
+          "type": "strudel",
+          "editorId": "ed-2d",
+          "editorLabel": "three in eight: euclidean",
+          "code": "s(\"bd(3,8)\")"
+        },
+        {
+          "type": "try-this",
+          "label": "Try this",
+          "content": "<p>Try <code>(5,8)</code>, <code>(3,4)</code>, <code>(7,16)</code>, <code>(2,5)</code>. Different numbers, different feel. Some of these are West African and Afro-Cuban rhythms, centuries old.</p>"
+        },
+        {
+          "type": "rabbit-hole",
+          "ref": "euclidean-circle"
+        },
+        {
+          "type": "text",
+          "content": "<h3>Angle brackets: alternate per cycle</h3><p><code>&lt; &gt;</code> rotates through its options, one per cycle. Snare, clap, snare, clap.</p>"
+        },
+        {
+          "type": "strudel",
+          "editorId": "ed-2e",
+          "editorLabel": "snare on odd cycles, clap on even",
+          "code": "s(\"bd <sd cp> hh oh\")"
+        },
+        {
+          "type": "concept",
+          "variant": "cool",
+          "label": "Mini-notation: the short version",
+          "content": "<p><code>[ ]</code> subdivide &bull; <code>*N</code> multiply &bull; <code>~</code> rest &bull; <code>(k,n)</code> euclidean &bull; <code>&lt; &gt;</code> alternate</p><p>Five tools. Every rhythm in this course uses some combination of these.</p>"
         }
       ]
     },
@@ -223,6 +258,10 @@
             "Remove the beat entirely. Just the Ðirðug sketch alone. Does it stand on its own?",
             "Share your capstone. Hit the share button and post it."
           ]
+        },
+        {
+          "type": "include",
+          "ref": "l0-earned-sections"
         }
       ]
     }

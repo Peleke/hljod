@@ -1,0 +1,79 @@
+
+<details class="earned">
+    <summary>what you earned</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>tool</th><th>does</th><th>looks like</th></tr></thead>
+        <tbody>
+        <tr><td>s()</td><td>plays a sample by name</td><td><code>s("bd sd hh")</code></td></tr>
+        <tr><td>note()</td><td>plays a pitched note through a synth</td><td><code>note("c2 eb2")</code></td></tr>
+        <tr><td>stack()</td><td>layers patterns on top of each other</td><td><code>stack(s("bd"), s("hh*8"))</code></td></tr>
+        <tr><td>[ ]</td><td>subdivides a slot (crams sounds in)</td><td><code>s("bd [sd sd]")</code></td></tr>
+        <tr><td>*N</td><td>repeats a sound N times in one slot</td><td><code>s("hh*8")</code></td></tr>
+        <tr><td>~</td><td>rest: holds the slot silent</td><td><code>s("bd ~ sd ~")</code></td></tr>
+        <tr><td>(k,n)</td><td>euclidean: distributes k hits across n slots</td><td><code>s("bd(3,8)")</code></td></tr>
+        <tr><td>&lt; &gt;</td><td>alternates options, one per cycle</td><td><code>s("bd &lt;sd cp&gt;")</code></td></tr>
+        <tr><td>.method()</td><td>chains effects onto a pattern</td><td><code>.lpf(500).gain(.5)</code></td></tr>
+        <tr><td>.s()</td><td>sets the sound source (sample or synth type)</td><td><code>.s("sawtooth")</code></td></tr>
+        <tr><td>.gain()</td><td>sets volume (0 to 1+)</td><td><code>.gain(.5)</code></td></tr>
+        <tr><td>.lpf()</td><td>low-pass filter: cuts frequencies above cutoff</td><td><code>.lpf(500)</code></td></tr>
+        <tr><td>.decay()</td><td>how fast the sound drops from peak</td><td><code>.decay(.15)</code></td></tr>
+        <tr><td>.sustain()</td><td>level the sound holds at after decay</td><td><code>.sustain(0)</code></td></tr>
+        <tr><td>sawtooth</td><td>a bright, buzzy synthesizer wave</td><td><code>.s("sawtooth")</code></td></tr>
+        </tbody>
+    </table>
+    <p class="earned-next">Next: <em>The Break</em>. 170bpm, half-time snare, an actual DnB beat.</p>
+    </div>
+</details>
+
+<details class="earned">
+    <summary>mini-notation reference</summary>
+    <div class="earned-body">
+    <table>
+        <thead><tr><th>syntax</th><th>name</th><th>does</th><th>example</th></tr></thead>
+        <tbody>
+        <tr><td>[ ]</td><td>brackets</td><td>subdivides a slot</td><td><code>s("bd [sd sd]")</code></td></tr>
+        <tr><td>*N</td><td>multiply</td><td>repeats N times in one slot</td><td><code>s("hh*8")</code></td></tr>
+        <tr><td>~</td><td>rest</td><td>silence, holds the slot</td><td><code>s("bd ~ sd ~")</code></td></tr>
+        <tr><td>(k,n)</td><td>euclidean</td><td>distributes k hits across n slots</td><td><code>s("bd(3,8)")</code></td></tr>
+        <tr><td>(k,n,r)</td><td>euclidean + rotation</td><td>same but rotated r steps</td><td><code>s("bd(3,8,2)")</code></td></tr>
+        <tr><td>&lt; &gt;</td><td>alternate</td><td>one option per cycle, rotating</td><td><code>s("bd &lt;sd cp&gt;")</code></td></tr>
+        <tr><td>/N</td><td>slow</td><td>stretches pattern across N cycles</td><td><code>s("[bd sd hh oh]/2")</code></td></tr>
+        <tr><td>!N</td><td>replicate</td><td>repeats without changing speed</td><td><code>s("bd!3 sd")</code></td></tr>
+        <tr><td>?</td><td>degrade</td><td>50% chance of silence</td><td><code>s("hh*8?")</code></td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>listening</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 1rem;">Tracks that demonstrate this lesson&rsquo;s concepts.</p>
+    <table>
+        <thead><tr><th>artist</th><th>track</th><th>why</th></tr></thead>
+        <tbody>
+        <tr><td>Kraftwerk</td><td>Numbers (1981)</td><td>(electronic) minimal pattern construction from drum machine loops</td></tr>
+        <tr><td>Derrick May</td><td>Strings of Life (1987)</td><td>(electro) a piano loop becomes a complete dance track</td></tr>
+        <tr><td>New Order</td><td>Blue Monday (1983)</td><td>(synth-pop) programmed loop as the whole song</td></tr>
+        <tr><td>Afrika Bambaataa</td><td>Planet Rock (1982)</td><td>(electro) Kraftwerk samples fused with the South Bronx, bridging D&uuml;sseldorf to hip-hop</td></tr>
+        </tbody>
+    </table>
+    </div>
+</details>
+
+<details class="earned" style="margin-top: 1rem;">
+    <summary>history</summary>
+    <div class="earned-body">
+    <p style="font-size: 0.85rem; color: var(--text-dim);">The idea of repeating patterns as music predates electronics by centuries &mdash; player pianos, music boxes, barrel organs. But the electronic loop changed everything.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Karlheinz Stockhausen and tape loops (1950s)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">In 1952&ndash;53 at the WDR studio in Cologne, Stockhausen created <em>Studie I</em> and <em>Studie II</em> &mdash; the first purely electronic compositions, built from sine wave generators and tape splicing. He demonstrated that sound could be constructed, not just recorded. His student Holger Czukay went on to found Can. His ideas directly influenced Kraftwerk.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Kraftwerk and the sequencer (1970s)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Ralf H&uuml;tter and Florian Schneider built custom instruments &mdash; the Synthanorma sequencer could store 32 steps and repeat them. <em>Trans-Europe Express</em> (1977) and <em>Computer World</em> (1981) proved that machine repetition wasn&rsquo;t cold &mdash; it was hypnotic. Afrika Bambaataa sampled &ldquo;Numbers&rdquo; and &ldquo;Trans-Europe Express&rdquo; for &ldquo;Planet Rock&rdquo; (1982), connecting D&uuml;sseldorf to the South Bronx.</p>
+    <h4 style="font-size: 0.95rem; margin: 1rem 0 0.3rem;">Detroit techno (1980s)</h4>
+    <p style="font-size: 0.85rem; color: var(--text-dim);">Juan Atkins, Derrick May, and Kevin Saunderson &mdash; the Belleville Three &mdash; heard Kraftwerk on late-night radio in Detroit and fused it with Parliament-Funkadelic. Atkins: &ldquo;I just thought it was some cool shit from outer space.&rdquo; May&rsquo;s &ldquo;Strings of Life&rdquo; (1987) demonstrated that a programmed loop could carry the emotional weight of a live performance.</p>
+    <p style="font-size: 0.75rem; color: var(--text-faint); margin-top: 1rem; border-top: 1px solid #1e1e24; padding-top: 0.8rem;"><strong>Sources:</strong> Stockhausen, <em>Studie II</em> (1954); Bussy, <em>Kraftwerk: Man, Machine and Music</em> (2004); Sicko, <em>Techno Rebels</em> (2010); Reynolds, S. <em>Energy Flash</em> (1998).</p>
+<p style="margin-top: 0.5rem;"><a href="history.html" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; color: var(--cool); text-decoration: none; letter-spacing: 0.06em;">&#x2192; explore the full timeline</a></p>
+    </div>
+</details>
+</section>

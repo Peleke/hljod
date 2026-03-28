@@ -67,7 +67,7 @@
               "properties": {
                 "type": {
                   "type": "string",
-                  "enum": ["text", "strudel", "concept", "try-this", "exercises", "rabbit-hole", "repertoire-ref"]
+                  "enum": ["text", "strudel", "concept", "try-this", "exercises", "rabbit-hole", "repertoire-ref", "raw-html"]
                 },
                 "content": { "type": "string", "description": "HTML content for text/concept/try-this blocks" },
                 "label": { "type": "string", "description": "Label for concept/try-this boxes" },
