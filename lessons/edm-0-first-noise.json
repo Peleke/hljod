@@ -209,23 +209,23 @@
       ]
     },
     {
-      "id": "dirdug-composition",
+      "id": "your-composition",
       "num": "04",
-      "title": "The Score Begins",
+      "title": "Your Composition",
       "blocks": [
         {
           "type": "text",
-          "content": "<p>Every lesson in this course builds a piece of music for <a href=\"https://grymoire.peleke.me\" style=\"color: var(--accent)\">Ðirðug: The Long Road North</a>. A documentary expedition. Rome to Atlanta. Germanic migrations, traced in reverse.</p><p>Your first composition uses a <strong>koto</strong>, a 13-string Japanese instrument plucked with fingerpicks. It sounds like a harp with edges. <code>.sound(\"gm_koto\")</code> loads it from Strudel's General MIDI bank. Three or four notes placed in silence. The beginning of <em>The North Atlantic</em>. The crossing between Norway and Iceland, the passage Guðríður made a thousand years ago in an open ship.</p>"
+          "content": "<p>Every lesson in this course builds a piece of ambient music alongside the main exercises. By Lesson 7 you'll have a finished 60-90 second track.</p><p>Your instrument: a <strong>koto</strong>, a 13-string Japanese instrument plucked with fingerpicks. It sounds like a harp with edges. <code>.sound(\"gm_koto\")</code> loads it from Strudel's General MIDI bank. Three or four notes placed in silence. The beginning of something.</p>"
         },
         {
           "type": "strudel",
-          "editorId": "ed-dirdug-0",
-          "editorLabel": "the north atlantic: first gesture",
+          "editorId": "ed-ambient-0",
+          "editorLabel": "your ambient piece: first gesture",
           "code": "note(\"e4 ~ ~ b3 ~ ~ g4 ~\")\n  .sound(\"gm_koto\")\n  .gain(0.8)\n  .room(0.8)\n  .delay(0.5).delaytime(0.375).delayfeedback(0.4)"
         },
         {
           "type": "text",
-          "content": "<p>Sparse. Mostly silence. The <code>~</code> is a rest, a deliberate gap. The delay and room let each note ring out and decay into the space around it. This is the sound of open water.</p><p>This is the seed. Over the next 7 lessons, you'll add a pulse, a drone, a second voice, and effects. By Lesson 7, you'll have a finished 60-90 second piece.</p>"
+          "content": "<p>Sparse. Mostly silence. The <code>~</code> is a rest, a deliberate gap. The delay and room let each note ring out and decay into the space around it.</p><p>This is the seed. Over the next 7 lessons, you'll add a pulse, a drone, a second voice, and effects. By Lesson 7, you'll have a finished piece.</p>"
         },
         {
           "type": "try-this",
@@ -241,13 +241,13 @@
       "blocks": [
         {
           "type": "text",
-          "content": "<p>Put it all together. A beat, a melody, and your Ðirðug sketch layered on top. This is yours. Change anything. Break it. Fix it. Share it.</p>"
+          "content": "<p>Put it all together. A beat, a melody, and your ambient sketch layered on top. This is yours. Change anything. Break it. Fix it. Share it.</p>"
         },
         {
           "type": "strudel",
           "editorId": "ed-capstone",
           "editorLabel": "capstone: share this",
-          "code": "stack(\n  // your beat\n  s(\"bd ~ sd ~\"),\n  // zelda-inspired melody\n  note(\"c4 e4 g4 c5\").s(\"triangle\").gain(0.4),\n  // your dirdug sketch\n  note(\"e4 ~ ~ b3 ~ ~ g4 ~\")\n    .sound(\"gm_koto\").gain(0.7)\n    .room(0.7).delay(0.4).delaytime(0.375).delayfeedback(0.3)\n)"
+          "code": "stack(\n  // your beat\n  s(\"bd ~ sd ~\"),\n  // zelda-inspired melody\n  note(\"c4 e4 g4 c5\").s(\"triangle\").gain(0.4),\n  // your ambient sketch\n  note(\"e4 ~ ~ b3 ~ ~ g4 ~\")\n    .sound(\"gm_koto\").gain(0.7)\n    .room(0.7).delay(0.4).delaytime(0.375).delayfeedback(0.3)\n)"
         },
         {
           "type": "exercises",
@@ -255,7 +255,7 @@
           "items": [
             "Replace the Zelda melody with the Mario coin (<code>note(\"b4 e5\")</code>). How does 2 notes vs 4 change the feel?",
             "Write a 6-note pattern of your own. No theory. Just notes that sound good to you.",
-            "Remove the beat entirely. Just the Ðirðug sketch alone. Does it stand on its own?",
+            "Remove the beat entirely. Just the koto sketch alone. Does it stand on its own?",
             "Share your capstone. Hit the share button and post it."
           ]
         },

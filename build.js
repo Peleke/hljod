@@ -159,12 +159,6 @@ ${lesson.repertoire ? `
     <p><em>${lesson.repertoire.why}</em></p>
 </div>` : ''}
 
-${lesson.dirdug ? `
-<div class="concept warm">
-    <span class="c-label">ðirðug composition track</span>
-    <p><strong>${lesson.dirdug.composition}</strong></p>
-    <p>${lesson.dirdug.technique}${lesson.dirdug.nodeUrl ? ` <a href="${lesson.dirdug.nodeUrl}" style="color: var(--accent)">${lesson.dirdug.node} →</a>` : ''}</p>
-</div>` : ''}
 </section>`
 
   // Fill template
