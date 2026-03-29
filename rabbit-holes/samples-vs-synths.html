@@ -1,0 +1,231 @@
+    <summary>rabbit hole: samples vs synths, wave shapes, and filters</summary>
+    <div class="rh-body">
+        <h4>Samples vs synths</h4>
+        <p><code>s()</code> plays a recording. Someone hit a drum, we play it back. <code>note()</code> generates a wave from scratch. No recording, just math. Samples sound &ldquo;real.&rdquo; Synths sound &ldquo;electronic.&rdquo; Both are patterns.</p>
+
+        <h4>Wave types</h4>
+        <table>
+            <thead><tr><th>wave</th><th>sound</th><th>code</th></tr></thead>
+            <tbody>
+            <tr><td>sine</td><td>pure, clean, sub-bass</td><td><code>.s("sine")</code></td></tr>
+            <tr><td>sawtooth</td><td>bright, buzzy, leads + bass</td><td><code>.s("sawtooth")</code></td></tr>
+            <tr><td>square</td><td>hollow, woody, chiptune</td><td><code>.s("square")</code></td></tr>
+            <tr><td>triangle</td><td>soft, muted, gentler saw</td><td><code>.s("triangle")</code></td></tr>
+            </tbody>
+        </table>
+
+        <!-- === WAVE TYPES VISUALIZER === -->
+        <div style="margin: 1rem 0 1.5rem;">
+            <div style="display: flex; gap: 0.4rem; margin-bottom: 0.5rem; flex-wrap: wrap;">
+                <button class="wave-btn" data-wave="sine" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">sine</button>
+                <button class="wave-btn" data-wave="sawtooth" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">sawtooth</button>
+                <button class="wave-btn" data-wave="square" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">square</button>
+                <button class="wave-btn" data-wave="triangle" style="font-family: 'SF Mono', monospace; font-size: 0.65rem; padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer; border: 1px solid #1e1e24; background: #141418; color: #8a8780; transition: all 0.2s; letter-spacing: 0.04em;">triangle</button>
+            </div>
+            <canvas id="wave-canvas" width="800" height="120" style="width: 100%; height: 120px; background: #0a0a0c; border: 1px solid #1e1e24; border-radius: 6px; display: block;"></canvas>
+        </div>
+        <script>
+        (function() {
+            const canvas = document.getElementById('wave-canvas');
+            const ctx = canvas.getContext('2d');
+            const buttons = document.querySelectorAll('.wave-btn');
+            let waveAudioCtx = null;
+
+            function drawWave(type) {
+                const w = canvas.width;
+                const h = canvas.height;
+                const cycles = 3.5;
+                const period = w / cycles;
+
+                ctx.clearRect(0, 0, w, h);
+                ctx.fillStyle = '#0a0a0c';
+                ctx.fillRect(0, 0, w, h);
+
+                // center line
+                ctx.strokeStyle = '#1e1e24';
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(0, h / 2);
+                ctx.lineTo(w, h / 2);
+                ctx.stroke();
+
+                ctx.strokeStyle = '#ff6b35';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+
+                for (let px = 0; px < w; px++) {
+                    const x = px;
+                    const phase = (px / period) * Math.PI * 2;
+                    let y;
+                    switch (type) {
+                        case 'sine':
+                            y = Math.sin(phase);
+                            break;
+                        case 'sawtooth':
+                            y = 2 * (px / period - Math.floor(px / period + 0.5));
+                            break;
+                        case 'square':
+                            y = Math.sign(Math.sin(phase));
+                            break;
+                        case 'triangle':
+                            y = 2 * Math.abs(2 * (px / period - Math.floor(px / period + 0.5))) - 1;
+                            break;
+                    }
+                    const py = h / 2 - y * (h / 2 - 10);
+                    if (px === 0) ctx.moveTo(x, py);
+                    else ctx.lineTo(x, py);
+                }
+                ctx.stroke();
+            }
+
+            function playTone(type) {
+                if (!waveAudioCtx) waveAudioCtx = new AudioContext();
+                const osc = waveAudioCtx.createOscillator();
+                const gain = waveAudioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = 220;
+                gain.gain.setValueAtTime(0.3, waveAudioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, waveAudioCtx.currentTime + 1);
+                osc.connect(gain);
+                gain.connect(waveAudioCtx.destination);
+                osc.start();
+                osc.stop(waveAudioCtx.currentTime + 1);
+            }
+
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    buttons.forEach(b => {
+                        b.style.borderColor = '#1e1e24';
+                        b.style.color = '#8a8780';
+                        b.style.background = '#141418';
+                    });
+                    btn.style.borderColor = '#ff6b35';
+                    btn.style.color = '#ff6b35';
+                    btn.style.background = '#ff6b3533';
+                    const type = btn.getAttribute('data-wave');
+                    drawWave(type);
+                    playTone(type);
+                });
+            });
+
+            // default: draw sine
+            drawWave('sine');
+            buttons[0].style.borderColor = '#ff6b35';
+            buttons[0].style.color = '#ff6b35';
+            buttons[0].style.background = '#ff6b3533';
+        })();
+        </script>
+
+        <h4>Filters</h4>
+        <p>A filter removes frequencies. <code>.lpf(500)</code> = low-pass filter at 500hz. Everything above 500hz gets cut. The number is the cutoff. Lower number = darker sound. Higher = brighter.</p>
+        <table>
+            <thead><tr><th>filter</th><th>does</th><th>code</th></tr></thead>
+            <tbody>
+            <tr><td>lpf</td><td>cuts highs (low-pass)</td><td><code>.lpf(500)</code></td></tr>
+            <tr><td>hpf</td><td>cuts lows (high-pass)</td><td><code>.hpf(200)</code></td></tr>
+            </tbody>
+        </table>
+
+        <!-- === FILTER SVG ILLUSTRATIONS === -->
+        <div style="display: flex; gap: 1rem; margin: 1rem 0 1.5rem; flex-wrap: wrap;">
+            <!-- LPF -->
+            <svg viewBox="0 0 200 100" style="flex: 1; min-width: 180px; max-width: 300px; border-radius: 6px; overflow: visible;">
+                <rect width="200" height="100" fill="#141418" rx="4"/>
+                <!-- pass area fill -->
+                <polygon points="15,20 120,20 120,85 15,85" fill="#ff6b3522"/>
+                <!-- pass line (flat full volume) -->
+                <line x1="15" y1="20" x2="120" y2="20" stroke="#ff6b35" stroke-width="2"/>
+                <!-- drop line -->
+                <line x1="120" y1="20" x2="185" y2="85" stroke="#ff6b35" stroke-width="2"/>
+                <!-- baseline -->
+                <line x1="15" y1="85" x2="185" y2="85" stroke="#1e1e24" stroke-width="1"/>
+                <!-- cutoff dashed line -->
+                <line x1="120" y1="10" x2="120" y2="90" stroke="#ff6b35" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
+                <!-- labels -->
+                <text x="120" y="8" fill="#ff6b35" font-family="SF Mono, monospace" font-size="7" text-anchor="middle">cutoff</text>
+                <text x="65" y="55" fill="#ff6b35" font-family="SF Mono, monospace" font-size="8" text-anchor="middle" opacity="0.7">passes</text>
+                <text x="155" y="55" fill="#8a8780" font-family="SF Mono, monospace" font-size="8" text-anchor="middle" opacity="0.6">cut</text>
+                <text x="100" y="97" fill="#8a8780" font-family="SF Mono, monospace" font-size="6" text-anchor="middle">frequency →</text>
+                <text x="6" y="55" fill="#8a8780" font-family="SF Mono, monospace" font-size="6" text-anchor="middle" transform="rotate(-90, 6, 55)">volume</text>
+                <!-- title -->
+                <text x="100" y="98" fill="#ff6b35" font-family="SF Mono, monospace" font-size="7" text-anchor="middle" opacity="0" dy="-82">LPF</text>
+            </svg>
+            <!-- HPF -->
+            <svg viewBox="0 0 200 100" style="flex: 1; min-width: 180px; max-width: 300px; border-radius: 6px; overflow: visible;">
+                <rect width="200" height="100" fill="#141418" rx="4"/>
+                <!-- pass area fill -->
+                <polygon points="80,20 185,20 185,85 80,85" fill="#4fc3f722"/>
+                <!-- rise line -->
+                <line x1="15" y1="85" x2="80" y2="20" stroke="#4fc3f7" stroke-width="2"/>
+                <!-- pass line (flat full volume) -->
+                <line x1="80" y1="20" x2="185" y2="20" stroke="#4fc3f7" stroke-width="2"/>
+                <!-- baseline -->
+                <line x1="15" y1="85" x2="185" y2="85" stroke="#1e1e24" stroke-width="1"/>
+                <!-- cutoff dashed line -->
+                <line x1="80" y1="10" x2="80" y2="90" stroke="#4fc3f7" stroke-width="1" stroke-dasharray="3,3" opacity="0.6"/>
+                <!-- labels -->
+                <text x="80" y="8" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="7" text-anchor="middle">cutoff</text>
+                <text x="45" y="55" fill="#8a8780" font-family="SF Mono, monospace" font-size="8" text-anchor="middle" opacity="0.6">cut</text>
+                <text x="135" y="55" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="8" text-anchor="middle" opacity="0.7">passes</text>
+                <text x="100" y="97" fill="#8a8780" font-family="SF Mono, monospace" font-size="6" text-anchor="middle">frequency →</text>
+                <text x="6" y="55" fill="#8a8780" font-family="SF Mono, monospace" font-size="6" text-anchor="middle" transform="rotate(-90, 6, 55)">volume</text>
+            </svg>
+        </div>
+
+        <h4>Envelope (ADSR)</h4>
+        <p>An envelope shapes a sound over time. Four stages:</p>
+        <table>
+            <thead><tr><th>stage</th><th>controls</th><th>code</th></tr></thead>
+            <tbody>
+            <tr><td>attack</td><td>how fast the sound starts</td><td><code>.attack(0.01)</code></td></tr>
+            <tr><td>decay</td><td>how fast it drops from peak</td><td><code>.decay(0.1)</code></td></tr>
+            <tr><td>sustain</td><td>level it holds at (0&ndash;1)</td><td><code>.sustain(0.5)</code></td></tr>
+            <tr><td>release</td><td>how fast it fades after stopping</td><td><code>.release(0.3)</code></td></tr>
+            </tbody>
+        </table>
+        <!-- === ADSR ENVELOPE SVG === -->
+        <svg viewBox="0 0 400 150" style="width: 100%; max-width: 500px; display: block; margin: 1rem auto 1.5rem; border-radius: 6px;">
+            <defs>
+                <linearGradient id="adsr-fill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#ff6b35" stop-opacity="0.08"/>
+                    <stop offset="100%" stop-color="#141418" stop-opacity="0"/>
+                </linearGradient>
+            </defs>
+            <rect width="400" height="150" fill="#141418" rx="4"/>
+
+            <!-- filled area under the ADSR curve -->
+            <polygon points="30,130 100,20 170,68 280,68 370,130" fill="url(#adsr-fill)"/>
+
+            <!-- Attack: (30,130) -> (100,20) -->
+            <line x1="30" y1="130" x2="100" y2="20" stroke="#ff6b35" stroke-width="2.5"/>
+            <!-- Decay: (100,20) -> (170,68) -->
+            <line x1="100" y1="20" x2="170" y2="68" stroke="#4fc3f7" stroke-width="2.5"/>
+            <!-- Sustain: (170,68) -> (280,68) -->
+            <line x1="170" y1="68" x2="280" y2="68" stroke="#66bb6a" stroke-width="2.5"/>
+            <!-- Release: (280,68) -> (370,130) -->
+            <line x1="280" y1="68" x2="370" y2="130" stroke="#ab47bc" stroke-width="2.5"/>
+
+            <!-- sustain level dashed line -->
+            <line x1="25" y1="68" x2="380" y2="68" stroke="#8a8780" stroke-width="0.8" stroke-dasharray="4,3" opacity="0.4"/>
+            <text x="385" y="71" fill="#8a8780" font-family="SF Mono, monospace" font-size="7" opacity="0.6" text-anchor="end">sustain level</text>
+
+            <!-- baseline -->
+            <line x1="25" y1="130" x2="380" y2="130" stroke="#1e1e24" stroke-width="1"/>
+
+            <!-- segment labels -->
+            <text x="65" y="145" fill="#ff6b35" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">attack</text>
+            <text x="135" y="145" fill="#4fc3f7" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">decay</text>
+            <text x="225" y="145" fill="#66bb6a" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">sustain</text>
+            <text x="325" y="145" fill="#ab47bc" font-family="SF Mono, monospace" font-size="9" text-anchor="middle">release</text>
+
+            <!-- peak dot -->
+            <circle cx="100" cy="20" r="3" fill="#ff6b35"/>
+            <!-- sustain start dot -->
+            <circle cx="170" cy="68" r="3" fill="#4fc3f7"/>
+            <!-- sustain end dot -->
+            <circle cx="280" cy="68" r="3" fill="#66bb6a"/>
+        </svg>
+
+        <p><code>.sustain(0)</code> with a short <code>.decay()</code> = a pluck. No sustain, instant drop.</p>
+    </div>
+</details>

@@ -260,7 +260,7 @@ details.rabbit-hole td:first-child { font-family: 'SF Mono', monospace; color: v
     <a href="#hear-it">Hear It First</a>
     <a href="#pattern-language">The Pattern Language</a>
     <a href="#stacking">Stack It</a>
-    <a href="#dirdug-composition">The Score Begins</a>
+    <a href="#your-composition">Your Composition</a>
     <a href="#capstone">Your First Loop</a>
 </div></nav>
 
@@ -294,12 +294,6 @@ That&rsquo;s the whole method.</p>
     <p><em>Before you can write a symphony you need to write 4 notes that mean something. Kondo did it in 1986 and 40 years later you still hear it in your sleep.</em></p>
 </div>
 
-
-<div class="concept warm">
-    <span class="c-label">ðirðug composition track</span>
-    <p><strong>Sparse koto pattern. 3-4 notes placed in silence. The first gesture of The North Atlantic.</strong></p>
-    <p>Pattern placement. Where you put sounds matters more than which sounds you pick. <a href="https://grymoire.peleke.me/nodes/rome" style="color: var(--accent)">rome →</a></p>
-</div>
 </section>
 
 
@@ -310,7 +304,7 @@ That&rsquo;s the whole method.</p>
 
 <div class="strudel-block">
     <div class="strudel-label">
-        <span>the chest opens</span>
+        <span>ascending arpeggio (placeholder — real jingle TBD)</span>
         <div class="strudel-controls">
             <button class="strudel-play" onclick="strudelPlay(this)">&#x25B6; play</button>
             <button class="strudel-stop" onclick="strudelStop(this)">&#x25A0; stop</button>
@@ -336,7 +330,7 @@ note("c4 e4 g4 c5").s("triangle").gain(0.6)
     </div>
     <strudel-editor id="ed-mario-coin">
 <!--
-note("b4 e5").s("triangle").gain(0.5)
+note("b5 e6").s("triangle").gain(0.5)
 -->
     </strudel-editor>
 </div>
@@ -940,21 +934,21 @@ stack(
 </div>
 </section>
 
-<!-- ============ THE SCORE BEGINS ============ -->
-<section id="dirdug-composition">
-<h2><span class="num">04</span>The Score Begins</h2>
-<p>Every lesson in this course builds a piece of music for <a href="https://grymoire.peleke.me" style="color: var(--accent)">Ðirðug: The Long Road North</a>. A documentary expedition. Rome to Atlanta. Germanic migrations, traced in reverse.</p><p>Your first composition uses a <strong>koto</strong>, a 13-string Japanese instrument plucked with fingerpicks. It sounds like a harp with edges. <code>.sound("gm_koto")</code> loads it from Strudel's General MIDI bank. Three or four notes placed in silence. The beginning of <em>The North Atlantic</em>. The crossing between Norway and Iceland, the passage Guðríður made a thousand years ago in an open ship.</p>
+<!-- ============ YOUR COMPOSITION ============ -->
+<section id="your-composition">
+<h2><span class="num">04</span>Your Composition</h2>
+<p>Every lesson in this course builds a piece of ambient music alongside the main exercises. By Lesson 7 you'll have a finished 60-90 second track.</p><p>Your instrument: a <strong>koto</strong>, a 13-string Japanese instrument plucked with fingerpicks. It sounds like a harp with edges. <code>.sound("gm_koto")</code> loads it from Strudel's General MIDI bank. Three or four notes placed in silence. The beginning of something.</p>
 
 <div class="strudel-block">
     <div class="strudel-label">
-        <span>the north atlantic: first gesture</span>
+        <span>your ambient piece: first gesture</span>
         <div class="strudel-controls">
             <button class="strudel-play" onclick="strudelPlay(this)">&#x25B6; play</button>
             <button class="strudel-stop" onclick="strudelStop(this)">&#x25A0; stop</button>
             <button class="strudel-share" onclick="strudelShare(this)">&#x2197; share</button>
         </div>
     </div>
-    <strudel-editor id="ed-dirdug-0">
+    <strudel-editor id="ed-ambient-0">
 <!--
 note("e4 ~ ~ b3 ~ ~ g4 ~")
   .sound("gm_koto")
@@ -964,7 +958,7 @@ note("e4 ~ ~ b3 ~ ~ g4 ~")
 -->
     </strudel-editor>
 </div>
-<p>Sparse. Mostly silence. The <code>~</code> is a rest, a deliberate gap. The delay and room let each note ring out and decay into the space around it. This is the sound of open water.</p><p>This is the seed. Over the next 7 lessons, you'll add a pulse, a drone, a second voice, and effects. By Lesson 7, you'll have a finished 60-90 second piece.</p>
+<p>Sparse. Mostly silence. The <code>~</code> is a rest, a deliberate gap. The delay and room let each note ring out and decay into the space around it.</p><p>This is the seed. Over the next 7 lessons, you'll add a pulse, a drone, a second voice, and effects. By Lesson 7, you'll have a finished piece.</p>
 
 <div class="try-this">
     <span class="label">Your turn</span>
@@ -975,7 +969,7 @@ note("e4 ~ ~ b3 ~ ~ g4 ~")
 <!-- ============ YOUR FIRST LOOP ============ -->
 <section id="capstone">
 <h2><span class="num">05</span>Your First Loop</h2>
-<p>Put it all together. A beat, a melody, and your Ðirðug sketch layered on top. This is yours. Change anything. Break it. Fix it. Share it.</p>
+<p>Put it all together. A beat, a melody, and your ambient sketch layered on top. This is yours. Change anything. Break it. Fix it. Share it.</p>
 
 <div class="strudel-block">
     <div class="strudel-label">
@@ -993,7 +987,7 @@ stack(
   s("bd ~ sd ~"),
   // zelda-inspired melody
   note("c4 e4 g4 c5").s("triangle").gain(0.4),
-  // your dirdug sketch
+  // your ambient sketch
   note("e4 ~ ~ b3 ~ ~ g4 ~")
     .sound("gm_koto").gain(0.7)
     .room(0.7).delay(0.4).delaytime(0.375).delayfeedback(0.3)
@@ -1005,9 +999,9 @@ stack(
 <div class="exercises">
     <span class="ex-label">Before you go</span>
     <ol>
-        <li>Replace the Zelda melody with the Mario coin (<code>note("b4 e5")</code>). How does 2 notes vs 4 change the feel?</li>
+        <li>Replace the Zelda melody with the Mario coin (<code>note("b5 e6")</code>). How does 2 notes vs 4 change the feel?</li>
         <li>Write a 6-note pattern of your own. No theory. Just notes that sound good to you.</li>
-        <li>Remove the beat entirely. Just the Ðirðug sketch alone. Does it stand on its own?</li>
+        <li>Remove the beat entirely. Just the koto sketch alone. Does it stand on its own?</li>
         <li>Share your capstone. Hit the share button and post it.</li>
     </ol>
 </div>
