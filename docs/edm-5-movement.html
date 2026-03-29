@@ -570,7 +570,7 @@ stack(
     </strudel-editor>
 </div>
 
-<p><strong>Fez</strong> (Disasterpeace, 2012). Patterns that evolve so slowly you don&rsquo;t notice until you&rsquo;ve been listening for three minutes. That&rsquo;s <code>.sometimes()</code> with low probability and <code>.degrade()</code> thinning events out:</p>
+<p><strong>Fez</strong> (Disasterpeace, 2012). Patterns that evolve so slowly you don&rsquo;t notice until you&rsquo;ve been listening for three minutes. That&rsquo;s <code>.sometimes()</code> with low probability and <code>.degradeBy()</code> thinning events out:</p>
 
 <div class="strudel-block">
     <div class="strudel-label"><span>fez-style glacial evolution</span><div class="strudel-controls"><button class="strudel-play" onclick="strudelPlay(this)">&#9654; play</button><button class="strudel-stop" onclick="strudelStop(this)">&#9632; stop</button><button class="strudel-share" onclick="strudelShare(this)">&#8599; share</button></div></div>
@@ -581,12 +581,12 @@ note("c4 e4 g4 b4 c5 b4 g4 e4")
   .s("gm_music_box").gain(0.5)
   .room(0.7).size(0.8)
   .sometimes(x => x.add(note(5)))
-  .degrade(0.3)
+  .degradeBy(0.3)
     -->
     </strudel-editor>
 </div>
 
-<p>Let it run for 30 seconds. It&rsquo;s never the same twice. The <code>.degrade(0.3)</code> randomly drops 30% of events. The <code>.sometimes()</code> shifts some notes up. The piece drifts.</p>
+<p>Let it run for 30 seconds. It&rsquo;s never the same twice. The <code>.degradeBy(0.3)</code> randomly drops 30% of events. The <code>.sometimes()</code> shifts some notes up. The piece drifts.</p>
 
 <details class="rabbit-hole">
     <summary>rabbit hole: jo-ha-ky&umacr; and the shape of everything</summary>
@@ -609,8 +609,8 @@ note("c4 e4 g4 b4 c5 b4 g4 e4")
     <div class="rh-body">
         <h4>Algorithmic breathing</h4>
         <p>Traditional Japanese music breathes. Notes happen, then silence, then notes. The spacing isn&rsquo;t metronomic. It fluctuates. You can model this in Strudel with probability:</p>
-        <p><code>.degrade(0.3)</code> randomly removes 30% of events. Each cycle, different events disappear. The pattern thins and thickens like breath.</p>
-        <p><code>.sometimes(x =&gt; x)</code> applies a transform with ~50% probability. Combine it with <code>.degrade()</code> and your pattern is never the same twice, but it&rsquo;s always recognizable. The motif survives. The details shift.</p>
+        <p><code>.degradeBy(0.3)</code> randomly removes 30% of events. Each cycle, different events disappear. The pattern thins and thickens like breath.</p>
+        <p><code>.sometimes(x =&gt; x)</code> applies a transform with ~50% probability. Combine it with <code>.degradeBy()</code> and your pattern is never the same twice, but it&rsquo;s always recognizable. The motif survives. The details shift.</p>
 
         <h4>Density modulation</h4>
         <p>Want the piece to breathe slowly? Use <code>.degradeBy(sine.range(0.1, 0.5).slow(8))</code>. The sine wave oscillates the degradation amount over 8 cycles: dense, then sparse, then dense again. The piece inhales and exhales.</p>
@@ -641,7 +641,7 @@ stack(
   note("~ ~ b4 ~ ~ ~ e4 ~")
     .sound("gm_shakuhachi").gain(0.5)
     .room(0.7).size(0.8).lpf(2000)
-    .degrade(0.2),
+    .degradeBy(0.2),
   // pad
   note("[e2,b2,e3]").s("sawtooth")
     .lpf(400).attack(2).sustain(0.5).release(2)

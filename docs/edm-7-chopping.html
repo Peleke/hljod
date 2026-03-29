@@ -677,7 +677,7 @@ cat(
     note("~ ~ b4 ~ ~ ~ e4 ~")
       .sound("gm_shakuhachi").gain(0.5)
       .room(0.7).size(0.8).lpf(2000)
-      .degrade(0.2),
+      .degradeBy(0.2),
     note("[e2,b2,e3]").s("sawtooth")
       .lpf(400).attack(2).sustain(0.5).release(2)
       .room(0.9).gain(0.2)
@@ -699,7 +699,7 @@ cat(
   ),
   // silence: chopped koto fragments fading
   note("e4 ~ ~ ~ ~ ~ ~ ~").sound("gm_koto").gain(0.4)
-    .chop(4).degrade(0.5)
+    .chop(4).degradeBy(0.5)
     .room(0.95).size(0.95)
     .delay(0.6).delaytime(0.5).delayfeedback(0.5)
 )
