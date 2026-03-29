@@ -239,6 +239,16 @@ details.syl-detail[open] summary { border-bottom: 1px solid var(--divider); padd
     .syl-body { padding-left: 1.5rem; }
 }
 
+/* --- Playlist filter buttons --- */
+.playlist-filter {
+    font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.65rem;
+    padding: 0.25rem 0.7rem; border-radius: 3px; cursor: pointer;
+    border: 1px solid var(--divider); background: var(--surface); color: var(--text-dim);
+    transition: all 0.2s; letter-spacing: 0.04em;
+}
+.playlist-filter:hover { border-color: var(--accent); color: var(--accent); }
+.playlist-filter.active { border-color: var(--accent); color: var(--bg); background: var(--accent); }
+
 /* --- Footer --- */
 .footer {
     margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--divider);
@@ -276,6 +286,7 @@ details.syl-detail[open] summary { border-bottom: 1px solid var(--divider); padd
     <button class="tab active" onclick="showTab('ramp')">Ramp</button>
     <button class="tab" onclick="showTab('ride')">Ride</button>
     <button class="tab" onclick="showTab('syllabus')">Syllabus</button>
+    <button class="tab" onclick="showTab('playlist')">Playlist</button>
     <button class="tab" onclick="window.location.href='history.html'">History</button>
 </div>
 
@@ -850,6 +861,38 @@ details.syl-detail[open] summary { border-bottom: 1px solid var(--divider); padd
 
 </div>
 
+<!-- PLAYLIST -->
+<div class="tab-content" id="tab-playlist">
+
+<p class="syllabus-intro">Every track referenced in the lessons. Click column headers to sort. Add Spotify/YouTube links as you go.</p>
+
+<div style="display: flex; gap: 0.4rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+    <button class="playlist-filter active" data-genre="all" onclick="filterPlaylist('all', this)">All</button>
+    <button class="playlist-filter" data-genre="game" onclick="filterPlaylist('game', this)">Game</button>
+    <button class="playlist-filter" data-genre="dnb" onclick="filterPlaylist('dnb', this)">DnB / Jungle</button>
+    <button class="playlist-filter" data-genre="electronic" onclick="filterPlaylist('electronic', this)">Electronic</button>
+    <button class="playlist-filter" data-genre="hiphop" onclick="filterPlaylist('hiphop', this)">Hip-Hop</button>
+    <button class="playlist-filter" data-genre="phonk" onclick="filterPlaylist('phonk', this)">Phonk / Memphis</button>
+    <button class="playlist-filter" data-genre="classical" onclick="filterPlaylist('classical', this)">Classical / Jazz</button>
+    <button class="playlist-filter" data-genre="traditional" onclick="filterPlaylist('traditional', this)">Traditional</button>
+</div>
+
+<table id="playlist-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+    <thead>
+        <tr>
+            <th class="sortable" onclick="sortPlaylist('artist')" style="cursor:pointer; text-align:left; padding: 0.5rem; border-bottom: 1px solid var(--divider); font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase;">Artist &#x25B4;&#x25BE;</th>
+            <th class="sortable" onclick="sortPlaylist('track')" style="cursor:pointer; text-align:left; padding: 0.5rem; border-bottom: 1px solid var(--divider); font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase;">Track &#x25B4;&#x25BE;</th>
+            <th class="sortable" onclick="sortPlaylist('year')" style="cursor:pointer; text-align:left; padding: 0.5rem; border-bottom: 1px solid var(--divider); font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase;">Year &#x25B4;&#x25BE;</th>
+            <th style="text-align:left; padding: 0.5rem; border-bottom: 1px solid var(--divider); font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase;">Genre</th>
+            <th style="text-align:left; padding: 0.5rem; border-bottom: 1px solid var(--divider); font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase;">Lesson</th>
+            <th style="text-align:left; padding: 0.5rem; border-bottom: 1px solid var(--divider); font-family: 'SF Mono', monospace; font-size: 0.6rem; color: var(--text-dim); letter-spacing: 0.08em; text-transform: uppercase;">Links</th>
+        </tr>
+    </thead>
+    <tbody id="playlist-body"></tbody>
+</table>
+
+</div>
+
 <!-- Footer -->
 <div class="footer">
     <p>hljóð &bull; <a href="https://peleke.me">peleke</a> &bull; built with <a href="https://strudel.cc">strudel</a> + <a href="https://hydra.ojack.xyz">hydra</a></p>
@@ -893,6 +936,127 @@ try {
         hydra.setResolution(window.innerWidth, window.innerHeight);
     });
 } catch(e) {}
+
+// ============================================================
+// Playlist data + rendering
+// ============================================================
+
+const PLAYLIST = [
+  // L0
+  { artist: 'Kraftwerk', track: 'Numbers', year: 1981, genre: 'electronic', subgenre: 'synth', lesson: 'L0', why: 'Minimal pattern construction from drum machine loops', spotify: '', youtube: '' },
+  { artist: 'Derrick May', track: 'Strings of Life', year: 1987, genre: 'electronic', subgenre: 'techno', lesson: 'L0', why: 'A piano loop becomes a complete dance track', spotify: '', youtube: '' },
+  { artist: 'New Order', track: 'Blue Monday', year: 1983, genre: 'electronic', subgenre: 'synth-pop', lesson: 'L0', why: 'Programmed loop as the whole song', spotify: '', youtube: '' },
+  { artist: 'Afrika Bambaataa', track: 'Planet Rock', year: 1982, genre: 'electronic', subgenre: 'electro', lesson: 'L0', why: 'Kraftwerk samples fused with the South Bronx', spotify: '', youtube: '' },
+  // L1
+  { artist: 'Hirokazu Tanaka', track: 'Metroid: Brinstar', year: 1986, genre: 'game', subgenre: 'NES', lesson: 'L1', why: 'Rhythm from noise channels. Atmosphere as groove.', spotify: '', youtube: '' },
+  { artist: 'Takashi Tateishi', track: 'Mega Man 2: Dr. Wily Stage 1', year: 1988, genre: 'game', subgenre: 'NES', lesson: 'L1', why: 'C#m, 180bpm. The bass IS the rhythm.', spotify: '', youtube: '' },
+  { artist: 'The Winstons', track: 'Amen, Brother', year: 1969, genre: 'dnb', subgenre: 'breakbeat', lesson: 'L1', why: 'The 7-second break that built jungle and DnB', spotify: '', youtube: '' },
+  { artist: 'Shy FX & UK Apache', track: 'Original Nuttah', year: 1994, genre: 'dnb', subgenre: 'jungle', lesson: 'L1', why: 'Chopped amen + dancehall', spotify: '', youtube: '' },
+  { artist: 'Roni Size / Reprazent', track: 'Brown Paper Bag', year: 1997, genre: 'dnb', subgenre: 'dnb', lesson: 'L1', why: 'Live bass over programmed breaks', spotify: '', youtube: '' },
+  { artist: 'Origin Unknown', track: 'Valley of the Shadows', year: 1993, genre: 'dnb', subgenre: 'jungle', lesson: 'L1', why: 'Processed breaks, early jungle landmark', spotify: '', youtube: '' },
+  { artist: 'Goldie', track: 'Inner City Life', year: 1995, genre: 'dnb', subgenre: 'dnb', lesson: 'L1', why: 'Orchestral strings + chopped breaks', spotify: '', youtube: '' },
+  { artist: 'LTJ Bukem', track: "Demon's Theme", year: 1992, genre: 'dnb', subgenre: 'atmospheric', lesson: 'L1', why: 'Genesis of liquid DnB', spotify: '', youtube: '' },
+  { artist: 'DJ Hype', track: 'Shot in the Dark', year: 1996, genre: 'dnb', subgenre: 'jungle', lesson: 'L1', why: 'Amen break chopped to perfection', spotify: '', youtube: '' },
+  { artist: 'Andy C', track: 'Valley of the Shadows (Remix)', year: 1997, genre: 'dnb', subgenre: 'dnb', lesson: 'L1', why: 'Pushed DnB tempo and mixing to its limit', spotify: '', youtube: '' },
+  // L2
+  { artist: 'Jeremy Soule', track: 'Skyrim: Dragonborn', year: 2011, genre: 'game', subgenre: 'orchestral', lesson: 'L2', why: 'Orchestral bass as power', spotify: '', youtube: '' },
+  { artist: 'C418', track: 'Minecraft: Subwoofer Lullaby', year: 2011, genre: 'game', subgenre: 'ambient', lesson: 'L2', why: 'Filtered sine bass as warmth', spotify: '', youtube: '' },
+  { artist: 'Kevin Saunderson (Reese)', track: 'Just Want Another Chance', year: 1988, genre: 'electronic', subgenre: 'techno', lesson: 'L2', why: 'The literal origin of the Reese bass', spotify: '', youtube: '' },
+  { artist: 'Ray Keith (Renegade)', track: 'Terrorist', year: 1994, genre: 'dnb', subgenre: 'jungle', lesson: 'L2', why: 'Sampled Reese + amen = instant jungle', spotify: '', youtube: '' },
+  { artist: 'Ed Rush & Optical', track: 'Wormhole', year: 1998, genre: 'dnb', subgenre: 'neurofunk', lesson: 'L2', why: 'First neurofunk, filter sweeps + resampled bass', spotify: '', youtube: '' },
+  { artist: 'Wendy Carlos', track: 'Switched-On Bach', year: 1968, genre: 'classical', subgenre: 'electronic', lesson: 'L2', why: 'First Moog album', spotify: '', youtube: '' },
+  // L3
+  { artist: 'Yasunori Mitsuda', track: 'Chrono Trigger: Wind Scene', year: 1995, genre: 'game', subgenre: 'SNES', lesson: 'L3', why: 'Three voices breathing together', spotify: '', youtube: '' },
+  { artist: 'ConcernedApe', track: 'Stardew Valley: Spring', year: 2016, genre: 'game', subgenre: 'indie', lesson: 'L3', why: 'Same three-voice architecture, folk simplicity', spotify: '', youtube: '' },
+  { artist: 'Photek', track: 'Ni-Ten-Ichi-Ryu', year: 1997, genre: 'dnb', subgenre: 'dnb', lesson: 'L3', why: 'Drum programming so intricate it seemed inhuman', spotify: '', youtube: '' },
+  { artist: 'Goldie', track: 'Timeless', year: 1995, genre: 'dnb', subgenre: 'dnb', lesson: 'L3', why: '21 minutes of impossibly layered production', spotify: '', youtube: '' },
+  { artist: 'Noisia', track: 'Stigma', year: 2007, genre: 'dnb', subgenre: 'neurofunk', lesson: 'L3', why: 'Polyrhythmic interplay', spotify: '', youtube: '' },
+  { artist: 'Ewe Drum Ensemble', track: 'Agbadza', year: 0, genre: 'traditional', subgenre: 'West African', lesson: 'L3', why: 'The original polyrhythmic stack', spotify: '', youtube: '' },
+  // L4a
+  { artist: 'Motoi Sakuraba', track: 'Dark Souls: Firelink Shrine', year: 2011, genre: 'game', subgenre: 'atmospheric', lesson: 'L4a', why: 'Sparse guitar in massive reverb', spotify: '', youtube: '' },
+  { artist: 'Manaka Kataoka', track: 'Zelda BotW: Temple of Time', year: 2017, genre: 'game', subgenre: 'atmospheric', lesson: 'L4a', why: 'Piano notes in silence, delay as composition', spotify: '', youtube: '' },
+  { artist: 'Koji Kondo', track: 'Zelda OoT: Temple of Time', year: 1998, genre: 'game', subgenre: 'N64', lesson: 'L4a', why: 'Choir pad + bells', spotify: '', youtube: '' },
+  { artist: 'Brian Eno', track: 'Music for Airports 1/1', year: 1978, genre: 'electronic', subgenre: 'ambient', lesson: 'L4a', why: 'The genre definition', spotify: '', youtube: '' },
+  { artist: 'Boards of Canada', track: 'Music Has the Right to Children', year: 1998, genre: 'electronic', subgenre: 'ambient', lesson: 'L4a', why: 'Filtered, degraded, nostalgic textures', spotify: '', youtube: '' },
+  // L4c
+  { artist: 'Three 6 Mafia', track: 'Tear Da Club Up', year: 1995, genre: 'phonk', subgenre: 'Memphis rap', lesson: 'L4c', why: 'Foundational Memphis phonk', spotify: '', youtube: '' },
+  { artist: 'Tommy Wright III', track: 'Ashes 2 Ashes, Dust 2 Dust', year: 1994, genre: 'phonk', subgenre: 'Memphis rap', lesson: 'L4c', why: 'Bedroom lo-fi Memphis', spotify: '', youtube: '' },
+  { artist: 'DJ Smokey', track: 'Evil Wayz', year: 2013, genre: 'phonk', subgenre: 'phonk', lesson: 'L4c', why: 'Bridged classic Memphis with modern phonk', spotify: '', youtube: '' },
+  { artist: 'Kaito Shoma', track: 'Scary Garry', year: 2016, genre: 'phonk', subgenre: 'drift phonk', lesson: 'L4c', why: 'First drift phonk', spotify: '', youtube: '' },
+  { artist: 'DJ Paul', track: 'Wanna Go to War', year: 1994, genre: 'phonk', subgenre: 'Memphis rap', lesson: 'L4c', why: 'The 808 as melodic instrument', spotify: '', youtube: '' },
+  // L5
+  { artist: 'Koji Kondo', track: 'Zelda OoT: Lost Woods', year: 1998, genre: 'game', subgenre: 'N64', lesson: 'L5', why: 'The melody that changes meaning across 5 games', spotify: '', youtube: '' },
+  { artist: 'Toby Fox', track: 'Undertale: Megalovania', year: 2015, genre: 'game', subgenre: 'indie', lesson: 'L5', why: 'Rhythmic persistence, everything shifts except the melody', spotify: '', youtube: '' },
+  { artist: 'Disasterpeace', track: 'Fez', year: 2012, genre: 'game', subgenre: 'indie', lesson: 'L5', why: 'Glacial evolution, patterns shifting over minutes', spotify: '', youtube: '' },
+  { artist: 'DJ Rashad', track: 'Feelin', year: 2012, genre: 'electronic', subgenre: 'footwork', lesson: 'L5', why: 'Constant rhythmic instability', spotify: '', youtube: '' },
+  { artist: 'Burial', track: 'Archangel', year: 2007, genre: 'electronic', subgenre: 'garage', lesson: 'L5', why: 'Constantly shifting chopped vocals', spotify: '', youtube: '' },
+  { artist: 'Aphex Twin', track: 'Xtal', year: 1992, genre: 'electronic', subgenre: 'ambient', lesson: 'L5', why: 'Subtle timbral shifts, generative ambient', spotify: '', youtube: '' },
+  // L6
+  { artist: 'Nobuo Uematsu', track: 'FF7: One Winged Angel', year: 1997, genre: 'game', subgenre: 'PS1', lesson: 'L6', why: 'The build. Layers add. Filter opens. Choir hits.', spotify: '', youtube: '' },
+  { artist: 'Christopher Larkin', track: 'Hollow Knight: Sealed Vessel', year: 2017, genre: 'game', subgenre: 'indie', lesson: 'L6', why: 'Restraint then devastation', spotify: '', youtube: '' },
+  { artist: 'Keiichi Okabe', track: 'NieR: Automata: Weight of the World', year: 2017, genre: 'game', subgenre: 'PS4', lesson: 'L6', why: 'Same melody in different languages as the story shifts', spotify: '', youtube: '' },
+  { artist: 'The Prodigy', track: 'Firestarter', year: 1996, genre: 'electronic', subgenre: 'rave', lesson: 'L6', why: 'Filter sweep build into vocal explosion', spotify: '', youtube: '' },
+  { artist: 'Chase & Status', track: 'Blind Faith', year: 2011, genre: 'dnb', subgenre: 'dnb', lesson: 'L6', why: 'Textbook DnB buildup and drop', spotify: '', youtube: '' },
+  { artist: 'Skrillex', track: 'Scary Monsters and Nice Sprites', year: 2010, genre: 'electronic', subgenre: 'dubstep', lesson: 'L6', why: 'Silence before the drop as a weapon', spotify: '', youtube: '' },
+  // L7
+  { artist: 'Koji Kondo', track: 'Zelda LttP: Dark World', year: 1991, genre: 'game', subgenre: 'SNES', lesson: 'L7', why: 'The SNES sample revolution', spotify: '', youtube: '' },
+  { artist: 'Yasunori Mitsuda', track: 'Chrono Trigger: Corridors of Time', year: 1995, genre: 'game', subgenre: 'SNES', lesson: 'L7', why: 'The most remixed game track. SPC700 lo-fi warmth.', spotify: '', youtube: '' },
+  { artist: 'Nujabes', track: 'Samurai Champloo: Battlecry', year: 2004, genre: 'hiphop', subgenre: 'lo-fi', lesson: 'L7', why: 'Japanese production + jazz samples + Dilla timing', spotify: '', youtube: '' },
+  { artist: 'DJ Shadow', track: 'Building Steam with a Grain of Salt', year: 1996, genre: 'hiphop', subgenre: 'instrumental', lesson: 'L7', why: 'First album made entirely from samples', spotify: '', youtube: '' },
+  { artist: 'J Dilla', track: 'Workinonit', year: 2006, genre: 'hiphop', subgenre: 'instrumental', lesson: 'L7', why: "King of chopping, SP-303, 'Dilla time'", spotify: '', youtube: '' },
+  { artist: 'Madvillain', track: 'Accordion', year: 2004, genre: 'hiphop', subgenre: 'hip-hop', lesson: 'L7', why: 'Pitched-down chop creates new identity', spotify: '', youtube: '' },
+  { artist: 'Pierre Schaeffer', track: 'Étude aux chemins de fer', year: 1948, genre: 'classical', subgenre: 'musique concrète', lesson: 'L7', why: 'The first sample-based composition', spotify: '', youtube: '' },
+];
+
+// Genre color map
+const GENRE_COLORS = {
+  game: 'var(--accent)', dnb: 'var(--cool)', electronic: 'var(--purple)',
+  hiphop: 'var(--green)', phonk: '#e57373', classical: '#ffb74d', traditional: '#81c784'
+};
+
+let currentSort = { key: 'lesson', asc: true };
+let currentFilter = 'all';
+
+function renderPlaylist() {
+  const tbody = document.getElementById('playlist-body');
+  if (!tbody) return;
+  let data = currentFilter === 'all' ? PLAYLIST : PLAYLIST.filter(t => t.genre === currentFilter);
+  data = [...data].sort((a, b) => {
+    const va = a[currentSort.key] || '';
+    const vb = b[currentSort.key] || '';
+    const cmp = typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb));
+    return currentSort.asc ? cmp : -cmp;
+  });
+  tbody.innerHTML = data.map(t => {
+    const gc = GENRE_COLORS[t.genre] || 'var(--text-dim)';
+    const links = [];
+    if (t.spotify) links.push(`<a href="${t.spotify}" target="_blank" style="color: var(--green); font-size: 0.7rem;">spotify</a>`);
+    if (t.youtube) links.push(`<a href="${t.youtube}" target="_blank" style="color: #ff4444; font-size: 0.7rem;">youtube</a>`);
+    return `<tr style="border-bottom: 1px solid #111115;">
+      <td style="padding: 0.4rem 0.5rem; color: var(--text);">${t.artist}</td>
+      <td style="padding: 0.4rem 0.5rem; color: var(--text-dim);">${t.track}</td>
+      <td style="padding: 0.4rem 0.5rem; font-family: 'SF Mono', monospace; font-size: 0.75rem; color: var(--text-faint);">${t.year || '—'}</td>
+      <td style="padding: 0.4rem 0.5rem;"><span style="color: ${gc}; font-family: 'SF Mono', monospace; font-size: 0.65rem; letter-spacing: 0.04em;">${t.genre}</span> <span style="color: var(--text-faint); font-size: 0.6rem;">${t.subgenre}</span></td>
+      <td style="padding: 0.4rem 0.5rem; font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);">${t.lesson}</td>
+      <td style="padding: 0.4rem 0.5rem;">${links.length ? links.join(' ') : '<span style="color: var(--text-faint); font-size: 0.6rem;">—</span>'}</td>
+    </tr>`;
+  }).join('');
+}
+
+function sortPlaylist(key) {
+  if (currentSort.key === key) currentSort.asc = !currentSort.asc;
+  else { currentSort.key = key; currentSort.asc = true; }
+  renderPlaylist();
+}
+
+function filterPlaylist(genre, btn) {
+  currentFilter = genre;
+  document.querySelectorAll('.playlist-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPlaylist();
+}
+
+renderPlaylist();
 </script>
 
 </body></html>
