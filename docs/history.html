@@ -439,6 +439,16 @@ const events = [
   { id: "clave", name: "Afro-Cuban Clave", year: 1940, category: "jazz", lessons: ["9e"], desc: "The 3-2 / 2-3 clave pattern: rhythmic DNA of Latin music. Tension-resolution encoded in a single rhythmic cell.", source: "Washburne, 'The Clave of Jazz' in Black Music Research Journal (1997)" },
   { id: "george-russell", name: "George Russell \u2014 Lydian Chromatic Concept", year: 1953, category: "theory", lessons: ["8b"], desc: "Proposed the Lydian scale as the true parent scale of tonality. Influenced Miles Davis and modal jazz.", source: "Russell, The Lydian Chromatic Concept (1953)" },
   { id: "charlie-parker", name: "Charlie Parker \u2014 Ko-Ko", year: 1945, category: "jazz", lessons: ["8c", "9b", "9f"], desc: "Parker's alto sax transformed melody. Chord tone targeting at blazing tempos, chromatic enclosures, motivic development across changes.", source: "Woideck, Charlie Parker: His Music and Life (1996)" },
+  // Game Music History
+  { id: "nes-chip", name: "NES Sound Chip (2A03)", year: 1983, category: "electronic", lessons: ["0", "1"], desc: "5 channels: 2 pulse, 1 triangle, 1 noise, 1 DPCM. Every NES soundtrack is constrained by this hardware. Composers learned to write melody, harmony, bass, and drums within 5 voices.", source: "Collins, Game Sound (MIT Press, 2008)" },
+  { id: "koji-kondo", name: "Koji Kondo \u2014 Super Mario Bros.", year: 1985, category: "electronic", lessons: ["0", "8a"], desc: "The Overworld theme. C major, written to fit the NES's 5 channels. The most recognized melody in gaming. Kondo wrote it to match the rhythm of Mario's jumps.", source: "Nintendo" },
+  { id: "uematsu-ff", name: "Nobuo Uematsu \u2014 Final Fantasy", year: 1987, category: "electronic", lessons: ["8b", "6"], desc: "The Prelude: a pentatonic arpeggio that appears in every FF game. Uematsu wrote it in 5 minutes. Terra's Theme (FF6) is a masterclass in suspensions. One Winged Angel (FF7) brought choir + orchestra to game music.", source: "Uematsu interviews" },
+  { id: "mitsuda-ct", name: "Yasunori Mitsuda \u2014 Chrono Trigger", year: 1995, category: "electronic", lessons: ["3", "7"], desc: "Wind Scene: three voices breathing together. Corridors of Time: the most remixed game track in history. Mitsuda hospitalized himself from overwork composing this soundtrack.", source: "Mitsuda, 1UP.com interview" },
+  { id: "yamane-sotn", name: "Michiru Yamane \u2014 Castlevania SotN", year: 1997, category: "electronic", lessons: ["9a"], desc: "Baroque + rock. Bach voice leading meets electric guitar. Dracula's Castle is a counterpoint lesson disguised as a boss theme.", source: "Yamane interviews" },
+  { id: "vgl", name: "Video Games Live (Concert Series)", year: 2005, category: "electronic", lessons: [], desc: "Tommy Tallarico and Jack Wall launched the first major touring VGM orchestral concert series. Proved game music could fill symphony halls. Led to Distant Worlds (FF), Zelda Symphony, and dozens of VGM concert programs worldwide.", source: "videogameslive.com" },
+  { id: "meguro-p5", name: "Shoji Meguro \u2014 Persona 5", year: 2016, category: "jazz", lessons: ["9a", "9b"], desc: "Acid jazz meets JRPG. Last Surprise is a ii-V-I lesson. Beneath the Mask is lo-fi before lo-fi was a genre. ~450M Spotify streams.", source: "Spotify, Atlus" },
+  { id: "ludomusicology", name: "Ludomusicology (Academic Field)", year: 2016, category: "theory", lessons: [], desc: "Society for the Study of Sound and Music in Games (SSSMG) founded. Journal of Sound and Music in Games (UC Press) launched 2020. 14th European Conference on Video Game Music scheduled for July 2026.", source: "SSSMG, JSMG (UC Press)" },
+  { id: "toby-fox", name: "Toby Fox \u2014 Undertale", year: 2015, category: "electronic", lessons: ["5"], desc: "Megalovania: 161M+ Spotify streams. The entire Undertale soundtrack (~950M total streams) was composed by one person in a bedroom. Proved indie game music could rival AAA.", source: "Spotify" },
 ];
 
 const connections = [
@@ -492,6 +502,15 @@ const connections = [
   ["charlie-parker", "bebop"],
   ["charlie-parker", "kind-of-blue"],
   ["charlie-parker", "autumn-leaves"],
+  // Game Music History
+  ["nes-chip", "koji-kondo"],
+  ["koji-kondo", "uematsu-ff"],
+  ["uematsu-ff", "mitsuda-ct"],
+  ["mitsuda-ct", "yamane-sotn"],
+  ["yamane-sotn", "meguro-p5"],
+  ["vgl", "ludomusicology"],
+  ["uematsu-ff", "vgl"],
+  ["toby-fox", "strudel"],
 ];
 
 // =========================================================================
