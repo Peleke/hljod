@@ -315,8 +315,10 @@ body {
             <button class="view-btn active" data-view="timeline">Timeline</button>
             <button class="view-btn" data-view="network">Network</button>
         </div>
-        <button class="ctrl-btn" id="scroll-left" onclick="scrollTimeline(-1)" title="Earlier">&#x2190;</button>
-        <button class="ctrl-btn" id="scroll-right" onclick="scrollTimeline(1)" title="Later">&#x2192;</button>
+        <button class="ctrl-btn" id="scroll-left" onclick="scrollTimeline(-1, 0)" title="Earlier">&#x2190;</button>
+        <button class="ctrl-btn" id="scroll-right" onclick="scrollTimeline(1, 0)" title="Later">&#x2192;</button>
+        <button class="ctrl-btn" id="scroll-up" onclick="scrollTimeline(0, -1)" title="Up">&#x2191;</button>
+        <button class="ctrl-btn" id="scroll-down" onclick="scrollTimeline(0, 1)" title="Down">&#x2193;</button>
         <span class="legend-label">filter</span>
         <div class="filter-group">
             <span class="filter-chip" data-cat="electronic">electronic</span>
@@ -658,7 +660,7 @@ function buildTimeline() {
     svg.attr('width', W).attr('height', H);
 
     const margin = { top: 80, bottom: 80, left: 60, right: 60 };
-    const innerW = Math.max(W * 3, 4000); // wide scrollable area
+    const innerW = Math.max(W * 5, 8000); // wider to spread modern era
     const innerH = H - margin.top - margin.bottom;
 
     // Scale: year -> x
@@ -672,7 +674,7 @@ function buildTimeline() {
     // Zoom behavior
     const zoom = d3.zoom()
         .scaleExtent([0.3, 5])
-        .translateExtent([[-200, -H], [innerW + 200, H * 2]])
+        .translateExtent([[-200, -H * 3], [innerW + 200, H * 4]])
         .on('zoom', (event) => {
             g.attr('transform', event.transform);
         });
@@ -1026,14 +1028,15 @@ let currentView = 'timeline';
 let networkBuilt = false;
 let timelineZoom = null;
 
-function scrollTimeline(direction) {
+function scrollTimeline(dx, dy) {
     if (currentView !== 'timeline') return;
     const svg = d3.select('#timeline-svg');
     const currentTransform = d3.zoomTransform(svg.node());
-    const newX = currentTransform.x + (direction * -300);
+    const newX = currentTransform.x + (dx * -300);
+    const newY = currentTransform.y + (dy * -200);
     svg.transition().duration(500).call(
         timelineZoom.transform,
-        d3.zoomIdentity.translate(newX, currentTransform.y).scale(currentTransform.k)
+        d3.zoomIdentity.translate(newX, newY).scale(currentTransform.k)
     );
 }
 
