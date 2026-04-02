@@ -1239,18 +1239,47 @@ function renderPlaylist() {
     const cmp = typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb));
     return currentSort.asc ? cmp : -cmp;
   });
+  // Map artist names to history.html node IDs
+  const HISTORY_LINKS = {
+    'Koji Kondo': 'koji-kondo', 'Nobuo Uematsu': 'uematsu-ff', 'Yasunori Mitsuda': 'mitsuda-ct',
+    'Michiru Yamane': 'yamane-sotn', 'Shoji Meguro': 'meguro-p5', 'Toby Fox': 'toby-fox',
+    'Kevin Saunderson (Reese)': 'reese', 'Kraftwerk': 'kraftwerk', 'Steve Reich': 'reich-phasing',
+    'Brian Eno': 'eno-generative', 'Bob Moog': 'moog', 'Pierre Schaeffer': 'musique-concrete',
+    'Charlie Parker': 'charlie-parker', 'Miles Davis': 'kind-of-blue'
+  };
+  // Map lesson codes to file paths
+  const LESSON_LINKS = {
+    'L0': 'edm-0-first-noise.html', 'L1': 'edm-1-the-break.html', 'L2': 'edm-2-the-bass.html',
+    'L3': 'edm-3-layers.html', 'L4a': 'edm-4-atmosphere.html', 'L4c': 'edm-4-atmosphere.html',
+    'L5': 'edm-5-movement.html', 'L6': 'edm-6-the-drop.html', 'L7': 'edm-7-chopping.html',
+    'L8a': 'edm-8a-the-scale.html', 'L8b': 'edm-8b-modes.html', 'L8c': 'edm-8c-melody-over-changes.html',
+    'L8d': 'edm-8d-intervals.html', 'L8e': 'edm-8e-non-chord-tones.html',
+    'L9a': 'edm-9a-diatonic-harmony.html', 'L9b': 'edm-9b-ii-v-i.html', 'L9c': 'edm-9c-the-monster.html',
+    'L9d': 'edm-9d-cadences-form.html', 'L9e': 'edm-9e-texture.html', 'L9f': 'edm-9f-melodic-development.html'
+  };
+
   tbody.innerHTML = data.map(t => {
     const gc = GENRE_COLORS[t.genre] || 'var(--text-dim)';
     const links = [];
     if (t.spotify) links.push(`<a href="${t.spotify}" target="_blank" style="color: var(--green); font-size: 0.7rem;">spotify</a>`);
     if (t.youtube) links.push(`<a href="${t.youtube}" target="_blank" style="color: #ff4444; font-size: 0.7rem;">youtube</a>`);
+    // Artist link to history.html if they have a node
+    const histId = HISTORY_LINKS[t.artist];
+    const artistHtml = histId
+      ? `<a href="history.html" style="color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--text-faint);" title="View on timeline">${t.artist}</a>`
+      : t.artist;
+    // Lesson link to the actual lesson page
+    const lessonFile = LESSON_LINKS[t.lesson];
+    const lessonHtml = lessonFile
+      ? `<a href="${lessonFile}" style="color: var(--accent); text-decoration: none;">${t.lesson}</a>`
+      : `<span>${t.lesson}</span>`;
     return `<tr style="border-bottom: 1px solid #111115;">
-      <td style="padding: 0.4rem 0.5rem; color: var(--text);">${t.artist}</td>
+      <td style="padding: 0.4rem 0.5rem; color: var(--text);">${artistHtml}</td>
       <td style="padding: 0.4rem 0.5rem; color: var(--text-dim);">${t.track}</td>
-      <td style="padding: 0.4rem 0.5rem; font-family: 'SF Mono', monospace; font-size: 0.75rem; color: var(--text-faint);">${t.year || '—'}</td>
+      <td style="padding: 0.4rem 0.5rem; font-family: 'SF Mono', monospace; font-size: 0.75rem; color: var(--text-faint);">${t.year || '\u2014'}</td>
       <td style="padding: 0.4rem 0.5rem;"><span style="color: ${gc}; font-family: 'SF Mono', monospace; font-size: 0.65rem; letter-spacing: 0.04em;">${t.genre}</span> <span style="color: var(--text-faint); font-size: 0.6rem;">${t.subgenre}</span></td>
-      <td style="padding: 0.4rem 0.5rem; font-family: 'SF Mono', monospace; font-size: 0.7rem; color: var(--accent);">${t.lesson}</td>
-      <td style="padding: 0.4rem 0.5rem;">${links.length ? links.join(' ') : '<span style="color: var(--text-faint); font-size: 0.6rem;">—</span>'}</td>
+      <td style="padding: 0.4rem 0.5rem; font-family: 'SF Mono', monospace; font-size: 0.7rem;">${lessonHtml}</td>
+      <td style="padding: 0.4rem 0.5rem;">${links.length ? links.join(' ') : '<span style="color: var(--text-faint); font-size: 0.6rem;">\u2014</span>'}</td>
     </tr>`;
   }).join('');
 }
