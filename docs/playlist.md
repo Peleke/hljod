@@ -4,7 +4,7 @@ Two playlists in one: EDM/phonk tracks that teach production, and game soundtrac
 
 <!-- TODO: Spotify playlist embed here once created -->
 
-74 tracks across 19 lessons. Search these on Spotify/YouTube to build the playlist.
+81 tracks across 19 lessons. Search these on Spotify/YouTube to build the playlist.
 
 ## Phase 1: The Beat
 
@@ -114,14 +114,21 @@ Two playlists in one: EDM/phonk tracks that teach production, and game soundtrac
 ### EDM.9f — Melodic Development
 68. Lena Raine — "Celeste: First Steps" (2018) (VGM)
 
-## Essential Canon (not lesson-specific)
+## Essential Canon (VGM)
 
-69. Martin O'Donnell — "Halo: Main Theme" (2001) (VGM)
+69. Martin O'Donnell — "Halo: Opening Suite" (2001) (VGM)
 70. David Wise — "DKC2: Stickerbrush Symphony" (1995) (VGM)
 71. Mick Gordon — "DOOM 2016: BFG Division" (2016) (VGM)
 72. Yoko Shimomura — "Kingdom Hearts: Dearly Beloved" (2002) (VGM)
 73. Darren Korb — "Hades: In the Blood" (2020) (VGM)
-74. Michiru Yamane — "Castlevania SotN: Dracula's Castle" (1997) (VGM)
+74. Junichi Masuda — "Pokemon: Lavender Town" (1996) (VGM)
+75. Masato Nakamura — "Sonic: Green Hill Zone" (1991) (VGM)
+76. Austin Wintory — "Journey: Nascence" (2012) (VGM)
+77. Nobuo Uematsu — "FFX: To Zanarkand" (2001) (VGM)
+78. Grant Kirkhope — "Banjo-Kazooie: Spiral Mountain" (1998) (VGM)
+79. Bear McCreary — "God of War: Main Theme" (2018) (VGM)
+80. Gareth Coker — "Ori: Light of Nibel" (2015) (VGM)
+81. Mahito Yokota — "Super Mario Galaxy: Gusty Garden Galaxy" (2007) (VGM)
 
 ---
 
@@ -194,10 +201,17 @@ Venetian Snares Hajnal
 Squarepusher Ultravisitor
 Masakazu Sugimori Ace Attorney Cross-Examination
 Lena Raine Celeste First Steps
-Martin ODonnell Halo Main Theme
+Martin ODonnell Halo Opening Suite
 David Wise DKC2 Stickerbrush Symphony
 Mick Gordon DOOM 2016 BFG Division
 Yoko Shimomura Kingdom Hearts Dearly Beloved
 Darren Korb Hades In the Blood
-Michiru Yamane Castlevania Symphony of the Night Draculas Castle
+Junichi Masuda Pokemon Lavender Town
+Masato Nakamura Sonic Green Hill Zone
+Austin Wintory Journey Nascence
+Nobuo Uematsu FFX To Zanarkand
+Grant Kirkhope Banjo-Kazooie Spiral Mountain
+Bear McCreary God of War Main Theme
+Gareth Coker Ori Light of Nibel
+Mahito Yokota Super Mario Galaxy Gusty Garden Galaxy
 ```
