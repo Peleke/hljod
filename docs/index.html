@@ -1028,6 +1028,10 @@ details.syl-detail[open] summary { border-bottom: 1px solid var(--divider); padd
 <!-- PLAYLIST -->
 <div class="tab-content" id="tab-playlist">
 
+<div style="margin-bottom: 2rem;">
+    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/255S7SXJv0MgNy4RF4047l?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+</div>
+
 <p class="syllabus-intro">Every track referenced in the lessons. Click column headers to sort. Add Spotify/YouTube links as you go.</p>
 
 <div style="display: flex; gap: 0.4rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
@@ -1112,8 +1116,8 @@ const PLAYLIST = [
   { artist: 'New Order', track: 'Blue Monday', year: 1983, genre: 'electronic', subgenre: 'synth-pop', lesson: 'L0', why: 'Programmed loop as the whole song', spotify: '', youtube: '' },
   { artist: 'Afrika Bambaataa', track: 'Planet Rock', year: 1982, genre: 'electronic', subgenre: 'electro', lesson: 'L0', why: 'Kraftwerk samples fused with the South Bronx', spotify: '', youtube: '' },
   // L1
-  { artist: 'Hirokazu Tanaka', track: 'Metroid: Brinstar', year: 1986, genre: 'game', subgenre: 'NES', lesson: 'L1', why: 'Rhythm from noise channels. Atmosphere as groove.', spotify: '', youtube: '' },
-  { artist: 'Takashi Tateishi', track: 'Mega Man 2: Dr. Wily Stage 1', year: 1988, genre: 'game', subgenre: 'NES', lesson: 'L1', why: 'C#m, 180bpm. The bass IS the rhythm.', spotify: '', youtube: '' },
+  { artist: 'Hirokazu Tanaka', track: 'Metroid: Brinstar', year: 1986, genre: 'game', subgenre: 'NES', lesson: 'L1', why: 'Rhythm from noise channels. Atmosphere as groove.', spotify: 'https://open.spotify.com/track/6Zqe7qNzi5a7dSnn4BJ541', youtube: 'https://www.youtube.com/watch?v=8h7GyFdm2xw' },
+  { artist: 'Takashi Tateishi', track: 'Mega Man 2: Dr. Wily Stage 1', year: 1988, genre: 'game', subgenre: 'NES', lesson: 'L1', why: 'C#m, 180bpm. The bass IS the rhythm.', spotify: 'https://open.spotify.com/track/71CcsoTpvWL3VJ4FxZoQiC', youtube: 'https://www.youtube.com/watch?v=aTbfpkByIM8' },
   { artist: 'The Winstons', track: 'Amen, Brother', year: 1969, genre: 'dnb', subgenre: 'breakbeat', lesson: 'L1', why: 'The 7-second break that built jungle and DnB', spotify: '', youtube: '' },
   { artist: 'Shy FX & UK Apache', track: 'Original Nuttah', year: 1994, genre: 'dnb', subgenre: 'jungle', lesson: 'L1', why: 'Chopped amen + dancehall', spotify: '', youtube: '' },
   { artist: 'Roni Size / Reprazent', track: 'Brown Paper Bag', year: 1997, genre: 'dnb', subgenre: 'dnb', lesson: 'L1', why: 'Live bass over programmed breaks', spotify: '', youtube: '' },
@@ -1123,23 +1127,23 @@ const PLAYLIST = [
   { artist: 'DJ Hype', track: 'Shot in the Dark', year: 1996, genre: 'dnb', subgenre: 'jungle', lesson: 'L1', why: 'Amen break chopped to perfection', spotify: '', youtube: '' },
   { artist: 'Andy C', track: 'Valley of the Shadows (Remix)', year: 1997, genre: 'dnb', subgenre: 'dnb', lesson: 'L1', why: 'Pushed DnB tempo and mixing to its limit', spotify: '', youtube: '' },
   // L2
-  { artist: 'Jeremy Soule', track: 'Skyrim: Dragonborn', year: 2011, genre: 'game', subgenre: 'orchestral', lesson: 'L2', why: 'Orchestral bass as power', spotify: '', youtube: '' },
-  { artist: 'C418', track: 'Minecraft: Subwoofer Lullaby', year: 2011, genre: 'game', subgenre: 'ambient', lesson: 'L2', why: 'Filtered sine bass as warmth', spotify: '', youtube: '' },
+  { artist: 'Jeremy Soule', track: 'Skyrim: Dragonborn', year: 2011, genre: 'game', subgenre: 'orchestral', lesson: 'L2', why: 'Orchestral bass as power', spotify: 'https://open.spotify.com/track/0iyglTS5t81u4SFDZOGIQx', youtube: 'https://www.youtube.com/watch?v=UsnRQJxanVM' },
+  { artist: 'C418', track: 'Minecraft: Subwoofer Lullaby', year: 2011, genre: 'game', subgenre: 'ambient', lesson: 'L2', why: 'Filtered sine bass as warmth', spotify: 'https://open.spotify.com/track/2hLRXbh7TwezpksciMibG1', youtube: 'https://www.youtube.com/watch?v=Gpd85y_iTxY' },
   { artist: 'Kevin Saunderson (Reese)', track: 'Just Want Another Chance', year: 1988, genre: 'electronic', subgenre: 'techno', lesson: 'L2', why: 'The literal origin of the Reese bass', spotify: '', youtube: '' },
   { artist: 'Ray Keith (Renegade)', track: 'Terrorist', year: 1994, genre: 'dnb', subgenre: 'jungle', lesson: 'L2', why: 'Sampled Reese + amen = instant jungle', spotify: '', youtube: '' },
   { artist: 'Ed Rush & Optical', track: 'Wormhole', year: 1998, genre: 'dnb', subgenre: 'neurofunk', lesson: 'L2', why: 'First neurofunk, filter sweeps + resampled bass', spotify: '', youtube: '' },
   { artist: 'Wendy Carlos', track: 'Switched-On Bach', year: 1968, genre: 'classical', subgenre: 'electronic', lesson: 'L2', why: 'First Moog album', spotify: '', youtube: '' },
   // L3
-  { artist: 'Yasunori Mitsuda', track: 'Chrono Trigger: Wind Scene', year: 1995, genre: 'game', subgenre: 'SNES', lesson: 'L3', why: 'Three voices breathing together', spotify: '', youtube: '' },
-  { artist: 'ConcernedApe', track: 'Stardew Valley: Spring', year: 2016, genre: 'game', subgenre: 'indie', lesson: 'L3', why: 'Same three-voice architecture, folk simplicity', spotify: '', youtube: '' },
+  { artist: 'Yasunori Mitsuda', track: 'Chrono Trigger: Wind Scene', year: 1995, genre: 'game', subgenre: 'SNES', lesson: 'L3', why: 'Three voices breathing together', spotify: 'https://open.spotify.com/track/2BPKqI11PLAKvtg9wGZ4Ll|https://open.spotify.com/track/6QXGGTaHvij7ptgcN9JiJQ|https://open.spotify.com/track/3ZRzvxSlVcGzUDlJESwFlL', youtube: 'https://www.youtube.com/watch?v=AbIwWBi1-UA|https://www.youtube.com/watch?v=tHfH7zvQudU' },
+  { artist: 'ConcernedApe', track: 'Stardew Valley: Spring', year: 2016, genre: 'game', subgenre: 'indie', lesson: 'L3', why: 'Same three-voice architecture, folk simplicity', spotify: 'https://open.spotify.com/track/6fwW6uPloanwDx78kBvH0N', youtube: 'https://www.youtube.com/watch?v=fI9QzlD_sm0' },
   { artist: 'Photek', track: 'Ni-Ten-Ichi-Ryu', year: 1997, genre: 'dnb', subgenre: 'dnb', lesson: 'L3', why: 'Drum programming so intricate it seemed inhuman', spotify: '', youtube: '' },
   { artist: 'Goldie', track: 'Timeless', year: 1995, genre: 'dnb', subgenre: 'dnb', lesson: 'L3', why: '21 minutes of impossibly layered production', spotify: '', youtube: '' },
   { artist: 'Noisia', track: 'Stigma', year: 2007, genre: 'dnb', subgenre: 'neurofunk', lesson: 'L3', why: 'Polyrhythmic interplay', spotify: '', youtube: '' },
   { artist: 'Ewe Drum Ensemble', track: 'Agbadza', year: 0, genre: 'traditional', subgenre: 'West African', lesson: 'L3', why: 'The original polyrhythmic stack', spotify: '', youtube: '' },
   // L4a
-  { artist: 'Motoi Sakuraba', track: 'Dark Souls: Firelink Shrine', year: 2011, genre: 'game', subgenre: 'atmospheric', lesson: 'L4a', why: 'Sparse guitar in massive reverb', spotify: '', youtube: '' },
-  { artist: 'Manaka Kataoka', track: 'Zelda BotW: Temple of Time', year: 2017, genre: 'game', subgenre: 'atmospheric', lesson: 'L4a', why: 'Piano notes in silence, delay as composition', spotify: '', youtube: '' },
-  { artist: 'Koji Kondo', track: 'Zelda OoT: Temple of Time', year: 1998, genre: 'game', subgenre: 'N64', lesson: 'L4a', why: 'Choir pad + bells', spotify: '', youtube: '' },
+  { artist: 'Motoi Sakuraba', track: 'Dark Souls: Firelink Shrine', year: 2011, genre: 'game', subgenre: 'atmospheric', lesson: 'L4a', why: 'Sparse guitar in massive reverb', spotify: 'https://open.spotify.com/track/5PWXnpg6pWsbmJu2Xr2iKw', youtube: 'https://www.youtube.com/watch?v=EL9dArwG5cE' },
+  { artist: 'Manaka Kataoka', track: 'Zelda BotW: Temple of Time', year: 2017, genre: 'game', subgenre: 'atmospheric', lesson: 'L4a', why: 'Piano notes in silence, delay as composition', spotify: 'https://open.spotify.com/track/6QmnrI6E0cxNlufcE10nfB', youtube: 'https://www.youtube.com/watch?v=L1igglghRW8' },
+  { artist: 'Koji Kondo', track: 'Zelda OoT: Temple of Time', year: 1998, genre: 'game', subgenre: 'N64', lesson: 'L4a', why: 'Choir pad + bells', spotify: 'https://open.spotify.com/track/1ZJug4IT2MqaqP6Yyr47tV', youtube: 'https://www.youtube.com/watch?v=n66LMxSH3ZM' },
   { artist: 'Brian Eno', track: 'Music for Airports 1/1', year: 1978, genre: 'electronic', subgenre: 'ambient', lesson: 'L4a', why: 'The genre definition', spotify: '', youtube: '' },
   { artist: 'Boards of Canada', track: 'Music Has the Right to Children', year: 1998, genre: 'electronic', subgenre: 'ambient', lesson: 'L4a', why: 'Filtered, degraded, nostalgic textures', spotify: '', youtube: '' },
   // L4c
@@ -1149,75 +1153,75 @@ const PLAYLIST = [
   { artist: 'Kaito Shoma', track: 'Scary Garry', year: 2016, genre: 'phonk', subgenre: 'drift phonk', lesson: 'L4c', why: 'First drift phonk', spotify: '', youtube: '' },
   { artist: 'DJ Paul', track: 'Wanna Go to War', year: 1994, genre: 'phonk', subgenre: 'Memphis rap', lesson: 'L4c', why: 'The 808 as melodic instrument', spotify: '', youtube: '' },
   // L5
-  { artist: 'Koji Kondo', track: 'Zelda OoT: Lost Woods', year: 1998, genre: 'game', subgenre: 'N64', lesson: 'L5', why: 'The melody that changes meaning across 5 games', spotify: '', youtube: '' },
-  { artist: 'Toby Fox', track: 'Undertale: Megalovania', year: 2015, genre: 'game', subgenre: 'indie', lesson: 'L5', why: 'Rhythmic persistence, everything shifts except the melody', spotify: '', youtube: '' },
-  { artist: 'Disasterpeace', track: 'Fez', year: 2012, genre: 'game', subgenre: 'indie', lesson: 'L5', why: 'Glacial evolution, patterns shifting over minutes', spotify: '', youtube: '' },
+  { artist: 'Koji Kondo', track: 'Zelda OoT: Lost Woods', year: 1998, genre: 'game', subgenre: 'N64', lesson: 'L5', why: 'The melody that changes meaning across 5 games', spotify: 'https://open.spotify.com/track/5UFYbXgRJ6bl5ObWesiUBb', youtube: 'https://www.youtube.com/watch?v=V9so9y-8Dgk' },
+  { artist: 'Toby Fox', track: 'Undertale: Megalovania', year: 2015, genre: 'game', subgenre: 'indie', lesson: 'L5', why: 'Rhythmic persistence, everything shifts except the melody', spotify: 'https://open.spotify.com/track/1J03Vp93ybKIxfzYI4YJtL', youtube: 'https://www.youtube.com/watch?v=KK3KXAECte4' },
+  { artist: 'Disasterpeace', track: 'Fez', year: 2012, genre: 'game', subgenre: 'indie', lesson: 'L5', why: 'Glacial evolution, patterns shifting over minutes', spotify: 'https://open.spotify.com/album/53t27Vjh6flQYgzXouSrX2', youtube: 'https://www.youtube.com/watch?v=ygVTXIIKoBY' },
   { artist: 'DJ Rashad', track: 'Feelin', year: 2012, genre: 'electronic', subgenre: 'footwork', lesson: 'L5', why: 'Constant rhythmic instability', spotify: '', youtube: '' },
   { artist: 'Burial', track: 'Archangel', year: 2007, genre: 'electronic', subgenre: 'garage', lesson: 'L5', why: 'Constantly shifting chopped vocals', spotify: '', youtube: '' },
   { artist: 'Aphex Twin', track: 'Xtal', year: 1992, genre: 'electronic', subgenre: 'ambient', lesson: 'L5', why: 'Subtle timbral shifts, generative ambient', spotify: '', youtube: '' },
   // L6
-  { artist: 'Nobuo Uematsu', track: 'FF7: One Winged Angel', year: 1997, genre: 'game', subgenre: 'PS1', lesson: 'L6', why: 'The build. Layers add. Filter opens. Choir hits.', spotify: '', youtube: '' },
-  { artist: 'Christopher Larkin', track: 'Hollow Knight: Sealed Vessel', year: 2017, genre: 'game', subgenre: 'indie', lesson: 'L6', why: 'Restraint then devastation', spotify: '', youtube: '' },
-  { artist: 'Keiichi Okabe', track: 'NieR: Automata: Weight of the World', year: 2017, genre: 'game', subgenre: 'PS4', lesson: 'L6', why: 'Same melody in different languages as the story shifts', spotify: '', youtube: '' },
+  { artist: 'Nobuo Uematsu', track: 'FF7: One Winged Angel', year: 1997, genre: 'game', subgenre: 'PS1', lesson: 'L6', why: 'The build. Layers add. Filter opens. Choir hits.', spotify: 'https://open.spotify.com/track/02hiFgacAzz7zGl5EF53eo', youtube: 'https://www.youtube.com/watch?v=IYMTzLxGv3M' },
+  { artist: 'Christopher Larkin', track: 'Hollow Knight: Sealed Vessel', year: 2017, genre: 'game', subgenre: 'indie', lesson: 'L6', why: 'Restraint then devastation', spotify: 'https://open.spotify.com/track/5LlqVViilxn216dQzcFyvy', youtube: 'https://www.youtube.com/watch?v=ze0Rk-m0w2A' },
+  { artist: 'Keiichi Okabe', track: 'NieR: Automata: Weight of the World', year: 2017, genre: 'game', subgenre: 'PS4', lesson: 'L6', why: 'Same melody in different languages as the story shifts', spotify: 'https://open.spotify.com/track/0qrvS8ysAmaXBz9uS4ot7M|https://open.spotify.com/track/1crLzBCIw7XxYt0AAbjeiE', youtube: 'https://www.youtube.com/watch?v=ToBQY630PZE|https://www.youtube.com/watch?v=PslQESlD4xs' },
   { artist: 'The Prodigy', track: 'Firestarter', year: 1996, genre: 'electronic', subgenre: 'rave', lesson: 'L6', why: 'Filter sweep build into vocal explosion', spotify: '', youtube: '' },
   { artist: 'Chase & Status', track: 'Blind Faith', year: 2011, genre: 'dnb', subgenre: 'dnb', lesson: 'L6', why: 'Textbook DnB buildup and drop', spotify: '', youtube: '' },
   { artist: 'Skrillex', track: 'Scary Monsters and Nice Sprites', year: 2010, genre: 'electronic', subgenre: 'dubstep', lesson: 'L6', why: 'Silence before the drop as a weapon', spotify: '', youtube: '' },
   // L7
-  { artist: 'Koji Kondo', track: 'Zelda LttP: Dark World', year: 1991, genre: 'game', subgenre: 'SNES', lesson: 'L7', why: 'The SNES sample revolution', spotify: '', youtube: '' },
-  { artist: 'Yasunori Mitsuda', track: 'Chrono Trigger: Corridors of Time', year: 1995, genre: 'game', subgenre: 'SNES', lesson: 'L7', why: 'The most remixed game track. SPC700 lo-fi warmth.', spotify: '', youtube: '' },
+  { artist: 'Koji Kondo', track: 'Zelda LttP: Dark World', year: 1991, genre: 'game', subgenre: 'SNES', lesson: 'L7', why: 'The SNES sample revolution', spotify: 'https://open.spotify.com/track/6pMkjkN5tgD7ORE8iSPKsw', youtube: 'https://www.youtube.com/watch?v=sslj06K-Nlw' },
+  { artist: 'Yasunori Mitsuda', track: 'Chrono Trigger: Corridors of Time', year: 1995, genre: 'game', subgenre: 'SNES', lesson: 'L7', why: 'The most remixed game track. SPC700 lo-fi warmth.', spotify: 'https://open.spotify.com/track/1kl6jzl9h38pjzALrPYvq3', youtube: 'https://www.youtube.com/watch?v=BXo3DrXHY8w' },
   { artist: 'Nujabes', track: 'Samurai Champloo: Battlecry', year: 2004, genre: 'hiphop', subgenre: 'lo-fi', lesson: 'L7', why: 'Japanese production + jazz samples + Dilla timing', spotify: '', youtube: '' },
   { artist: 'DJ Shadow', track: 'Building Steam with a Grain of Salt', year: 1996, genre: 'hiphop', subgenre: 'instrumental', lesson: 'L7', why: 'First album made entirely from samples', spotify: '', youtube: '' },
   { artist: 'J Dilla', track: 'Workinonit', year: 2006, genre: 'hiphop', subgenre: 'instrumental', lesson: 'L7', why: "King of chopping, SP-303, 'Dilla time'", spotify: '', youtube: '' },
   { artist: 'Madvillain', track: 'Accordion', year: 2004, genre: 'hiphop', subgenre: 'hip-hop', lesson: 'L7', why: 'Pitched-down chop creates new identity', spotify: '', youtube: '' },
   { artist: 'Pierre Schaeffer', track: 'Étude aux chemins de fer', year: 1948, genre: 'classical', subgenre: 'musique concrète', lesson: 'L7', why: 'The first sample-based composition', spotify: '', youtube: '' },
   // L8a
-  { artist: 'Koji Kondo', track: 'Zelda OoT: Gerudo Valley', year: 1998, genre: 'game', subgenre: 'N64', lesson: 'L8a', why: 'Minor scale, flamenco guitar, rhythmic fire', spotify: '', youtube: '' },
+  { artist: 'Koji Kondo', track: 'Zelda OoT: Gerudo Valley', year: 1998, genre: 'game', subgenre: 'N64', lesson: 'L8a', why: 'Minor scale, flamenco guitar, rhythmic fire', spotify: 'https://open.spotify.com/track/5yR83V6yy3IUxSvzrFtlLg|https://open.spotify.com/track/7DG6A3XsTxbMC9Fpkh74W3', youtube: 'https://www.youtube.com/watch?v=0hEYvdMoF2g' },
   { artist: 'Nujabes', track: 'Feather', year: 2005, genre: 'hiphop', subgenre: 'lo-fi', lesson: 'L8a', why: 'Modal harmony in beat music', spotify: '', youtube: '' },
   { artist: 'LTJ Bukem', track: "Demon's Theme", year: 1992, genre: 'dnb', subgenre: 'atmospheric', lesson: 'L8a', why: 'Atmospheric DnB, melodic layers over breaks', spotify: '', youtube: '' },
   // L8b
-  { artist: 'Nobuo Uematsu', track: 'Final Fantasy: Prelude', year: 1987, genre: 'game', subgenre: 'NES', lesson: 'L8b', why: 'The pentatonic arpeggio, appears in every FF', spotify: '', youtube: '' },
-  { artist: 'Koji Kondo', track: 'Zelda OoT: Lost Woods', year: 1998, genre: 'game', subgenre: 'N64', lesson: 'L8b', why: 'Mixolydian mode', spotify: '', youtube: '' },
+  { artist: 'Nobuo Uematsu', track: 'Final Fantasy: Prelude', year: 1987, genre: 'game', subgenre: 'NES', lesson: 'L8b', why: 'The pentatonic arpeggio, appears in every FF', spotify: 'https://open.spotify.com/track/3RLbxxaJznA2qzlW78SlB1|https://open.spotify.com/track/5xPAEIfCjg7OWGDSClQhzu', youtube: 'https://www.youtube.com/watch?v=dPkoNICjQFI' },
+  { artist: 'Koji Kondo', track: 'Zelda OoT: Lost Woods', year: 1998, genre: 'game', subgenre: 'N64', lesson: 'L8b', why: 'Mixolydian mode', spotify: 'https://open.spotify.com/track/5UFYbXgRJ6bl5ObWesiUBb', youtube: 'https://www.youtube.com/watch?v=V9so9y-8Dgk' },
   { artist: 'Calibre', track: 'Even If', year: 2010, genre: 'dnb', subgenre: 'liquid', lesson: 'L8b', why: 'Liquid DnB, jazz/blues influenced melody', spotify: '', youtube: '' },
   { artist: 'Miles Davis', track: 'So What', year: 1959, genre: 'classical', subgenre: 'modal jazz', lesson: 'L8b', why: 'D dorian for 16 bars. The modal jazz manifesto.', spotify: '', youtube: '' },
   // L8c
-  { artist: 'Shoji Meguro', track: 'Persona 5: Beneath the Mask', year: 2016, genre: 'game', subgenre: 'PS4', lesson: 'L8c', why: 'Extended harmony, lo-fi over JRPG', spotify: '', youtube: '' },
+  { artist: 'Shoji Meguro', track: 'Persona 5: Beneath the Mask', year: 2016, genre: 'game', subgenre: 'PS4', lesson: 'L8c', why: 'Extended harmony, lo-fi over JRPG', spotify: 'https://open.spotify.com/track/5XLXrm5JVMdOus1fWmTOFw', youtube: 'https://www.youtube.com/watch?v=gFFOXwniVKw' },
   { artist: 'Nujabes', track: 'Luv(sic) Part 3', year: 2005, genre: 'hiphop', subgenre: 'lo-fi', lesson: 'L8c', why: 'Jazz samples + modal harmony in beat music', spotify: '', youtube: '' },
   // L8d
-  { artist: 'Akira Yamaoka', track: 'Silent Hill 2: Theme of Laura', year: 2001, genre: 'game', subgenre: 'PS2', lesson: 'L8d', why: 'Tritone as dread', spotify: '', youtube: '' },
+  { artist: 'Akira Yamaoka', track: 'Silent Hill 2: Theme of Laura', year: 2001, genre: 'game', subgenre: 'PS2', lesson: 'L8d', why: 'Tritone as dread', spotify: 'https://open.spotify.com/track/1gWL1q8vipVkWgwPWDsbWL|https://open.spotify.com/track/4iWHHzondqddiRhaUCZNgi', youtube: 'https://www.youtube.com/watch?v=td3P1-cfZ4E|https://www.youtube.com/watch?v=Q47veZhrMW8' },
   // L8e
-  { artist: 'Nobuo Uematsu', track: "FF6: Terra's Theme", year: 1994, genre: 'game', subgenre: 'SNES', lesson: 'L8e', why: 'Suspensions and non-chord tones', spotify: '', youtube: '' },
+  { artist: 'Nobuo Uematsu', track: "FF6: Terra's Theme", year: 1994, genre: 'game', subgenre: 'SNES', lesson: 'L8e', why: 'Suspensions and non-chord tones', spotify: 'https://open.spotify.com/track/5h33AwPJXXfT6KwvHlolYE|https://open.spotify.com/track/6OKQ8zCNcCxIzGw3Z6mHMP', youtube: 'https://www.youtube.com/watch?v=ObccgHQdos0|https://www.youtube.com/watch?v=PiI7rDqv9FQ' },
   // L9a
-  { artist: 'Shoji Meguro', track: 'Persona 5: Beneath the Mask', year: 2016, genre: 'game', subgenre: 'PS4', lesson: 'L9a', why: 'Extended diatonic harmony', spotify: '', youtube: '' },
-  { artist: 'Michiru Yamane', track: "Castlevania SotN: Dracula's Castle", year: 1997, genre: 'game', subgenre: 'PS1', lesson: 'L9a', why: 'Baroque voice leading meets guitar', spotify: '', youtube: '' },
+  { artist: 'Shoji Meguro', track: 'Persona 5: Beneath the Mask', year: 2016, genre: 'game', subgenre: 'PS4', lesson: 'L9a', why: 'Extended diatonic harmony', spotify: 'https://open.spotify.com/track/5XLXrm5JVMdOus1fWmTOFw', youtube: 'https://www.youtube.com/watch?v=gFFOXwniVKw' },
+  { artist: 'Michiru Yamane', track: "Castlevania SotN: Dracula's Castle", year: 1997, genre: 'game', subgenre: 'PS1', lesson: 'L9a', why: 'Baroque voice leading meets guitar', spotify: 'https://open.spotify.com/track/4yvbrEScaYxiSdKGwM3fFI', youtube: 'https://www.youtube.com/watch?v=cyWTgLf-piE' },
   { artist: 'A Tribe Called Quest', track: 'Electric Relaxation', year: 1993, genre: 'hiphop', subgenre: 'hip-hop', lesson: 'L9a', why: 'Jazz organ sample, harmonic ambiguity', spotify: '', youtube: '' },
   { artist: 'Flying Lotus', track: 'Do the Astral Plane', year: 2010, genre: 'electronic', subgenre: 'IDM', lesson: 'L9a', why: 'Free jazz + IDM, unconventional harmony', spotify: '', youtube: '' },
   // L9b
-  { artist: 'Shoji Meguro', track: 'Persona 5: Last Surprise', year: 2016, genre: 'game', subgenre: 'PS4', lesson: 'L9b', why: 'ii-V-I cadence, acid jazz meets JRPG', spotify: '', youtube: '' },
+  { artist: 'Shoji Meguro', track: 'Persona 5: Last Surprise', year: 2016, genre: 'game', subgenre: 'PS4', lesson: 'L9b', why: 'ii-V-I cadence, acid jazz meets JRPG', spotify: 'https://open.spotify.com/track/4cPnNnTMkJ6soUOUzEtmcp', youtube: 'https://www.youtube.com/watch?v=ZNGqBDRJgvo' },
   { artist: 'Roni Size / Reprazent', track: 'Brown Paper Bag', year: 1997, genre: 'dnb', subgenre: 'dnb', lesson: 'L9b', why: 'Jazz bass walks in DnB', spotify: '', youtube: '' },
   // L9c
-  { artist: 'Mick Gordon', track: 'DOOM 2016: BFG Division', year: 2016, genre: 'game', subgenre: 'FPS', lesson: 'L9c', why: 'Extreme layered production, 500M streams', spotify: '', youtube: '' },
+  { artist: 'Mick Gordon', track: 'DOOM 2016: BFG Division', year: 2016, genre: 'game', subgenre: 'FPS', lesson: 'L9c', why: 'Extreme layered production, 500M streams', spotify: 'https://open.spotify.com/track/2WxUbLeMfRboGqFc1qiZBi', youtube: 'https://www.youtube.com/watch?v=EHM2OIcG8Ok' },
   { artist: 'Aphex Twin', track: 'Vordhosbn', year: 2001, genre: 'electronic', subgenre: 'IDM', lesson: 'L9c', why: 'Inhuman layered complexity', spotify: '', youtube: '' },
   { artist: 'Venetian Snares', track: 'Hajnal', year: 2005, genre: 'electronic', subgenre: 'breakcore', lesson: 'L9c', why: 'Bartók + amen break', spotify: '', youtube: '' },
   // L9d
-  { artist: 'Nobuo Uematsu', track: 'Final Fantasy: Main Theme', year: 1987, genre: 'game', subgenre: 'NES', lesson: 'L9d', why: 'AABA form across 35 years', spotify: '', youtube: '' },
+  { artist: 'Nobuo Uematsu', track: 'Final Fantasy: Main Theme', year: 1987, genre: 'game', subgenre: 'NES', lesson: 'L9d', why: 'AABA form across 35 years', spotify: 'https://open.spotify.com/track/534JtmQfjJdgOB9jYfEvMr|https://open.spotify.com/track/1Op47dMLD73On4rNNNU3AW', youtube: 'https://www.youtube.com/watch?v=6JcieaSuHOc|https://www.youtube.com/watch?v=O8IBoFIFE-E' },
   // L9e
-  { artist: 'Masakazu Sugimori', track: 'Ace Attorney: Cross-Examination', year: 2001, genre: 'game', subgenre: 'GBA', lesson: 'L9e', why: 'Walking bass as tension', spotify: '', youtube: '' },
+  { artist: 'Masakazu Sugimori', track: 'Ace Attorney: Cross-Examination', year: 2001, genre: 'game', subgenre: 'GBA', lesson: 'L9e', why: 'Walking bass as tension', spotify: 'https://open.spotify.com/track/53n9A8FX2WattJpb40WuHp|https://open.spotify.com/track/6SNLdSGDFb3lKrwqdSBOyM', youtube: 'https://www.youtube.com/watch?v=HK2VLhbSaoc' },
   // L9f
-  { artist: 'Lena Raine', track: 'Celeste: First Steps', year: 2018, genre: 'game', subgenre: 'indie', lesson: 'L9f', why: 'Motif as narrative', spotify: '', youtube: '' },
-  { artist: 'Koji Kondo', track: 'Zelda: Main Theme', year: 1986, genre: 'game', subgenre: 'NES', lesson: 'L9f', why: 'One motif developed across 35 years', spotify: '', youtube: '' },
+  { artist: 'Lena Raine', track: 'Celeste: First Steps', year: 2018, genre: 'game', subgenre: 'indie', lesson: 'L9f', why: 'Motif as narrative', spotify: 'https://open.spotify.com/track/4MsC3bu5B8WQGHQjOoH2NG', youtube: 'https://www.youtube.com/watch?v=N8OHSXvneOE' },
+  { artist: 'Koji Kondo', track: 'Zelda: Main Theme', year: 1986, genre: 'game', subgenre: 'NES', lesson: 'L9f', why: 'One motif developed across 35 years', spotify: 'https://open.spotify.com/track/4TsNJOplJcFSKkKRXGNm07', youtube: 'https://www.youtube.com/watch?v=uyMKWJ5e1kg' },
   // Essential Canon
-  { artist: 'Martin O\'Donnell', track: 'Halo: Opening Suite', year: 2001, genre: 'game', subgenre: 'Xbox', lesson: '—', why: 'Most iconic Western game theme', spotify: '', youtube: '' },
-  { artist: 'David Wise', track: 'DKC2: Stickerbrush Symphony', year: 1995, genre: 'game', subgenre: 'SNES', lesson: '—', why: 'One of the most atmospheric SNES tracks', spotify: '', youtube: '' },
-  { artist: 'Yoko Shimomura', track: 'Kingdom Hearts: Dearly Beloved', year: 2002, genre: 'game', subgenre: 'PS2', lesson: '—', why: 'Classic FM Hall of Fame', spotify: '', youtube: '' },
-  { artist: 'Darren Korb', track: 'Hades: In the Blood', year: 2020, genre: 'game', subgenre: 'indie', lesson: '—', why: 'Modern indie essential', spotify: '', youtube: '' },
-  { artist: 'Junichi Masuda', track: 'Pokémon: Lavender Town', year: 1996, genre: 'game', subgenre: 'Game Boy', lesson: '—', why: 'Cultural phenomenon', spotify: '', youtube: '' },
-  { artist: 'Masato Nakamura', track: 'Sonic: Green Hill Zone', year: 1991, genre: 'game', subgenre: 'Genesis', lesson: '—', why: 'Top-5 recognizable game melody', spotify: '', youtube: '' },
-  { artist: 'Austin Wintory', track: 'Journey: Nascence', year: 2012, genre: 'game', subgenre: 'PS3', lesson: '—', why: 'First VGM Grammy nomination', spotify: '', youtube: '' },
-  { artist: 'Nobuo Uematsu', track: 'FFX: To Zanarkand', year: 2001, genre: 'game', subgenre: 'PS2', lesson: '—', why: 'Most-covered VGM piano piece', spotify: '', youtube: '' },
-  { artist: 'Grant Kirkhope', track: 'Banjo-Kazooie: Spiral Mountain', year: 1998, genre: 'game', subgenre: 'N64', lesson: '—', why: 'N64 era essential', spotify: '', youtube: '' },
-  { artist: 'Bear McCreary', track: 'God of War: Main Theme', year: 2018, genre: 'game', subgenre: 'PS4', lesson: '—', why: 'Game Awards winner', spotify: '', youtube: '' },
-  { artist: 'Gareth Coker', track: 'Ori: Light of Nibel', year: 2015, genre: 'game', subgenre: 'indie', lesson: '—', why: 'Emotional indie benchmark', spotify: '', youtube: '' },
-  { artist: 'Mahito Yokota', track: 'Super Mario Galaxy: Gusty Garden', year: 2007, genre: 'game', subgenre: 'Wii', lesson: '—', why: 'First orchestral Mario', spotify: '', youtube: '' },
+  { artist: 'Martin O\'Donnell', track: 'Halo: Opening Suite', year: 2001, genre: 'game', subgenre: 'Xbox', lesson: '—', why: 'Most iconic Western game theme', spotify: 'https://open.spotify.com/track/0gAqni5NhrAoaf7aWB5P0c', youtube: 'https://www.youtube.com/watch?v=p4mRgxIYtE0' },
+  { artist: 'David Wise', track: 'DKC2: Stickerbrush Symphony', year: 1995, genre: 'game', subgenre: 'SNES', lesson: '—', why: 'One of the most atmospheric SNES tracks', spotify: 'https://open.spotify.com/track/4ad8d9rj7pD4Wt6B1qkeP1', youtube: 'https://www.youtube.com/watch?v=mdPlcKg-qFs' },
+  { artist: 'Yoko Shimomura', track: 'Kingdom Hearts: Dearly Beloved', year: 2002, genre: 'game', subgenre: 'PS2', lesson: '—', why: 'Classic FM Hall of Fame', spotify: 'https://open.spotify.com/track/6Tkn4gwyqVcpU0ecgtU3bw|https://open.spotify.com/track/2G8tfTExxzpRKssKzKwDYV|https://open.spotify.com/track/3aYEUM5s9KS5IU3vLGFsdh', youtube: 'https://www.youtube.com/watch?v=Jk4P10nsq4c|https://www.youtube.com/watch?v=B1nDzB1P8GM|https://www.youtube.com/watch?v=x__1hc7jOgA' },
+  { artist: 'Darren Korb', track: 'Hades: In the Blood', year: 2020, genre: 'game', subgenre: 'indie', lesson: '—', why: 'Modern indie essential', spotify: 'https://open.spotify.com/track/5M8tCPBRAGdAVAyKIaEh9l', youtube: 'https://www.youtube.com/watch?v=ojx8dyes__8' },
+  { artist: 'Junichi Masuda', track: 'Pokémon: Lavender Town', year: 1996, genre: 'game', subgenre: 'Game Boy', lesson: '—', why: 'Cultural phenomenon', spotify: 'https://open.spotify.com/track/15AkM62tf9cszrGNKj2STC|https://open.spotify.com/track/2fSFbhtxLL9a9dwKqpqXAm', youtube: 'https://www.youtube.com/watch?v=JNJJ-QkZ8cM' },
+  { artist: 'Masato Nakamura', track: 'Sonic: Green Hill Zone', year: 1991, genre: 'game', subgenre: 'Genesis', lesson: '—', why: 'Top-5 recognizable game melody', spotify: 'https://open.spotify.com/track/2ZbJuTlSK9TYokeza42cmR', youtube: 'https://www.youtube.com/watch?v=G-i8HYi1QH0' },
+  { artist: 'Austin Wintory', track: 'Journey: Nascence', year: 2012, genre: 'game', subgenre: 'PS3', lesson: '—', why: 'First VGM Grammy nomination', spotify: 'https://open.spotify.com/album/5fEkyTeRzYV32RcT8c5tTn', youtube: 'https://www.youtube.com/playlist?list=PL60408EBD7150DDA5' },
+  { artist: 'Nobuo Uematsu', track: 'FFX: To Zanarkand', year: 2001, genre: 'game', subgenre: 'PS2', lesson: '—', why: 'Most-covered VGM piano piece', spotify: 'https://open.spotify.com/track/5NP9bhvIp2XGY3Xl0ICAub', youtube: 'https://www.youtube.com/watch?v=6fp81GzKarQ' },
+  { artist: 'Grant Kirkhope', track: 'Banjo-Kazooie: Spiral Mountain', year: 1998, genre: 'game', subgenre: 'N64', lesson: '—', why: 'N64 era essential', spotify: 'https://open.spotify.com/track/0mD6uTdPSQZZxuqVeFNLAt', youtube: 'https://www.youtube.com/watch?v=IlzflkN7g-U' },
+  { artist: 'Bear McCreary', track: 'God of War: Main Theme', year: 2018, genre: 'game', subgenre: 'PS4', lesson: '—', why: 'Game Awards winner', spotify: 'https://open.spotify.com/track/6ZMwwuUOx8kefl32gWOjtY', youtube: 'https://www.youtube.com/watch?v=jpyVfd8TyoI' },
+  { artist: 'Gareth Coker', track: 'Ori: Light of Nibel', year: 2015, genre: 'game', subgenre: 'indie', lesson: '—', why: 'Emotional indie benchmark', spotify: 'https://open.spotify.com/track/79aotvPXTlHbZ8MvoxhqAE', youtube: 'https://www.youtube.com/watch?v=t6vWDz5NzOY' },
+  { artist: 'Mahito Yokota', track: 'Super Mario Galaxy: Gusty Garden', year: 2007, genre: 'game', subgenre: 'Wii', lesson: '—', why: 'First orchestral Mario', spotify: 'https://open.spotify.com/track/05XPxcgHp4I4CFlOhMnskS', youtube: 'https://www.youtube.com/watch?v=1bvDHAUv2ak' },
 ];
 
 // Genre color map
@@ -1261,8 +1265,22 @@ function renderPlaylist() {
   tbody.innerHTML = data.map(t => {
     const gc = GENRE_COLORS[t.genre] || 'var(--text-dim)';
     const links = [];
-    if (t.spotify) links.push(`<a href="${t.spotify}" target="_blank" style="color: var(--green); font-size: 0.7rem;">spotify</a>`);
-    if (t.youtube) links.push(`<a href="${t.youtube}" target="_blank" style="color: #ff4444; font-size: 0.7rem;">youtube</a>`);
+    if (t.spotify) {
+        const urls = t.spotify.split('|');
+        if (urls.length === 1) {
+            links.push(`<a href="${urls[0]}" target="_blank" style="color: var(--green); font-size: 0.65rem; text-decoration: none;">&#9835;</a>`);
+        } else {
+            urls.forEach((u, i) => links.push(`<a href="${u}" target="_blank" style="color: var(--green); font-size: 0.65rem; text-decoration: none;">&#9835;${i+1}</a>`));
+        }
+    }
+    if (t.youtube) {
+        const urls = t.youtube.split('|');
+        if (urls.length === 1) {
+            links.push(`<a href="${urls[0]}" target="_blank" style="color: #ff4444; font-size: 0.65rem; text-decoration: none;">&#9654;</a>`);
+        } else {
+            urls.forEach((u, i) => links.push(`<a href="${u}" target="_blank" style="color: #ff4444; font-size: 0.65rem; text-decoration: none;">&#9654;${i+1}</a>`));
+        }
+    }
     // Artist link to history.html if they have a node
     const histId = HISTORY_LINKS[t.artist];
     const artistHtml = histId
