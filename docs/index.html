@@ -1028,13 +1028,31 @@ details.syl-detail[open] summary { border-bottom: 1px solid var(--divider); padd
 <!-- PLAYLIST -->
 <div class="tab-content" id="tab-playlist">
 
-<div style="margin-bottom: 2rem;">
-    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/255S7SXJv0MgNy4RF4047l?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+<p class="syllabus-intro">Every track referenced across the curriculum. Game soundtracks, electronic, DnB, hip-hop, jazz. Links go to <svg width="12" height="12" viewBox="0 0 24 24" style="vertical-align:-1px;"><circle cx="12" cy="12" r="12" fill="#1DB954"/><path d="M17.9 10.9C14.7 9 9.4 8.6 6.6 9.5c-.5.2-1-.2-1.1-.7-.2-.5.2-1 .7-1.1 3.3-1 8.9-.6 12.4 1.5.4.3.6.8.3 1.3-.2.4-.8.5-1 .4zM17.8 13.7c-.3.4-.8.5-1.2.3-2.7-1.7-6.8-2.2-10-1.2-.4.1-.9-.1-1-.5s.1-.9.5-1c3.7-1.1 8.3-.6 11.4 1.4.4.2.5.8.3 1zM16.6 16.5c-.2.3-.6.4-1 .2-2.4-1.4-5.3-1.8-8.8-.9-.3.1-.7-.1-.8-.4-.1-.3.1-.7.4-.8 3.8-.9 7.1-.5 9.8 1.1.4.2.5.6.4.8z" fill="white"/></svg> Spotify or <svg width="14" height="10" viewBox="0 0 24 17" style="vertical-align:-1px;"><rect width="24" height="17" rx="4" fill="#FF0000"/><polygon points="10,3.5 10,13.5 18,8.5" fill="white"/></svg> YouTube.</p>
+
+<!-- Playlist subtabs -->
+<div style="display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--divider);">
+    <button class="tab active" onclick="showPlaylistView('all', this)" style="font-size:0.6rem; padding:0.5rem 1rem;">All Tracks</button>
+    <button class="tab" onclick="showPlaylistView('game', this)" style="font-size:0.6rem; padding:0.5rem 1rem;">Game Music</button>
+    <button class="tab" onclick="showPlaylistView('edm', this)" style="font-size:0.6rem; padding:0.5rem 1rem;">EDM / Phonk</button>
+    <button class="tab" onclick="showPlaylistView('other', this)" style="font-size:0.6rem; padding:0.5rem 1rem;">Jazz / Classical</button>
 </div>
 
-<p class="syllabus-intro">Every track referenced in the lessons. Click column headers to sort. Add Spotify/YouTube links as you go.</p>
+<!-- Spotify embed (shown only for Game Music subtab) -->
+<div id="playlist-embed-game" style="margin-bottom: 1.5rem; display: none;">
+    <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/255S7SXJv0MgNy4RF4047l?utm_source=generator&theme=0" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+    <p style="font-family:'SF Mono',monospace; font-size:0.55rem; color:var(--text-faint); margin-top:0.4rem; letter-spacing:0.04em;">Game soundtrack playlist on Spotify. Full track list with YouTube links below.</p>
+</div>
 
-<div style="display: flex; gap: 0.4rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+<!-- Spotify embed placeholder for EDM (future) -->
+<div id="playlist-embed-edm" style="margin-bottom: 1.5rem; display: none;">
+    <div style="padding:2rem; background:var(--surface); border:1px dashed var(--divider); border-radius:12px; text-align:center;">
+        <p style="font-family:'SF Mono',monospace; font-size:0.65rem; color:var(--text-faint); letter-spacing:0.06em;">EDM / Phonk Spotify playlist coming soon</p>
+    </div>
+</div>
+
+<!-- Genre filter chips (for All Tracks view) -->
+<div id="playlist-genre-filters" style="display: flex; gap: 0.4rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
     <button class="playlist-filter active" data-genre="all" onclick="filterPlaylist('all', this)">All</button>
     <button class="playlist-filter" data-genre="game" onclick="filterPlaylist('game', this)">Game</button>
     <button class="playlist-filter" data-genre="dnb" onclick="filterPlaylist('dnb', this)">DnB / Jungle</button>
@@ -1265,20 +1283,22 @@ function renderPlaylist() {
   tbody.innerHTML = data.map(t => {
     const gc = GENRE_COLORS[t.genre] || 'var(--text-dim)';
     const links = [];
+    const spSvg = '<svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:-2px;"><circle cx="12" cy="12" r="12" fill="#1DB954"/><path d="M17.9 10.9C14.7 9 9.4 8.6 6.6 9.5c-.5.2-1-.2-1.1-.7-.2-.5.2-1 .7-1.1 3.3-1 8.9-.6 12.4 1.5.4.3.6.8.3 1.3-.2.4-.8.5-1 .4zM17.8 13.7c-.3.4-.8.5-1.2.3-2.7-1.7-6.8-2.2-10-1.2-.4.1-.9-.1-1-.5s.1-.9.5-1c3.7-1.1 8.3-.6 11.4 1.4.4.2.5.8.3 1zM16.6 16.5c-.2.3-.6.4-1 .2-2.4-1.4-5.3-1.8-8.8-.9-.3.1-.7-.1-.8-.4-.1-.3.1-.7.4-.8 3.8-.9 7.1-.5 9.8 1.1.4.2.5.6.4.8z" fill="white"/></svg>';
+    const ytSvg = '<svg width="16" height="12" viewBox="0 0 24 17" style="vertical-align:-2px;"><rect width="24" height="17" rx="4" fill="#FF0000"/><polygon points="10,3.5 10,13.5 18,8.5" fill="white"/></svg>';
     if (t.spotify) {
         const urls = t.spotify.split('|');
         if (urls.length === 1) {
-            links.push(`<a href="${urls[0]}" target="_blank" style="color: var(--green); font-size: 0.65rem; text-decoration: none;">&#9835;</a>`);
+            links.push(`<a href="${urls[0]}" target="_blank" title="Spotify" style="text-decoration:none;">${spSvg}</a>`);
         } else {
-            urls.forEach((u, i) => links.push(`<a href="${u}" target="_blank" style="color: var(--green); font-size: 0.65rem; text-decoration: none;">&#9835;${i+1}</a>`));
+            urls.forEach((u, i) => links.push(`<a href="${u}" target="_blank" title="Spotify ${i+1}" style="text-decoration:none;font-size:0.55rem;color:var(--text-faint);">${spSvg}<sub>${i+1}</sub></a>`));
         }
     }
     if (t.youtube) {
         const urls = t.youtube.split('|');
         if (urls.length === 1) {
-            links.push(`<a href="${urls[0]}" target="_blank" style="color: #ff4444; font-size: 0.65rem; text-decoration: none;">&#9654;</a>`);
+            links.push(`<a href="${urls[0]}" target="_blank" title="YouTube" style="text-decoration:none;">${ytSvg}</a>`);
         } else {
-            urls.forEach((u, i) => links.push(`<a href="${u}" target="_blank" style="color: #ff4444; font-size: 0.65rem; text-decoration: none;">&#9654;${i+1}</a>`));
+            urls.forEach((u, i) => links.push(`<a href="${u}" target="_blank" title="YouTube ${i+1}" style="text-decoration:none;font-size:0.55rem;color:var(--text-faint);">${ytSvg}<sub>${i+1}</sub></a>`));
         }
     }
     // Artist link to history.html if they have a node
@@ -1314,6 +1334,111 @@ function filterPlaylist(genre, btn) {
   btn.classList.add('active');
   renderPlaylist();
 }
+
+let currentPlaylistView = 'all';
+
+function showPlaylistView(view, btn) {
+  currentPlaylistView = view;
+  // Update subtab active state
+  btn.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  // Show/hide embeds
+  document.getElementById('playlist-embed-game').style.display = view === 'game' ? 'block' : 'none';
+  document.getElementById('playlist-embed-edm').style.display = view === 'edm' ? 'block' : 'none';
+  // Show/hide genre filter chips (only for "all" view)
+  document.getElementById('playlist-genre-filters').style.display = view === 'all' ? 'flex' : 'none';
+  // Set filter based on view
+  if (view === 'all') {
+    currentFilter = 'all';
+    document.querySelectorAll('.playlist-filter').forEach(b => b.classList.remove('active'));
+    document.querySelector('.playlist-filter[data-genre="all"]').classList.add('active');
+  } else if (view === 'game') {
+    currentFilter = 'game';
+  } else if (view === 'edm') {
+    currentFilter = '_edm'; // special: dnb + electronic + phonk
+  } else if (view === 'other') {
+    currentFilter = '_other'; // special: classical + hiphop + traditional
+  }
+  renderPlaylist();
+}
+
+// Override filter logic to handle composite views
+const _origFilter = currentFilter;
+const _renderOrig = renderPlaylist;
+renderPlaylist = function() {
+  const tbody = document.getElementById('playlist-body');
+  if (!tbody) return;
+  let data;
+  if (currentFilter === 'all') {
+    data = PLAYLIST;
+  } else if (currentFilter === '_edm') {
+    data = PLAYLIST.filter(t => ['dnb','electronic','phonk'].includes(t.genre));
+  } else if (currentFilter === '_other') {
+    data = PLAYLIST.filter(t => ['classical','hiphop','traditional'].includes(t.genre));
+  } else {
+    data = PLAYLIST.filter(t => t.genre === currentFilter);
+  }
+  data = [...data].sort((a, b) => {
+    const va = a[currentSort.key] || '';
+    const vb = b[currentSort.key] || '';
+    const cmp = typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb));
+    return currentSort.asc ? cmp : -cmp;
+  });
+  const HISTORY_LINKS = {
+    'Koji Kondo': 'koji-kondo', 'Nobuo Uematsu': 'uematsu-ff', 'Yasunori Mitsuda': 'mitsuda-ct',
+    'Michiru Yamane': 'yamane-sotn', 'Shoji Meguro': 'meguro-p5', 'Toby Fox': 'toby-fox',
+    'Kevin Saunderson (Reese)': 'reese', 'Kraftwerk': 'kraftwerk', 'Steve Reich': 'reich-phasing',
+    'Brian Eno': 'eno-generative', 'Bob Moog': 'moog', 'Pierre Schaeffer': 'musique-concrete',
+    'Charlie Parker': 'charlie-parker', 'Miles Davis': 'kind-of-blue'
+  };
+  const LESSON_LINKS = {
+    'L0': 'edm-0-first-noise.html', 'L1': 'edm-1-the-break.html', 'L2': 'edm-2-the-bass.html',
+    'L3': 'edm-3-layers.html', 'L4a': 'edm-4-atmosphere.html', 'L4c': 'edm-4-atmosphere.html',
+    'L5': 'edm-5-movement.html', 'L6': 'edm-6-the-drop.html', 'L7': 'edm-7-chopping.html',
+    'L8a': 'edm-8a-the-scale.html', 'L8b': 'edm-8b-modes.html', 'L8c': 'edm-8c-melody-over-changes.html',
+    'L8d': 'edm-8d-intervals.html', 'L8e': 'edm-8e-non-chord-tones.html',
+    'L9a': 'edm-9a-diatonic-harmony.html', 'L9b': 'edm-9b-ii-v-i.html', 'L9c': 'edm-9c-the-monster.html',
+    'L9d': 'edm-9d-cadences-form.html', 'L9e': 'edm-9e-texture.html', 'L9f': 'edm-9f-melodic-development.html'
+  };
+  const spSvg = '<svg width="14" height="14" viewBox="0 0 24 24" style="vertical-align:-2px;"><circle cx="12" cy="12" r="12" fill="#1DB954"/><path d="M17.9 10.9C14.7 9 9.4 8.6 6.6 9.5c-.5.2-1-.2-1.1-.7-.2-.5.2-1 .7-1.1 3.3-1 8.9-.6 12.4 1.5.4.3.6.8.3 1.3-.2.4-.8.5-1 .4zM17.8 13.7c-.3.4-.8.5-1.2.3-2.7-1.7-6.8-2.2-10-1.2-.4.1-.9-.1-1-.5s.1-.9.5-1c3.7-1.1 8.3-.6 11.4 1.4.4.2.5.8.3 1zM16.6 16.5c-.2.3-.6.4-1 .2-2.4-1.4-5.3-1.8-8.8-.9-.3.1-.7-.1-.8-.4-.1-.3.1-.7.4-.8 3.8-.9 7.1-.5 9.8 1.1.4.2.5.6.4.8z" fill="white"/></svg>';
+  const ytSvg = '<svg width="16" height="12" viewBox="0 0 24 17" style="vertical-align:-2px;"><rect width="24" height="17" rx="4" fill="#FF0000"/><polygon points="10,3.5 10,13.5 18,8.5" fill="white"/></svg>';
+  tbody.innerHTML = data.map(t => {
+    const gc = GENRE_COLORS[t.genre] || 'var(--text-dim)';
+    const links = [];
+    if (t.spotify) {
+        const urls = t.spotify.split('|');
+        if (urls.length === 1) {
+            links.push(`<a href="${urls[0]}" target="_blank" title="Spotify" style="text-decoration:none;">${spSvg}</a>`);
+        } else {
+            urls.forEach((u, i) => links.push(`<a href="${u}" target="_blank" title="Spotify ${i+1}" style="text-decoration:none;font-size:0.55rem;color:var(--text-faint);">${spSvg}<sub>${i+1}</sub></a>`));
+        }
+    }
+    if (t.youtube) {
+        const urls = t.youtube.split('|');
+        if (urls.length === 1) {
+            links.push(`<a href="${urls[0]}" target="_blank" title="YouTube" style="text-decoration:none;">${ytSvg}</a>`);
+        } else {
+            urls.forEach((u, i) => links.push(`<a href="${u}" target="_blank" title="YouTube ${i+1}" style="text-decoration:none;font-size:0.55rem;color:var(--text-faint);">${ytSvg}<sub>${i+1}</sub></a>`));
+        }
+    }
+    const histId = HISTORY_LINKS[t.artist];
+    const artistHtml = histId
+      ? `<a href="history.html" style="color: var(--text); text-decoration: none; border-bottom: 1px dotted var(--text-faint);" title="View on timeline">${t.artist}</a>`
+      : t.artist;
+    const lessonFile = LESSON_LINKS[t.lesson];
+    const lessonHtml = lessonFile
+      ? `<a href="${lessonFile}" style="color: var(--accent); text-decoration: none;">${t.lesson}</a>`
+      : `<span>${t.lesson}</span>`;
+    return `<tr style="border-bottom: 1px solid #111115;">
+      <td style="padding: 0.4rem 0.5rem; color: var(--text);">${artistHtml}</td>
+      <td style="padding: 0.4rem 0.5rem; color: var(--text-dim);">${t.track}</td>
+      <td style="padding: 0.4rem 0.5rem; font-family: 'SF Mono', monospace; font-size: 0.75rem; color: var(--text-faint);">${t.year || '\u2014'}</td>
+      <td style="padding: 0.4rem 0.5rem;"><span style="color: ${gc}; font-family: 'SF Mono', monospace; font-size: 0.65rem; letter-spacing: 0.04em;">${t.genre}</span> <span style="color: var(--text-faint); font-size: 0.6rem;">${t.subgenre}</span></td>
+      <td style="padding: 0.4rem 0.5rem; font-family: 'SF Mono', monospace; font-size: 0.7rem;">${lessonHtml}</td>
+      <td style="padding: 0.4rem 0.5rem; white-space: nowrap;">${links.length ? links.join(' ') : '<span style="color: var(--text-faint); font-size: 0.6rem;">\u2014</span>'}</td>
+    </tr>`;
+  }).join('');
+};
 
 renderPlaylist();
 </script>
