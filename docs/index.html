@@ -1028,7 +1028,7 @@ details.syl-detail[open] summary { border-bottom: 1px solid var(--divider); padd
 <!-- PLAYLIST -->
 <div class="tab-content" id="tab-playlist">
 
-<p class="syllabus-intro">Every track referenced across the curriculum. Game soundtracks, electronic, DnB, hip-hop, jazz. Links go to <svg width="12" height="12" viewBox="0 0 24 24" style="vertical-align:-1px;"><circle cx="12" cy="12" r="12" fill="#1DB954"/><path d="M17.9 10.9C14.7 9 9.4 8.6 6.6 9.5c-.5.2-1-.2-1.1-.7-.2-.5.2-1 .7-1.1 3.3-1 8.9-.6 12.4 1.5.4.3.6.8.3 1.3-.2.4-.8.5-1 .4zM17.8 13.7c-.3.4-.8.5-1.2.3-2.7-1.7-6.8-2.2-10-1.2-.4.1-.9-.1-1-.5s.1-.9.5-1c3.7-1.1 8.3-.6 11.4 1.4.4.2.5.8.3 1zM16.6 16.5c-.2.3-.6.4-1 .2-2.4-1.4-5.3-1.8-8.8-.9-.3.1-.7-.1-.8-.4-.1-.3.1-.7.4-.8 3.8-.9 7.1-.5 9.8 1.1.4.2.5.6.4.8z" fill="white"/></svg> Spotify or <svg width="14" height="10" viewBox="0 0 24 17" style="vertical-align:-1px;"><rect width="24" height="17" rx="4" fill="#FF0000"/><polygon points="10,3.5 10,13.5 18,8.5" fill="white"/></svg> YouTube.</p>
+<p class="syllabus-intro">Every track referenced in the curriculum. Links go to <svg width="12" height="12" viewBox="0 0 24 24" style="vertical-align:-1px;"><circle cx="12" cy="12" r="12" fill="#1DB954"/><path d="M17.9 10.9C14.7 9 9.4 8.6 6.6 9.5c-.5.2-1-.2-1.1-.7-.2-.5.2-1 .7-1.1 3.3-1 8.9-.6 12.4 1.5.4.3.6.8.3 1.3-.2.4-.8.5-1 .4zM17.8 13.7c-.3.4-.8.5-1.2.3-2.7-1.7-6.8-2.2-10-1.2-.4.1-.9-.1-1-.5s.1-.9.5-1c3.7-1.1 8.3-.6 11.4 1.4.4.2.5.8.3 1zM16.6 16.5c-.2.3-.6.4-1 .2-2.4-1.4-5.3-1.8-8.8-.9-.3.1-.7-.1-.8-.4-.1-.3.1-.7.4-.8 3.8-.9 7.1-.5 9.8 1.1.4.2.5.6.4.8z" fill="white"/></svg> Spotify or <svg width="14" height="10" viewBox="0 0 24 17" style="vertical-align:-1px;"><rect width="24" height="17" rx="4" fill="#FF0000"/><polygon points="10,3.5 10,13.5 18,8.5" fill="white"/></svg> YouTube.</p>
 
 <!-- Playlist subtabs -->
 <div style="display: flex; gap: 0; margin-bottom: 1.5rem; border-bottom: 1px solid var(--divider);">
@@ -1036,6 +1036,13 @@ details.syl-detail[open] summary { border-bottom: 1px solid var(--divider); padd
     <button class="tab" onclick="showPlaylistView('game', this)" style="font-size:0.6rem; padding:0.5rem 1rem;">Game Music</button>
     <button class="tab" onclick="showPlaylistView('edm', this)" style="font-size:0.6rem; padding:0.5rem 1rem;">EDM / Phonk</button>
     <button class="tab" onclick="showPlaylistView('other', this)" style="font-size:0.6rem; padding:0.5rem 1rem;">Jazz / Classical</button>
+</div>
+
+<!-- Spotify embed placeholder for All Tracks -->
+<div id="playlist-embed-all" style="margin-bottom: 1.5rem; display: block;">
+    <div style="padding:2rem; background:var(--surface); border:1px dashed var(--divider); border-radius:12px; text-align:center;">
+        <p style="font-family:'SF Mono',monospace; font-size:0.65rem; color:var(--text-faint); letter-spacing:0.06em;">Full curriculum Spotify playlist coming soon</p>
+    </div>
 </div>
 
 <!-- Spotify embed (shown only for Game Music subtab) -->
@@ -1048,6 +1055,13 @@ details.syl-detail[open] summary { border-bottom: 1px solid var(--divider); padd
 <div id="playlist-embed-edm" style="margin-bottom: 1.5rem; display: none;">
     <div style="padding:2rem; background:var(--surface); border:1px dashed var(--divider); border-radius:12px; text-align:center;">
         <p style="font-family:'SF Mono',monospace; font-size:0.65rem; color:var(--text-faint); letter-spacing:0.06em;">EDM / Phonk Spotify playlist coming soon</p>
+    </div>
+</div>
+
+<!-- Spotify embed placeholder for Jazz/Classical -->
+<div id="playlist-embed-other" style="margin-bottom: 1.5rem; display: none;">
+    <div style="padding:2rem; background:var(--surface); border:1px dashed var(--divider); border-radius:12px; text-align:center;">
+        <p style="font-family:'SF Mono',monospace; font-size:0.65rem; color:var(--text-faint); letter-spacing:0.06em;">Jazz / Classical Spotify playlist coming soon</p>
     </div>
 </div>
 
@@ -1248,7 +1262,7 @@ const GENRE_COLORS = {
   hiphop: 'var(--green)', phonk: '#e57373', classical: '#ffb74d', traditional: '#81c784'
 };
 
-let currentSort = { key: 'lesson', asc: true };
+let currentSort = { key: 'year', asc: true };
 let currentFilter = 'all';
 
 function renderPlaylist() {
@@ -1343,8 +1357,10 @@ function showPlaylistView(view, btn) {
   btn.parentElement.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   btn.classList.add('active');
   // Show/hide embeds
+  document.getElementById('playlist-embed-all').style.display = view === 'all' ? 'block' : 'none';
   document.getElementById('playlist-embed-game').style.display = view === 'game' ? 'block' : 'none';
   document.getElementById('playlist-embed-edm').style.display = view === 'edm' ? 'block' : 'none';
+  document.getElementById('playlist-embed-other').style.display = view === 'other' ? 'block' : 'none';
   // Show/hide genre filter chips (only for "all" view)
   document.getElementById('playlist-genre-filters').style.display = view === 'all' ? 'flex' : 'none';
   // Set filter based on view
